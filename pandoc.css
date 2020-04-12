@@ -1,0 +1,155 @@
+body {
+    background-color: #fffaf0;
+}
+
+:root {
+    --font-family: iosevka, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Fira Sans, Droid Sans,
+        Helvetica Neue, sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+* {
+    /* font-family: var(--font-family); */
+    color: #172b4d;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+li,
+code,
+table {
+    font-family: var(--font-family);
+}
+
+tr,
+th {
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+}
+
+.important {
+    border-bottom: 2px solid salmon;
+    box-sizing: border-box;
+}
+
+.center-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.shift-level-1 {
+    margin-left: 2em;
+}
+
+.shift-level-2 {
+    margin-left: 4em;
+}
+
+.shift-level-3 {
+    margin-left: 6em;
+}
+
+.shift-level-4 {
+    margin-left: 8em;
+}
+
+.shift-level-5 {
+    margin-left: 10m;
+}
+
+.shift-level-6 {
+    margin-left: 12em;
+}
+
+body {
+    padding: 0.5em;
+}
+
+p {
+    margin: 0.5em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    padding-left: 0.5rem;
+    border-left: 0.25em solid salmon;
+}
+
+h1 {
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 500;
+    text-transform: none;
+    color: #172b4d;
+}
+
+h2 {
+    font-weight: 500;
+    text-transform: none;
+    font-size: 20px;
+    line-height: 1.5;
+    color: #172b4d;
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.25;
+    text-transform: none;
+    color: #172b4d;
+}
+
+h4 {
+    font-size: 14px;
+    line-height: 1.42857143;
+    font-weight: 600;
+    text-transform: none;
+    color: #172b4d;
+}
+
+h5 {
+    color: #172b4d;
+    font-weight: 600;
+    text-transform: none;
+    font-size: 12px;
+    line-height: 1.66666667;
+}
+
+h6 {
+    font-size: 12px;
+    line-height: 1.66666667;
+    color: #6b778c;
+    font-weight: 600;
+    text-transform: none;
+}
+
+cite {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #172b4d;
+    font-style: italic;
+}
+
+bq {
+    box-sizing: border-box;
+    border-left: 0.25em solid #dfe1e6;
+    color: #7a869a;
+    margin-left: 1em;
+    padding-left: 1em;
+}

@@ -13,6 +13,14 @@ body {
     /* font-family: var(--font-family); */
     color: #172b4d;
 }
+ul {
+    list-style-type: none;
+    padding-left: 2em;
+}
+
+li::before {
+    content: '- ';
+}
 
 h1,
 h2,

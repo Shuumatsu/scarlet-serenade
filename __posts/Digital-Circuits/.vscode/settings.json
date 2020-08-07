@@ -1,0 +1,10 @@
+{
+  "filewatcher.commands": [
+    {
+      "match": "\\.md*",
+      "isAsync": true,
+      "cmd": "pandoc --wrap=preserve --mathjax --css ${workspaceRoot}\\pandoc.css ${file}  --metadata title=\"${fileBasenameNoExt}\" -o ${fileDirname}\\${fileBasenameNoExt}.html -s --self-contained",
+      "event": "onFileChange"
+    }
+  ]
+}

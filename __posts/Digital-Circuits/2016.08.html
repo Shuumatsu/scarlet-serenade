@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>2016.08</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <style type="text/css">body {
+font-family: Iosevka, "微软雅黑", inconsolata, dm, Consolas;
+}
+h1 {
+text-align: left;
+}
+</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">2016.08</h1>
+</header>
+<ol type="1">
+<li><p>implement a D-flip-flop</p></li>
+<li><p>just wire input d and output q’ together</p></li>
+<li></li>
+</ol>
+<p>suppose <code>cmp(a, b) = 1 =&gt; a &lt;= b</code></p>
+<p>implement 4-bit D-flip-flop (4DFF) module using the 1-bit D-flip-flop we implemented in part-1
+this is trivial</p>
+<p>implement an 1-bit swap module =&gt; implement a 4-bit swap module (4SWAP) =&gt; implement a 4-compare &amp; swap module (4CMP&amp;SWAP)
+this is trivial</p>
+<p>8 4DFFs are used as an array.</p>
+<p>determine which pairs to compare &amp; swap (using 4CMP&amp;SWAP) based on ALT we implemented in part-2
+(pair values are from outputs of DFFs
+- if output of ALT is 1 then we compare&amp;swap <code>[(i, i + 1) | i &lt;- [0, 2, 4, 6]]</code> else we compare&amp;swap <code>[(i, i + 1) | i &lt;- [1, 3, 5]]</code>
+(this can be achieved using a 2-to-1 MUX</p>
+<p>input of each 4DFF maybe from two types of sources, use a a 2-to-1 MUX with L being the <code>sel</code> input
+1. inputs from outside
+2. 4CMP&amp;SWAPs
+each value will compare with either the value before it or after it, so also use a 2-to-1 MUX, with output of ALT being the <code>sel</code> input</p>
+<p>V is 1 iff the array is sorted, so let V be AND of all CMP</p>
+</body>
+</html>

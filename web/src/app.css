@@ -1,0 +1,62 @@
+/* app.css */
+:root {
+    --font-family: iosevka, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Fira Sans, Droid Sans,
+        Helvetica Neue, sans-serif;
+}
+
+* {
+    color: #172b4d;
+    font-weight: 400;
+    font-size: 14px;
+    font-family: var(--font-family);
+    color: #172b4d;
+}
+
+body {
+    padding: 0.5em;
+}
+
+p {
+    margin: 0.5em;
+}
+
+[indent="1"] {
+    margin-left: 2em;
+}
+[indent="2"] {
+    margin-left: 4em;
+}
+[indent="3"] {
+    margin-left: 6em;
+}
+[indent="4"] {
+    margin-left: 8em;
+}
+[indent="5"] {
+    margin-left: 10em;
+}
+[indent="6"] {
+    margin-left: 12em;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+h1,h2,h3 {
+    display: block;
+    padding-bottom: 5px;
+    font-family: Arvo, Monaco, serif;
+    line-height: 1.3;
+    font-weight: normal;
+}
+
+.center-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-text {
+    text-align: center;
+}

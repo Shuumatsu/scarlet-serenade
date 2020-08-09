@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Prs (pDocument, pText) where
@@ -9,6 +10,7 @@ import Control.Monad.Combinators
 import Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.Text as T
 import Data.Text (Text)
+import GHC.Natural
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -45,33 +47,41 @@ parens = between (symbol "(") (char ')')
 
 -- | sentence
 pInlineCode :: Parser SentenceComponent
-pInlineCode = dbg "inline_code" (lexeme p) <?> "inline_code"
+pInlineCode = lexeme p <?> "inline_code"
   where
     content = manyTill anySingle (symbol "`")
     p = SCode . T.pack <$> (symbol "`" *> content)
 
 pInlineEquation :: Parser SentenceComponent
-pInlineEquation = dbg "inline_equation" (lexeme p) <?> "inline_equation"
+pInlineEquation = lexeme p <?> "inline_equation"
   where
     content = manyTill anySingle (symbol "$")
     p = SEquation . T.pack <$> (symbol "$" *> content)
 
+pBoldText :: Parser SentenceComponent
+pBoldText = lexeme p <?> "inline_equation"
+  where
+    content = manyTill anySingle (symbol "**")
+    p = SBold . T.pack <$> (symbol "**" *> content)
+
 pText :: Parser SentenceComponent
-pText = SText . T.pack <$> some p
+pText = lexeme $ SText . T.pack <$> some p
   where
     p = do
       (e, r) <- (,) <$> lookAhead (optional eol) <*> lookAhead (count' 1 10 anySingle)
       case (e, r) of
         (Just _, _) -> unexpected (Tokens (head r :| []))
         (Nothing, c : r') | c == '`' || c == '$' -> unexpected (Tokens (head r :| []))
+        (Nothing, '*' : '*' : r') -> unexpected (Tokens (head r :| []))
+        (Nothing, '\\' : c : r') -> c <$ skipCount (length r - length r') anySingle
         (Nothing, c : r') -> c <$ skipCount (length r - length r') anySingle
 
-pSentence :: Parser Ast
-pSentence = L.lexeme pscn $ Sentence <$> some (pText <|> pInlineCode <|> pInlineEquation)
+pSentence :: Parser Element
+pSentence = L.lexeme pscn $ Sentence <$> some (pBoldText <|> pInlineCode <|> pInlineEquation <|> pText)
 
 -- | block
-pBlockCode :: Parser Ast
-pBlockCode = dbg "block_code" (L.lexeme pscn p) <?> "block_code"
+pBlockCode :: Parser Element
+pBlockCode = L.lexeme pscn p <?> "block_code"
   where
     content = many $ do
       r <- lookAhead (count' 1 10 anySingle)
@@ -80,8 +90,8 @@ pBlockCode = dbg "block_code" (L.lexeme pscn p) <?> "block_code"
         c : r' -> c <$ skipCount (length r - length r') anySingle
     p = Code . T.pack <$> between (symbol "```") (symbol "```") content
 
-pBlockEquation :: Parser Ast
-pBlockEquation = dbg "block_equation" (L.lexeme pscn p) <?> "block_equation"
+pBlockEquation :: Parser Element
+pBlockEquation = L.lexeme pscn p <?> "block_equation"
   where
     content = many $ do
       r <- lookAhead (count' 1 10 anySingle)
@@ -92,35 +102,41 @@ pBlockEquation = dbg "block_equation" (L.lexeme pscn p) <?> "block_equation"
 
 -- | component
 pClassnames :: Parser Classnames
-pClassnames = dbg "classnames" p <?> "classnames"
+pClassnames = p <?> "classnames"
   where
     p = Classnames . (maybe [] id) <$> optional (char '.' >> sepBy1 pIdent (char ','))
 
 pAttrs :: Parser Attrs
-pAttrs = dbg "attrs" p <?> "attrs"
+pAttrs = p <?> "attrs"
   where
     pAttr = (,) <$> pIdent <* string "=" <*> pStringLiteral
     p = Attrs . (maybe [] id) <$> (optional . parens) (sepBy1 pAttr (symbol ","))
 
-pComponent :: Parser Ast
-pComponent = dbg "component" (L.lexeme pscn p) <?> "component"
+pComponent :: Parser Element
+pComponent = L.lexeme pscn p <?> "component"
   where
     meta = lexeme $ (,,) <$> (char ':' *> pIdent) <*> pClassnames <*> pAttrs
-    inline = dbg "inline" $ do
+    inline = do
       (tag, classnames, attrs) <- meta
-      Component tag classnames attrs . Document . pure <$> pSentence
-    block = dbg "block" $ L.indentBlock pscn $ do
+      Component tag classnames attrs . Document . pure . (0,) <$> pSentence
+    block = L.indentBlock pscn $ do
       (tag, classnames, attrs) <- meta
-      pure $ L.IndentMany Nothing (pure . Component tag classnames attrs . Document) pElement
+      pure $ L.IndentMany Nothing (pure . Component tag classnames attrs . Document) pAtom
     p = try inline <|> block
 
 -- | element
-pElement :: Parser Ast
-pElement = dbg "element" p <?> "element"
+pElement :: Parser Element
+pElement = L.lexeme pscn p <?> "element"
   where
     p = pComponent <|> pBlockCode <|> pBlockEquation <|> pSentence
 
-pDocument :: Parser Document
-pDocument = dbg "document" $ Document <$> p <* eof
+-- | atom
+pAtom :: Parser (Natural, Element)
+pAtom = (,) <$> pIndent <*> pElement
   where
-    p = many . L.lexeme pscn $ L.nonIndented pscn pElement
+    pIndent = intToNatural . length <$> lexeme (many (char '-'))
+
+pDocument :: Parser Document
+pDocument = Document <$> p <* eof <?> "document"
+  where
+    p = L.lexeme pscn $ many (L.nonIndented pscn pAtom)

@@ -1,0 +1,25 @@
+**intros**
+- intros 从目标中按照顺序引入假设。每一次它会消耗 forall 里面的一个自由变量，或者是一个 -> 前面的命题（也就是前提条件）
+```
+Theorem Transform_transform:
+  forall c1 c2,
+    Transform c1 c2 ->
+    transform c1 = c2.
+```
+intros c1 c2 H. 之后：
+```
+c1, c2 : cmd
+H : Transform c1 c2
+______________________________________(1/1)
+transform c1 = c2
+```
+另外，你也可以用 intros. 来引入所有的假设，Coq 会自动给他们命名。
+
+**simpl** 
+
+**reflexivity**
+当目标类似 x = x 的形式，使用 reflexivity. 就能结束证明。
+
+
+
+:bq https://zhuanlan.zhihu.com/p/54164515

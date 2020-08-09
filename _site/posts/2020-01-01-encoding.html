@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Hakyll Blog - 2020-01-01-encoding</title>
+    <link rel="stylesheet" href="../web/static/main.css" />
+    <script src="../web/static/main.bundle.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="../">My Hakyll Blog</a>
+        </div>
+        <nav>
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+        </nav>
+    </header>
+
+    <main role="main">
+        <h1>2020-01-01-encoding</h1>
+        <article>
+    <section class="header">
+        
+    </section>
+    <section>
+        <h3 id="encoding-boolean">Encoding Boolean</h3>
+<p><code>let cond p a b = if p then a else b</code> 是常见的 boolean 操作，我们从这个方法下手。可以看出如果将 <code>a b</code> 看作一个 tuple 那么 <code>p</code> 就像一个一个从 tuple 中取值的函数。<code>true</code> 为取第一个元素，<code>false</code> 为第二个。 容易写出函数表达的 boolean:</p>
+<pre><code>let true' a b = a
+
+let false' a b = b
+
+let and' a b = a b false'
+
+let or' a b = a true' b</code></pre>
+<pre><code>COND == λp.λa.λb.p a b
+TRUE == λx.λy.x
+FALSE == λx.λy.y
+
+AND == λa.λb.a b FALSE
+OR == λa.λb.a TRUE b</code></pre>
+<h3 id="encoding-lisp-style-lists">Encoding LISP-style lists</h3>
+<p>从 <code>car</code> 与 <code>cdr</code> 入手，The way we’ll define a non-nil list is as a function that “stores” the head and tail of the list in its body. Its argument will be a selector function (head or tail).</p>
+<pre><code>&lt;!-- type list = λs.s h t --&gt;
+car = λl.l (λh.λt.h) = λl.l true
+cdr = λl.l (λh.λt.t) = λl.l false
+
+is_empty = λl.l (λh.λt.false)
+nil = λs.true
+
+CONS = λh.λt.(λs.s h t)</code></pre>
+<h3 id="encoding-natural-numbers">Encoding Natural Numbers</h3>
+<h4 id="可以用-list-来实现">可以用 list 来实现</h4>
+<pre><code>ISZERO == ISEMPTY
+PRED == TAIL
+SUCC is a function that adds one more element onto a given list, so: SUCC == λL.CONS x L</code></pre>
+<h4 id="根据函数-apply-的次数来实现">根据函数 apply 的次数来实现</h4>
+<pre><code>n = λx.λy.x^n y
+
+0	==	λx.λy.y
+1	==	λx.λy.xy
+2	==	λx.λy.x(xy)
+3	==	λx.λy.x(x(xy))
+etc.</code></pre>
+<pre><code>ISZERO = λf.f(λx.FALSE)TRUE
+n != 0 即 x 一旦 apply 就返回 falses，那么 let `x` be `λx.FALSE`
+n == 0 即 y 直接返回就返回 true，那么 let `y` be `True`</code></pre>
+<p><br /><span class="math display">(SUCC(<em>λ</em><em>x</em>.<em>λ</em><em>y</em>.<em>x</em><sup><em>n</em></sup><em>y</em>))→<sub><em>β</em></sub>(<em>λ</em><em>x</em>.<em>λ</em><em>y</em>.<em>x</em><sup><em>n</em> + 1</sup><em>y</em>)</span><br /></p>
+<p>那么需要接受一个数返回另一个数，即接受一个接受两个参数的函数返回一个接受两个参数的函数。区别在于第二个函数的第一个参数多 apply 一次，但是我们无法改变参数函数的 function body，不妨在 apply 到函数之前，先让 x apply y 一次。 <code>SUCC == λa.(λx.λy.a x (xy))</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">module</span> <span class="kw">type</span> ChurchNumber = <span class="kw">sig</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>  <span class="co">(* in untyped lambda calculus, we can use a generic type instead of bool *)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  <span class="co">(* we use bool here because of is_zero *)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  <span class="kw">type</span> t = (<span class="dt">bool</span> -&gt; <span class="dt">bool</span>) -&gt; <span class="dt">bool</span> -&gt; <span class="dt">bool</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  <span class="kw">val</span> zero : t</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>  <span class="kw">val</span> one : t</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>  <span class="kw">val</span> two : t</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>  <span class="kw">val</span> is_zero : t -&gt; <span class="dt">bool</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>  <span class="kw">val</span> add : t -&gt; t -&gt; t</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>  <span class="kw">val</span> mult : t -&gt; t -&gt; t</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a><span class="kw">module</span> ChurchNumber : ChurchNumber = <span class="kw">struct</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a>  <span class="kw">type</span> t = (<span class="dt">bool</span> -&gt; <span class="dt">bool</span>) -&gt; <span class="dt">bool</span> -&gt; <span class="dt">bool</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a>  <span class="kw">let</span> zero f b = b</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a>  <span class="kw">let</span> one f b = f (f b)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true"></a>  <span class="kw">let</span> two f b = f (f (f b))</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true"></a>  <span class="kw">let</span> is_zero n = n (<span class="kw">fun</span> _ -&gt; <span class="kw">false</span>) <span class="kw">true</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true"></a></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true"></a>  <span class="kw">let</span> add x y f b = x f (y f b)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true"></a>  <span class="kw">let</span> mult x y f b = x (y f) b</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+    </section>
+</article>
+    </main>
+
+    <footer>
+        Site proudly generated by
+        <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+</body>
+
+</html>

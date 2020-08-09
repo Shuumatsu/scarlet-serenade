@@ -1,14 +1,14 @@
-name:                ryokou
-version:             0.1.0.0
-github:              "githubuser/ryokou"
-license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2020 Author name here"
+name: ryokou
+version: 0.1.0.0
+github: 'githubuser/ryokou'
+license: BSD3
+author: 'Author name here'
+maintainer: 'example@example.com'
+copyright: '2020 Author name here'
 
 extra-source-files:
-- README.md
-- ChangeLog.md
+    - README.md
+    - ChangeLog.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -17,36 +17,38 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/ryokou#readme>
+description: Please see the README on GitHub at <https://github.com/githubuser/ryokou#readme>
 
 dependencies:
-- base >= 4.7 && < 5
-- hakyll >= 4.13.4.0 && < 5
-- megaparsec >= 8.0.0 && < 9
-- text >= 1.2.4.0 && < 2
-- parser-combinators >= 1.2.1 && < 2
+    - base >= 4.7 && < 5
+    - hakyll >= 4.13.4.0 && < 5
+    - megaparsec >= 8.0.0 && < 9
+    - text >= 1.2.4.0 && < 2
+    - parser-combinators >= 1.2.1 && < 2
+    - blaze-html >= 0.9.1.2 && < 1
+    - blaze-markup >= 0.8.2.3 && < 1
 
 library:
-  source-dirs: src
+    source-dirs: src
 
 executables:
-  ryokou-exe:
-    main:                Main.hs
-    source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - ryokou
+    ryokou-exe:
+        main: Main.hs
+        source-dirs: app
+        ghc-options:
+            - -threaded
+            - -rtsopts
+            - -with-rtsopts=-N
+        dependencies:
+            - ryokou
 
 tests:
-  ryokou-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - ryokou
+    ryokou-test:
+        main: Spec.hs
+        source-dirs: test
+        ghc-options:
+            - -threaded
+            - -rtsopts
+            - -with-rtsopts=-N
+        dependencies:
+            - ryokou

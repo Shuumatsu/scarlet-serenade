@@ -1,0 +1,4 @@
+An indexed type family in type theory is a partial function at the type level. Applying the function to parameters (called type indices) yields a type. 
+
+
+https://wiki.haskell.org/GHC/Type_families

@@ -1,0 +1,21 @@
+A proof is a logical sequence of arguments, starting from some initial assumptions
+
+Foundations
+– Functional programming
+– Constructive logic
+– Logical foundations
+– Proof techniques for inductive definitions
+
+Semantics
+– Operational semantics
+– Modeling imperative “While” programs
+– Hoare logic for reasoning about program correctness
+
+Type Systems
+– Simply typed l-calculus
+– Type safety
+– Subtyping
+– Dependently-typed programming
+
+Coq interactive theorem prover
+– turns doing proofs & logic into programming fun!

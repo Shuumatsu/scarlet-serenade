@@ -1,0 +1,26 @@
+`data CompilerRead` environment in which a compiler runs
+
+`data CompilerWrite` contains dependencies and cache hit counts
+- instance of Monoid: add deps & counts 
+
+`data CompilerResult a` 
+- `CompilerDone` contains result and `CompilerWrite`
+- `CompilerSnapshot`
+
+`newtype Compiler a` take an environment and returns an IO result
+- instance of Functor
+-- case `CompilerDone`: map result
+
+- instance of Applicative
+-- case `CompilerDone`: Applicative version of fmap
+
+- instance of Monad 
+-- case `CompilerDone`: new result & mappend deps
+
+- instance of Alternative
+-- empty = error result
+-- <|> 
+
+
+
+

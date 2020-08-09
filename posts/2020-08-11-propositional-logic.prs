@@ -1,0 +1,7 @@
+如果 $\Gamma, \Delta$ 是有限的公式集合，则， $\Gamma \vdash \Delta$ ，称为一个序贯（sequent）。
+其中， $\Gamma$ 称为序贯的前提（antecedent）， $\Delta$ 称为序贯的结论（succedent）。
+它表示，如果公式集 $\Gamma$ 都成立，那么 $\Delta$ 中至少有一个成立。
+
+如果 [公式] 中总是只包含一个公式，则称该演绎系统为自然演绎系统（natural deduction system）。
+
+如果证明过程中，每一行断言是一个序贯，这种风格的演绎系统，称为具有 Gentzen-style。

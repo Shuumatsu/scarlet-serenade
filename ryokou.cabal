@@ -27,12 +27,15 @@ library
   exposed-modules:
       Ast
       Prs
+      PrsCompiler
   other-modules:
       Paths_ryokou
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , blaze-html >=0.9.1.2 && <1
+    , blaze-markup >=0.8.2.3 && <1
     , hakyll >=4.13.4.0 && <5
     , megaparsec >=8.0.0 && <9
     , parser-combinators >=1.2.1 && <2
@@ -48,6 +51,8 @@ executable ryokou-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , blaze-html >=0.9.1.2 && <1
+    , blaze-markup >=0.8.2.3 && <1
     , hakyll >=4.13.4.0 && <5
     , megaparsec >=8.0.0 && <9
     , parser-combinators >=1.2.1 && <2
@@ -65,6 +70,8 @@ test-suite ryokou-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , blaze-html >=0.9.1.2 && <1
+    , blaze-markup >=0.8.2.3 && <1
     , hakyll >=4.13.4.0 && <5
     , megaparsec >=8.0.0 && <9
     , parser-combinators >=1.2.1 && <2

@@ -1,0 +1,17 @@
+`data Identifier` contains version and path 
+
+`data RoutesRead` contains provider and underlying identifer
+
+`runRoutes` takes in a routese, a provider and an identifier
+- `unRoutes routes (RoutesRead provider identifier) identifier`
+
+`customRoute` takes in a function which matches identifier to path, and the returned routes will ignore `RoutesRead` fed in when running
+
+`newtype Routes` takse in a `RoutesRead` and an identifier return an `IO (Maybe FilePath, UsedMetadata)`
+- instance of Semigroup 
+-- if the result is nothing then use the second 
+
+- instance of Monoid 
+-- mempty = pure (Nothing, False)
+
+`data Provider` contains directory

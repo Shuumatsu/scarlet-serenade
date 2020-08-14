@@ -16,7 +16,6 @@ export class CodeSnippet extends LitElement {
     slotchange = (event: Event) => {
         const slot = this.shadowRoot?.querySelector('slot')
         const code = slot?.assignedNodes()[0].textContent
-        console.log(code)
         if (code) this.rendered = hljs.highlightAuto(code).value
     }
 

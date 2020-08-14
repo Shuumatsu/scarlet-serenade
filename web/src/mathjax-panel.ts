@@ -3,9 +3,7 @@ import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
 import { styleMap } from 'lit-html/directives/style-map'
 import katex from 'katex'
 import 'katex/dist/katex.css'
-import styles from 'raw-loader!katex/dist/katex.css'
-
-console.log(styles)
+import styles from '!!raw-loader!katex/dist/katex.css'
 
 @customElement('mathjax-panel')
 export class MathjaxPanel extends LitElement {
@@ -29,8 +27,8 @@ export class MathjaxPanel extends LitElement {
     }
 
     render() {
-        const rstyle = this.rendered ? "" : styleMap({ display: 'none' })
-        const pstyle = this.rendered ? styleMap({ display: 'none' }) : ""
+        const rstyle = this.rendered ? '' : styleMap({ display: 'none' })
+        const pstyle = this.rendered ? styleMap({ display: 'none' }) : ''
         if (this.block) {
             return html`
                 <div style=${rstyle}>${unsafeHTML(this.rendered)}</div>

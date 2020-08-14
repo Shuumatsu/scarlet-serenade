@@ -1,0 +1,31 @@
+DIGEST afd11c02043a2eae9385e38ca435249a
+FLF.Induction
+R167:172 LF.Basics <> <> lib
+prf 4235:4251 <> plus_n_O_firsttry
+R4264:4266 Coq.Init.Datatypes <> nat ind
+R4272:4274 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4271:4271 LF.Induction <> n var
+R4276:4278 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R4275:4275 LF.Induction <> n var
+prf 4818:4835 <> plus_n_O_secondtry
+R4848:4850 Coq.Init.Datatypes <> nat ind
+R4856:4858 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4855:4855 LF.Induction <> n var
+R4860:4862 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R4859:4859 LF.Induction <> n var
+prf 6141:6148 <> plus_n_O
+R6161:6163 Coq.Init.Datatypes <> nat ind
+R6167:6169 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6166:6166 LF.Induction <> n var
+R6171:6173 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R6170:6170 LF.Induction <> n var
+prf 7353:7362 <> minus_diag
+R7387:7389 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R7378:7382 Coq.Init.Peano <> minus syndef
+R7386:7386 LF.Induction <> n var
+R7384:7384 LF.Induction <> n var
+prf 7972:7979 <> mult_0_r
+R7992:7994 Coq.Init.Datatypes <> nat ind
+R8004:8006 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R8000:8002 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R7999:7999 LF.Induction <> n var

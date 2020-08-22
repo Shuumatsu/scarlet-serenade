@@ -29,6 +29,7 @@
         "eslint-plugin-lit": "^1.2.2",
         "file-loader": "^6.0.0",
         "html-webpack-plugin": "^4.3.0",
+        "lit-css-loader": "0.0.3",
         "mini-css-extract-plugin": "^0.9.0",
         "optimize-css-assets-webpack-plugin": "^5.0.3",
         "prettier": "^2.0.5",
@@ -41,7 +42,6 @@
         "webpack-cli": "^3.3.12"
     },
     "scripts": {
-        "start": "node script.js",
         "bundle-scripts": "webpack-cli --config ./webpack.prod.js",
         "watch-scripts": "webpack-cli -w --config ./webpack.dev.js"
     }

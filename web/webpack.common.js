@@ -26,10 +26,10 @@ const configs = {
                         loader: 'file-loader',
                         options: {
                             name: '[name].[ext]',
-                            outputPath: 'fonts/'
-                        }
-                    }
-                ]
+                            outputPath: '/web/static',
+                        },
+                    },
+                ],
             },
         ],
     },

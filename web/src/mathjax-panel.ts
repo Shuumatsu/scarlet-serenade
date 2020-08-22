@@ -1,9 +1,10 @@
-import { LitElement, html, property, customElement, unsafeCSS } from 'lit-element'
-import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
-import { styleMap } from 'lit-html/directives/style-map'
+import style from '!!lit-css-loader!katex/dist/katex.css'
 import katex from 'katex'
+// https://github.com/Polymer/lit-element/issues/1053#issuecomment-677973159
 import 'katex/dist/katex.css'
-import styles from '!!raw-loader!katex/dist/katex.css'
+import { customElement, html, LitElement, property } from 'lit-element'
+import { styleMap } from 'lit-html/directives/style-map'
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
 
 @customElement('mathjax-panel')
 export class MathjaxPanel extends LitElement {
@@ -11,7 +12,7 @@ export class MathjaxPanel extends LitElement {
     @property({ reflect: true }) block = false
 
     static get styles() {
-        return [unsafeCSS(styles)]
+        return [style]
     }
 
     slotchange = (event: Event) => {

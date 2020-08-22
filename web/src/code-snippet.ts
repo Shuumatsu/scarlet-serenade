@@ -1,5 +1,5 @@
 import hljs from 'highlight.js'
-import styles from '!!raw-loader!highlight.js/styles/github.css'
+import style from '!!lit-css-loader!highlight.js/styles/github.css'
 import { customElement, html, LitElement, property, unsafeCSS } from 'lit-element'
 import { styleMap } from 'lit-html/directives/style-map'
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
@@ -10,7 +10,7 @@ export class CodeSnippet extends LitElement {
     @property({ reflect: true }) block = false
 
     static get styles() {
-        return [unsafeCSS(styles)]
+        return [style]
     }
 
     slotchange = (event: Event) => {

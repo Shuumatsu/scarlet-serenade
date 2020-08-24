@@ -155,5 +155,72 @@ Definition: A definition `d` at program point `p` reaches a point `q` if there i
 :img(src="./reaching-definition.png", height="120")
 
 Reaching definitions can be used to detect possible undefined variables.
+- e.g. introduce a dummy definition for each variable v at the entry of CFG, and if the dummy definition of v reaches a point p where v is used, then v may be used before definition (as undefined reaches v)
+
+abstraction: definitions can be represented by bit vectors
+- `e.g., D1, D2, D3, D4, ..., D100 (100 definitions)`
+transfer function: 
+```
+D: v = x op y
+```
+This statement 
+- - "generates" a definition D of variable v
+- - "kills" all the other definitions in the program that define variable v.
+`OUT[B] = genB U (IN[B] - killB)`
+
+A definition reaches a program point as long as there exists at least one path along which the definition reaches.
+$IN [B]=\bigcup_{P \text { predecessors of } B}$ OUT $[P]$
+
+```
+output[entry] = empty
+for block of all_other_blocks:
+    output[block] = empty 
+
+while changes to any output:
+    for block of all_blocks:
+        input = merge output of predecessors
+        output[block] = gen(block) <> (input[block] - kill(block))
+```
+
+Why this iterative can finally algorithm stop? 
+`output[block] = gen(block) <> (input[block] - kill(block))` every part of this statement except input[block] is constant. 
+When a fact is added to `output[block]`, whether it's from `gen(block)` or survived from `input[block] - kill(block)`, it stays there forever
+
+Thus output never shrinks.
+
+As the set of facts is finite (e.g., all definitions in the program), there must exist a pass of iteration during which nothing is added to any OUT, and then the algorithm terminates
+
+:h3 Live Variables Analysis
+
+Live variables analysis tells whether the value of variable v at program point p could be used along some path in CFG starting at p. If so, v is live at p; otherwise, v is dead at p.
+
+:img(src="./live-variable.png", height="120")
+
+Information of live variables can be used for register allocations. e.g., at some point all registers are full and we need to use one, then we should favor using a register with a dead value.
 
 
+
+transfer function 
+对于一个 `a = x op y` 
+x y 确定存活，kill a
+
+backward analysis
+input[block] = (output[block] - kills) + uses 
+
+output[block]: It is live coming out of B and is not redefined in B
+uses: It is used before redefinition in B
+kills: It is redefined in B
+
+
+:h3 Available Expressions Analysis
+
+An expression x op y is available at program point p if 
+- 1. **all paths** from the entry to p **must** pass through the evaluation of x op y
+- 2. after the last evaluation of x op y, there is no redefinition of x or y
+
+This definition means at program p, we can replace expression x op y by the result of its last evaluation.
+
+transfer function 
+对于一个 `a = x op y` 
+- Add to OUT the expression x op y (gen)
+- Delete from IN any expression involving variable `a` (kill)

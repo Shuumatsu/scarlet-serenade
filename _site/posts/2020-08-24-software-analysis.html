@@ -149,6 +149,57 @@ y = x + 7        =&gt;     x = phi(x_0, x_1)
 <p indent="0">Definition: A definition  <code-snippet>d</code-snippet> at program point  <code-snippet>p</code-snippet> reaches a point  <code-snippet>q</code-snippet> if there is a path from  <code-snippet>p</code-snippet> to  <code-snippet>q</code-snippet> such that  <code-snippet>d</code-snippet> is not “killed” along that path</p>
 <img src="./reaching-definition.png" height="120" />
 <p indent="0">Reaching definitions can be used to detect possible undefined variables.</p>
+<p indent="1">e.g. introduce a dummy definition for each variable v at the entry of CFG, and if the dummy definition of v reaches a point p where v is used, then v may be used before definition (as undefined reaches v)</p>
+<p indent="0">abstraction: definitions can be represented by bit vectors</p>
+<p indent="1"><code-snippet>e.g., D1, D2, D3, D4, ..., D100 (100 definitions)</code-snippet></p>
+<p indent="0">transfer function: </p>
+<code-snippet indent="0" block="true">
+D: v = x op y
+
+</code-snippet>
+<p indent="0">This statement </p>
+<p indent="1">- "generates" a definition D of variable v</p>
+<p indent="1">- "kills" all the other definitions in the program that define variable v.</p>
+<p indent="0"><code-snippet>OUT[B] = genB U (IN[B] - killB)</code-snippet></p>
+<p indent="0">A definition reaches a program point as long as there exists at least one path along which the definition reaches.</p>
+<p indent="0"><mathjax-panel>IN [B]=\bigcup_{P \text { predecessors of } B}</mathjax-panel> OUT  <mathjax-panel>[P]</mathjax-panel></p>
+<code-snippet indent="0" block="true">
+output[entry] = empty
+for block of all_other_blocks:
+    output[block] = empty 
+
+while changes to any output:
+    for block of all_blocks:
+        input = merge output of predecessors
+        output[block] = gen(block) &lt;&gt; (input[block] - kill(block))
+
+</code-snippet>
+<p indent="0">Why this iterative can finally algorithm stop? </p>
+<p indent="0"><code-snippet>output[block] = gen(block) <> (input[block] - kill(block))</code-snippet> every part of this statement except input[block] is constant. </p>
+<p indent="0">When a fact is added to  <code-snippet>output[block]</code-snippet> , whether it's from  <code-snippet>gen(block)</code-snippet> or survived from  <code-snippet>input[block] - kill(block)</code-snippet> , it stays there forever</p>
+<p indent="0">Thus output never shrinks.</p>
+<p indent="0">As the set of facts is finite (e.g., all definitions in the program), there must exist a pass of iteration during which nothing is added to any OUT, and then the algorithm terminates</p>
+<h3><p indent="0">Live Variables Analysis</p></h3>
+<p indent="0">Live variables analysis tells whether the value of variable v at program point p could be used along some path in CFG starting at p. If so, v is live at p; otherwise, v is dead at p.</p>
+<img src="./live-variable.png" height="120" />
+<p indent="0">Information of live variables can be used for register allocations. e.g., at some point all registers are full and we need to use one, then we should favor using a register with a dead value.</p>
+<p indent="0">transfer function </p>
+<p indent="0">对于一个  <code-snippet>a = x op y</code-snippet></p>
+<p indent="0">x y 确定存活，kill a</p>
+<p indent="0">backward analysis</p>
+<p indent="0">input[block] = (output[block] - kills) + uses </p>
+<p indent="0">output[block]: It is live coming out of B and is not redefined in B</p>
+<p indent="0">uses: It is used before redefinition in B</p>
+<p indent="0">kills: It is redefined in B</p>
+<h3><p indent="0">Available Expressions Analysis</p></h3>
+<p indent="0">An expression x op y is available at program point p if </p>
+<p indent="1">1.  <b>all paths</b> from the entry to p  <b>must</b> pass through the evaluation of x op y</p>
+<p indent="1">2. after the last evaluation of x op y, there is no redefinition of x or y</p>
+<p indent="0">This definition means at program p, we can replace expression x op y by the result of its last evaluation.</p>
+<p indent="0">transfer function </p>
+<p indent="0">对于一个  <code-snippet>a = x op y</code-snippet></p>
+<p indent="1">Add to OUT the expression x op y (gen)</p>
+<p indent="1">Delete from IN any expression involving variable  <code-snippet>a</code-snippet> (kill)</p>
     </section>
 </article>
     </main>

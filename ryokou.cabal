@@ -1,17 +1,19 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: 48e36293b9b9153164bfe0f70d036ee009ce3308eb6e415cdd8d5223790925d8
 
 name:           ryokou
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/ryokou#readme>
-homepage:       https://github.com/githubuser/ryokou#readme
-bug-reports:    https://github.com/githubuser/ryokou/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2020 Author name here
+homepage:       https://github.com/Shuumatsu/ryokou#readme
+bug-reports:    https://github.com/Shuumatsu/ryokou/issues
+author:         Curry
+maintainer:     VanishingDante@gmail.com
+copyright:      2020 Curry
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -21,7 +23,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/ryokou
+  location: https://github.com/Shuumatsu/ryokou
 
 library
   exposed-modules:

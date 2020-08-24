@@ -132,6 +132,23 @@ y = x + 7        =&gt;     x = phi(x_0, x_1)
 <p indent="1">There is an edge from block A to block B if and only if</p>
 <p indent="2">- There is a conditional or unconditional jump from the end of A to the beginning of B</p>
 <p indent="2">- B immediately follows A in the original order of instructions</p>
+<p indent="0">may analysis: outputs information that may be true (over-approximation)</p>
+<p indent="1">假设正确答案是一个集合S，返回的集合总是S的子集</p>
+<p indent="0">must analysis: outputs information that must be true (under-approximation)</p>
+<p indent="1">假设正确答案是一个集合S，返回的集合总是S的超集</p>
+<p indent="0">Input and Output States</p>
+<p indent="0">Each execution of an IR statement transforms an input state to a new output state</p>
+<p indent="0">The input (output) state is associated with the program point before (after) the statement</p>
+<p indent="0">In each data-flow analysis application, we associate with every program point a data-flow value that represents an abstraction of the set of all possible program states that can be observed for that point.</p>
+<p indent="0">Data-flow analysis is to find a solution to a set of safe-approximation directed constraints on the IN[s]’s and OUT[s]’s, for all statements s.</p>
+<p indent="1">- constraints based on semantics of statements (transfer functions)</p>
+<p indent="1">- constraints based on the flows of control</p>
+<h3><p indent="0">Forward Analysis & Backward Analysis</p></h3>
+<p indent="0">omitted</p>
+<h3><p indent="0">Reaching Definitions Analysis</p></h3>
+<p indent="0">Definition: A definition  <code-snippet>d</code-snippet> at program point  <code-snippet>p</code-snippet> reaches a point  <code-snippet>q</code-snippet> if there is a path from  <code-snippet>p</code-snippet> to  <code-snippet>q</code-snippet> such that  <code-snippet>d</code-snippet> is not “killed” along that path</p>
+<img src="./reaching-definition.png" height="120" />
+<p indent="0">Reaching definitions can be used to detect possible undefined variables.</p>
     </section>
 </article>
     </main>

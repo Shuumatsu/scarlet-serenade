@@ -127,3 +127,33 @@ Steps:
 
 
 
+may analysis: outputs information that may be true (over-approximation)
+- 假设正确答案是一个集合S，返回的集合总是S的子集
+must analysis: outputs information that must be true (under-approximation)
+- 假设正确答案是一个集合S，返回的集合总是S的超集
+
+
+Input and Output States
+Each execution of an IR statement transforms an input state to a new output state
+The input (output) state is associated with the program point before (after) the statement
+
+In each data-flow analysis application, we associate with every program point a data-flow value that represents an abstraction of the set of all possible program states that can be observed for that point.
+
+Data-flow analysis is to find a solution to a set of safe-approximation directed constraints on the IN[s]’s and OUT[s]’s, for all statements s.
+- - constraints based on semantics of statements (transfer functions)
+- - constraints based on the flows of control
+
+:h3 Forward Analysis & Backward Analysis
+
+omitted
+
+
+:h3 Reaching Definitions Analysis
+
+Definition: A definition `d` at program point `p` reaches a point `q` if there is a path from `p` to `q` such that `d` is not “killed” along that path
+
+:img(src="./reaching-definition.png", height="120")
+
+Reaching definitions can be used to detect possible undefined variables.
+
+

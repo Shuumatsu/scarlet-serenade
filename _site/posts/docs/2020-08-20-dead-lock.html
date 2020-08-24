@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Hakyll Blog - 2020-08-20-dead-lock</title>
+    <link rel="stylesheet" href="../../web/static/main.css" />
+    <script src="../../web/static/main.bundle.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="../../">My Hakyll Blog</a>
+        </div>
+        <nav>
+            <a href="../../">Home</a>
+            <a href="../../about.html">About</a>
+            <a href="../../contact.html">Contact</a>
+            <a href="../../archive.html">Archive</a>
+        </nav>
+    </header>
+
+    <main role="main">
+        <h1>2020-08-20-dead-lock</h1>
+        <article>
+    <section class="header">
+        
+    </section>
+    <section>
+        <h1 id="deadlock">Deadlock</h1>
+<p>Deadlock is a situation where a set of processes are blocked because each process is holding a resource and waiting for another resource acquired by some other process.</p>
+<p>Deadlock can arise if the following four conditions hold simultaneously (Necessary Conditions)</p>
+<ul>
+<li><strong>Mutual Exclusion</strong>: One or more than one resource is non-sharable (Only one process can use at a time)</li>
+<li><strong>Hold and Wait</strong>: A process is holding at least one resource and waiting for resources.</li>
+<li><strong>No Preemption</strong>: A resource cannot be taken from a process unless the process releases the resource.</li>
+<li><strong>Circular Wait</strong>: A set of processes are waiting for each other in circular form.</li>
+</ul>
+<p>quiz: 有 m 份不可共享的资源，有 n 个进程相互竞争，假设每个进程需求 ( S_i ) 那么他们满足什么样的数学关系可以保证没有死锁</p>
+<p>An: 考虑极端情况，所有的进程都拿到了 ( S_i - 1 ) 份资源，那么再需要一份即可打破，那么数学关系式为 ( (S_i - 1) + 1 &lt;= m )，也就是 ( S_i &lt; m + n )</p>
+<p><strong>Resource Allocation Graph</strong> Each resource is represented with a box, each process with a circle, and the individual instances of the resources with dots in the boxes. Arrows go from processes to resource boxes if the process is waiting for the resource. Arrows go from dots in resource box to processes if the process holds that instance of the resource.</p>
+<p>If graph contains no cycles, is no deadlock. If has a cycle, may or may not have deadlock.</p>
+<p><strong>Concept: Safe Sequence</strong>. Is an ordering of processes such that all processes can execute to completion in that order even if all request maximum resources. <strong>Concept: Safe State</strong> - a state in which there exists a safe sequence. Deadlock avoidance algorithms always ensure that system stays in a safe state.</p>
+<p>How can you figure out if a system is in a safe state? - Bankers’ Algorithm</p>
+<p>Here is deadlock detection algorithm. Is very similar to safe state detection algorithm.</p>
+<p>1: Work = Avail; Finish[i] = False for all i; 2: Find i such that Finish[i] = False and Request[i] &lt;= Work If no such i exists, goto 4 3: Work = Work + Alloc[i]; Finish[i] = True; goto 2 4: If Finish[i] = False for some i, system is deadlocked. Moreover, Finish[i] = False implies that process i is deadlocked.</p>
+<p>基本上和找安全序列的区别就是最后一步，Finish[i] 对应着</p>
+<h2 id="methods-for-handling-deadlock">Methods for handling deadlock</h2>
+<p>There are three ways to handle deadlock</p>
+<h3 id="deadlock-prevention-or-avoidance">Deadlock prevention or avoidance</h3>
+<p>We need to know all information about resources which the process WILL need beforehand.</p>
+<h4 id="deadlock-prevention">Deadlock prevention</h4>
+<p>which means we are to break one (or more) of the 4 Necessary Conditions</p>
+<p><strong>Eliminate Circular Wait</strong>: Order the locks, and always acquire the locks in that order.</p>
+<p>Occasionally you may need to write code that needs to acquire locks in different orders. Here is what to do in this situation.</p>
+<ul>
+<li>First, most locking abstractions offer an operation that tries to acquire the lock but returns if it cannot. We will call this operation TryAcquire. Use this operation to try to acquire the lock that you need to acquire out of order.</li>
+<li>If the operation succeeds, fine. Once you’ve got the lock, there is no problem.</li>
+<li>If the operation fails, release all of the locks that come after the lock you are trying to acquire, then reacquire all of the locks in the right order.</li>
+</ul>
+<pre><code>int d1, d2;
+// The standard acquisition order for these two locks
+// is l1, l2.
+Lock *l1, // protects d1 
+     *l2; // protects d2
+// Decrements d2, and if the result is 0, increments d1
+void increment() {
+  l2-&gt;Acquire();
+  int t = d2;
+  t--;
+  if (t == 0) { 
+    if (l1-&gt;TryAcquire()) {
+      d1++;
+    } else { 
+      // Any modifications to d2 go here - in this case none
+      l2-&gt;Release();
+      l1-&gt;Acquire();
+      l2-&gt;Acquire();
+      t = d2;
+      t--;
+      // some other thread may have changed d2 - must recheck it
+      if (t == 0) { 
+        d1++;
+      }
+    }
+    l1-&gt;Release();
+  }
+  d2 = t;
+  l2-&gt;Release();
+}</code></pre>
+<p><strong>Eliminate Hold and Wait</strong>: - Allocate all required resources to the process before the start of its execution. - 会降低资源的利用度，比如明明进程要很久之后才用打印机的情况 - The process will make a new request for resources after releasing the current set of resources. This solution may lead to starvation. （为啥</p>
+<ul>
+<li>Eliminate No preemption: Each resource will be assigned with a numerical number. A process can request the resources increasing/decreasing the order of numbering. 没懂</li>
+</ul>
+<h4 id="deadlock-avoidance">Deadlock Avoidance</h4>
+<p>The famous Deadlock avoidance algorithm is Bankers Algorithm</p>
+<h3 id="deadlock-detection-and-recovery">Deadlock detection and recovery</h3>
+<p>Let deadlock occur, then do preemption to handle it once occurred.</p>
+<h3 id="ignore-the-problem-altogether">Ignore the problem altogether</h3>
+<p>If the deadlock is very rare, then let it happen and reboot the system. This is the approach that both Windows and UNIX take.</p>
+<p>Must free up some resources so that some processes can run. So, preempt resources - take them away from processes. Several different preemption cases:</p>
+<p>Can preempt some resources without killing job - for example, main memory. Can just swap out to disk and resume job later.</p>
+<p>If job provides rollback points, can roll job back to point before acquired resources. At a later time, restart job from rollback point. Default rollback point - start of job.</p>
+<p>For some resources must just kill job. All resources are then free. Can either kill processes one by one until your system is no longer deadlocked. Or, just go ahead and kill all deadlocked processes.</p>
+    </section>
+</article>
+    </main>
+
+    <footer>
+        Site proudly generated by
+        <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+</body>
+
+</html>

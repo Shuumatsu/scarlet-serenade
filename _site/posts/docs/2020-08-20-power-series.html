@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Hakyll Blog - 2020-08-20-power-series</title>
+    <link rel="stylesheet" href="../../web/static/main.css" />
+    <script src="../../web/static/main.bundle.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="../../">My Hakyll Blog</a>
+        </div>
+        <nav>
+            <a href="../../">Home</a>
+            <a href="../../about.html">About</a>
+            <a href="../../contact.html">Contact</a>
+            <a href="../../archive.html">Archive</a>
+        </nav>
+    </header>
+
+    <main role="main">
+        <h1>2020-08-20-power-series</h1>
+        <article>
+    <section class="header">
+        
+    </section>
+    <section>
+        <h1 id="power-series">Power Series</h1>
+<h2 id="abels-theorem">Abel’s Theorem</h2>
+<p>给定一个级数 <span class="math inline">$A = \sum_{n=1}^{n} a_{n}\left(x-x_{0}\right)^{n}$</span></p>
+<ul>
+<li>如果 A 在 b 处收敛，那么一定有所有的 <span class="math inline">{<em>x</em>||<em>x</em> − <em>x</em><sub>0</sub>| &lt; |<em>b</em> − <em>x</em><sub>0</sub>|}</span>，A 绝对收敛</li>
+<li>如果 A 在 b 处发散，那么一定有所有的 <span class="math inline">{<em>x</em>||<em>x</em> − <em>x</em><sub>0</sub>| &gt; |<em>b</em> − <em>x</em><sub>0</sub>|}</span>，A 发散</li>
+</ul>
+<p>一个常用的结论是，若幂级数再某点处条件收敛，则该点一定是收敛区间的一个端点</p>
+<p>例题： <span class="math inline">$A = \sum_{n=1}^{\infty} \frac{(x-a)^{n}}{n}$</span> 在 <span class="math inline"><em>x</em> =  − 2</span> 处条件收敛，判断 <span class="math inline">$B = \sum_{n=1}^{\infty} n^{2}(x-a)^{n}$</span> 在 <span class="math inline">$x = ln\frac{1}{2}$</span>处的收敛情况</p>
+<p>An: 首先很容易得到 A 的收敛半径为 <span class="math inline">1</span>，则 <span class="math inline">| − 2 − <em>a</em>| = 1</span>，可以知道 <span class="math inline"><em>a</em> =  − 1</span> 或 <span class="math inline"><em>a</em> =  − 3</span>，带入验证后可排除 <span class="math inline"><em>a</em> =  − 3</span> 的情况。已知 <span class="math inline"><em>a</em></span> 的情况下很容易得到 <span class="math inline"><em>B</em></span> 的收敛区间为 <span class="math inline">( − 2, 0)</span>，则在 <span class="math inline">$x = ln\frac{1}{2}$</span> 处绝对收敛</p>
+<ul>
+<li>收敛域与收敛区间：收敛域与收敛区间区别只有一个：区间是否闭合。
+<ul>
+<li>如果幂级数半径为 <span class="math inline"><em>R</em></span> 那么马上可以得到收敛区间 <span class="math inline">( − <em>R</em>, <em>R</em>)</span>。如果进一步讨论，该级数在点 <span class="math inline"> − <em>R</em></span>或 <span class="math inline"><em>R</em></span> 处的收敛性，比如在点 <span class="math inline"> − <em>R</em></span> 收敛，在点 <span class="math inline"><em>R</em></span> 不收敛，则称该幂级数的收敛域为 <span class="math inline">[ − <em>R</em>, <em>R</em>)</span>。</li>
+<li>简而言之，收敛区间直接根据收敛半径而得，收敛域是讨论收敛区间两端点收敛性后的结论。收敛区间可能同于收敛域，可能是收敛域的子集。</li>
+</ul></li>
+</ul>
+<h2 id="求幂级数的收敛域">求幂级数的收敛域</h2>
+<p>通常的方法是先计算出收敛区间，再判断两个端点的收敛情况。</p>
+<p>求收敛区间最常用的两个方法是利用公式</p>
+<p><br /><span class="math display">$$\frac{1}{R} = \lim_{n \rightarrow \infty} | \frac{a_{n+1}}{a_n} |$$</span><br /></p>
+<p><br /><span class="math display">$$\frac{1}{R} = \lim _{n \rightarrow \infty} \sqrt[n]{\left|a_{n}\right|}$$</span><br /></p>
+<hr />
+<p>例如求 <span class="math inline">$\sum_{n=1}^{\infty} (-1)^n \frac{\sqrt n x^n}{n!}$</span> 的收敛域</p>
+<p><br /><span class="math display">$$
+\lim _{n \rightarrow \infty}\left|\frac{a_{n+1}}{a_{n}}\right|=\lim _{n \rightarrow \infty} \frac{\sqrt{n+1}}{(n+1) !} \cdot \frac{n !}{\sqrt{n}}=\lim _{n \rightarrow \infty} \frac{1}{n+1} \sqrt{1+\frac{1}{n}}=0
+$$</span><br /></p>
+<p>则有 <span class="math inline">$\frac{1}{R} = 0$</span>，那么可以知道收敛域为 <span class="math inline">( − ∞,  + ∞)</span></p>
+<hr />
+<p>例如求 <span class="math inline">$A = \sum_{n=1}^{\infty}(-1)^{n} \frac{n}{2^{n}}(x-1)^{2 n}$</span> 的收敛域 用变量替换，定义 <span class="math inline"><em>t</em></span> 为 <span class="math inline">(<em>x</em> − 1)<sup>2</sup></span>，则有 <span class="math inline">$A = \sum_{n=1}^{\infty}(-1)^{n} \frac{n}{2^{n}}t^n$</span></p>
+<p><br /><span class="math display">$$
+\lim _{n \rightarrow \infty} \sqrt[n]{\left|a_{n}\right|}=\lim _{n \rightarrow \infty} \frac{\sqrt[n]{n}}{2}=\frac{1}{2}
+$$</span><br /></p>
+<p>则有收敛半径 <span class="math inline"><em>R</em> = 2</span>，因为 <span class="math inline"><em>t</em></span> 的取值范围为 <span class="math inline">[0,  + ∞)</span>，则有收敛区间为 <span class="math inline">[0, 2)</span>，将 <span class="math inline"><em>t</em> = (<em>x</em> − 1)<sup>2</sup></span> 带入回去得到，<span class="math inline"><em>x</em></span> 的幂级数的收敛区间为 <span class="math inline">$(1- \sqrt 2, 1 + \sqrt 2)$</span>。检查两个端点的情况都是发散，则A的收敛域为 <span class="math inline">$(1- \sqrt 2, 1 + \sqrt 2)$</span></p>
+<h2 id="常用的麦克劳林展开式">常用的麦克劳林展开式</h2>
+<p><br /><span class="math display">$$ 
+\frac{1}{1-x} = 1 + x + x^2 + \cdots + x^n + \cdots, \quad x \in (-1, 1) 
+$$</span><br /> (1)</p>
+<p><br /><span class="math display">$$
+\frac{1}{1+x} = 1 - x + x ^ 2 + \cdots + (-1)^n x ^n + \cdots, \quad x \in (-1, 1)
+$$</span><br /> (2)</p>
+<h2 id="将函数展开为幂级数">将函数展开为幂级数</h2>
+<ul>
+<li>直接法
+<ul>
+<li>求出函数在 <span class="math inline"><em>x</em><sub>0</sub></span> 点各阶导数，写出在 <span class="math inline"><em>x</em><sub>0</sub></span> 处的泰勒级数</li>
+<li>考察余项极限是否为 <span class="math inline">0</span></li>
+</ul></li>
+<li>间接法
+<ul>
+<li>利用常见的麦克劳林展开公式通过适当变量代换或者借助幂级数性质（四则运算，逐项求导，逐项积分）将函数展开为幂级数
+<ul>
+<li>四则运算是显然的</li>
+<li>因为幂级数展开后都是多项式的形式，易于积分，那么便可以利用逐项积分的性质，将原函数看作某个函数的积分。利用逐项求导的性质同理。</li>
+</ul></li>
+</ul></li>
+</ul>
+<p>例如可通过四则运算将 <span class="math inline">$f(x)=\frac{3 x}{2+x^{2}}$</span> 展开为 <span class="math inline"><em>x</em></span> 的幂级数</p>
+<p><br /><span class="math display">$$
+\begin{aligned}
+f(x) &amp;=\frac{3 x}{2} \cdot \frac{1}{1+\frac{x^{2}}{2}}=\frac{3 x}{2} \sum_{n=0}^{\infty}(-1)^{n}\left(\frac{x^{2}}{2}\right)^{n} \\
+&amp;=\sum_{n=0}^{\infty} \frac{(-1)^{n} 3 x^{2 n+1}}{2^{n+1}}, x \in(-\sqrt{2}, \sqrt{2})
+\end{aligned}
+$$</span><br /></p>
+<p>例如可通过逐项积分的性质将 <span class="math inline">$f(x)=\arctan \frac{1+x}{1-x}$</span> 展开为 <span class="math inline"><em>x</em></span> 的幂级数</p>
+<p><br /><span class="math display">$$
+\begin{aligned}
+&amp;f^{\prime}(x)=\frac{1}{1+x^{2}}=\sum_{n=0}^{\infty}(-1)^{n}\left(x^{2}\right)^{n}=\sum_{n=0}^{\infty}(-1)^{n} x^{2 n}, x \in(-1,1)\\
+&amp;f(x)-f(0)=\int_{0}^{x} f^{\prime}(t) \mathrm{d} t=\sum_{n=0}^{\infty} \int_{0}^{x}(-1)^{n} t^{2 n} \mathrm{d} t=\sum_{n=0}^{\infty} \frac{(-1)^{n} x^{2 n+1}}{2 n+1}
+\end{aligned}
+$$</span><br /> 而 <span class="math inline"><em>f</em>(0)</span> 是可以直接求得的，那么通过上式就可得到 <span class="math inline"><em>f</em>(<em>x</em>)</span></p>
+<p>例如可通过一定的变换，通过麦克劳林展开求函数 <span class="math inline">$f(x)=\frac{1}{(x+2)^{2}}$</span> 在 <span class="math inline"><em>x</em> =  − 1</span> 处的幂级数展开</p>
+<p><br /><span class="math display">$$
+\begin{aligned}
+f(x) &amp;=-\left(\frac{1}{x+2}\right)^{\prime}=-\left(\frac{1}{1+(x+1)}\right)^{\prime}=-\left(\sum_{n=0}^{\infty}(-1)^{n}(x+1)^{n}\right)^{\prime} \\
+&amp;=-\sum_{n=1}^{\infty}(-1)^{n} n(x+1)^{n-1}, \quad x \in(-2,0)
+\end{aligned}
+$$</span><br /></p>
+<p>利用幂级数展开与泰勒展开的对应关系，还可以求函数的高阶导数。例如将 <span class="math inline"><em>f</em>(<em>x</em>) = <em>x</em><sup>2</sup>ln (1 + <em>x</em>)</span> 展开为 <span class="math inline"><em>x</em></span> 的幂级数，求 <span class="math inline"><em>f</em><sup>(<em>n</em>)</sup>(0)(<em>n</em> &gt; 2)</span></p>
+<p><br /><span class="math display">$$
+f(x)=x^{2} \ln (1+x)=\sum_{n=1}^{\infty} \frac{(-1)^{n-1} x^{n+2}}{n}
+$$</span><br /></p>
+<p><br /><span class="math display">$$
+\begin{array}{c}
+a_{n}=\frac{(-1)^{n-3}}{n-2}=\frac{(-1)^{n-1}}{n-2} \cdot(n&gt;2) \\
+\frac{f^{(n)}(0)}{n !}=\frac{(-1)^{n-1}}{n-2} \Rightarrow f^{(n)}(0)=\frac{(-1)^{n-1} n !}{n-2}  
+\end{array}
+$$</span><br /></p>
+<h2 id="级数求和">级数求和</h2>
+<ul>
+<li>可以给常数项级数替换或者添加 <span class="math inline"><em>x</em></span> 转变为函数项级数</li>
+<li>利用几个常用的麦克劳林展开式以及幂级数的性质</li>
+</ul>
+<p>例如</p>
+    </section>
+</article>
+    </main>
+
+    <footer>
+        Site proudly generated by
+        <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+</body>
+
+</html>

@@ -15,6 +15,10 @@ main = hakyllWith (defaultConfiguration {previewHost = "0.0.0.0"}) $ do
     route idRoute
     compile copyFileCompiler
 
+  match ("posts/**.png" .||. "posts/**.jpg") $ do
+    route idRoute
+    compile copyFileCompiler
+
   match (fromList ["about.rst", "contact.md"]) $ do
     route $ setExtension "html"
     compile $
@@ -41,7 +45,7 @@ main = hakyllWith (defaultConfiguration {previewHost = "0.0.0.0"}) $ do
   create ["archive.html"] $ do
     route idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll "posts/*"
+      posts <- recentFirst =<< loadAll ("posts/**.prs" .||. "posts/**.md")
       let archiveCtx =
             listField "posts" postCtx (return posts)
               `mappend` constField "title" "Archives"
@@ -55,7 +59,7 @@ main = hakyllWith (defaultConfiguration {previewHost = "0.0.0.0"}) $ do
   match "index.html" $ do
     route idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll "posts/*"
+      posts <- recentFirst =<< loadAll ("posts/**.prs" .||. "posts/**.md")
       let indexCtx =
             listField "posts" postCtx (return posts)
               `mappend` defaultContext

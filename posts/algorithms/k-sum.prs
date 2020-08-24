@@ -1,0 +1,52 @@
+2 Sum is easy to implement using a hash.
+
+and to generalize to a K-Sum problem, all you really have to do is make a recursive function that keeps calling K-1 Sums until you get to 2sum at which point you just do a 2 sum, outputing all of the answers that you find
+
+(to avoid duplicate results, you need to sort the array first, it will be convenient to skip duplicate numbers
+
+e.g. https://leetcode.com/problems/4sum/
+
+```
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[][]}
+ */
+var fourSum = function (nums, target) {
+    nums.sort()
+    const kSum = (k, left, right, target) => {
+        if (k == 2) {
+            return twoSum(left, right, target)
+        }
+        const ret = []
+        const seen = new Set()
+        for (let i = left; i <= right; i += 1) {
+            if (seen.has(nums[i])) {
+                continue
+            }
+            seen.add(nums[i])
+
+            const rest = kSum(k - 1, i + 1, right, target - nums[i])
+            // not very efficient
+            ret.push(...rest.map(v => [nums[i], ...v]))
+        }
+        return ret
+    }
+    const twoSum = (left, right, target) => {
+        const mappings = {}
+        const ret = []
+        for (let i = left; i <= right; i += 1) {
+            if (mappings[target - nums[i]] == 1) {
+                mappings[target - nums[i]] = 0
+                mappings[nums[i]] = 0
+                ret.push([target - nums[i], nums[i]])
+            }
+            if (mappings[nums[i]] == undefined) {
+                mappings[nums[i]] = 1
+            }
+        }
+        return ret
+    }
+    return kSum(4, 0, nums.length - 1, target)
+}
+```

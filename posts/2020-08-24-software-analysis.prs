@@ -1,0 +1,129 @@
+Analyze a program to reason about its behaviors and determine whether it satisfies some properties 
+
+:h3 Sound & Complete
+
+**Sound**: over-approximation
+**Complete**: under-approximation
+- e.g. 某个程序有 10 个指针错误，一个 Sound 的分析可能得出除了真实的那 10 个错误外还有其他错误，一个 Complete 的分析可能得出在那 10 个错误中的 2 个错误
+
+- ```
++------------------------------+
+|                              |
+|        +---------------------+
+|        |                     |
+|        |         +-----------+
+|        |         |           |
+| Sound  |  Truth  |  Complete |
+|        |         |           |
++--------+---------+-----------+
+```
+
+Rice Theorem tells us that we cannot build an analyzer thats both **sound** and **complete**
+
+Two options:
+- - Compromise Soundness: 造成漏报
+- - Compromise Completeness: 造成误报
+
+Most of the time we prefer compromising completeness. 
+
+Static Analysis ensure (or get close to) Soundness while making good trade offs between precision and speed.
+
+:h3 Static Analysis
+
+Static Analysis = Abstraction + over-approximation
+- e.g. 例如分析程序中变量的符号
+-- - Abstraction: 
+--- ```
+Concrete Domain         Abstract Domain
+    v = 100                 P
+    v = - 1                 N 
+    v = 0                   O
+    v = e ? 1 : -1          T (unknown)
+```
+-- - over-approximation: Transfer function
+--- defines how to evaluate different program statements on abstract values
+---- e.g. 
+---- ```
+P + P = P
+P + N = T
+```
+
+
+:h3 IR
+
+:h4 Ast vs IR
+
+Ast: 
+- - high level and close to grammar structure
+- - usually language dependent 
+- - lack of control flow information
+- - suitable for fast type checking 
+
+IR:
+- - low level and closed to machine code
+- - usually language independent
+- - contains control flow information
+
+IR is usually considered as the basis for static analysis.
+
+:h4 3-addr-code 
+
+omitted.
+
+:h4 Static Single Assignment
+
+All assignments in SSA are to variables with distinct names
+
+:br
+
+What if a variable use is at control flow merges?
+- ```
+if a = 1                if a = 1 
+then x_0 = 1            then x_0 = 1
+else x_1 = 2            else x_1 = 2
+y = x + 7        =>     x = phi(x_0, x_1)
+                        y = x + 7
+```
+A special merge operator $\phi$, (called phi-function), is introduced to select the values at merge nodes
+$\phi(x_0, x_1)$ has the value $x_0$ if the control flow passes through the true part of the conditional and the value $x_1$ otherwise
+
+:h5 Advantages & Disadvantages
+
+Advantages of SSA:
+- Flow information is indirectly incorporated into the unique variable names
+-- (even flow-insensitive analysis gains partial precision of flow-sensitive analysis via SSA
+- Define-and-Use pairs are explicit
+-- Enable more effective data facts storage and propagation in some on-demand tasks
+-- Some optimization tasks perform better on SSA (e.g. conditional constant propagation, global value numbering
+
+Disadvantages of SSA: 
+- May introduce too many variables and phi-functions
+- May introduce inefficiency problem when translating to machine code (due to copy operations)
+
+:h3 Control Flow Analysis
+Usually refer to building Control Flow Graph (CFG)
+- CFG serves as the basic structure for static analysis. The node in CFG is a Basic Block (BB). 
+
+**Basic blocks (BB)** are maximal sequences of consecutive three-address instructions with the properties that
+- It can be entered only at the beginning
+- It can be exited only at the end
+
+**How to build Basic Blocks?**
+INPUT: A sequence of three-address instructions 
+OUTPUT: A list of basic blocks of P
+Steps: 
+- 1. Determine the leaders in P
+-- - The first instruction in P is a leader
+-- - Any target instruction of a conditional or unconditional jump is a leader
+-- - Any instruction that immediately follows a conditional or unconditional jump is a leader
+- 2. Build BBs for P
+-- - A BB consists of a leader and all its subsequent instructions until the next leader
+
+**How to build CFG on top of BBs?**
+- The nodes of CFG are basic blocks. Usually we add two nodes, Entry and Exit. (They do not correspond to executable IR
+- There is an edge from block A to block B if and only if
+-- - There is a conditional or unconditional jump from the end of A to the beginning of B
+-- - B immediately follows A in the original order of instructions
+
+
+

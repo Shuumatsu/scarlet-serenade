@@ -1,0 +1,6 @@
+In combinatorial game theory, an impartial game is a game in which the allowable moves depend only on the position and not on which of the two players is currently moving, and where the payoffs are symmetric.
+- (e.g. chess is not impartial
+
+Normal play convention: If the winning condition of the game is that the opponent has no valid moves
+Misere play convention: If the winning condition is that the player himself has no valid moves
+

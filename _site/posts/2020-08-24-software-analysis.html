@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Hakyll Blog - 2020-08-24-software-analysis</title>
+    <link rel="stylesheet" href="../web/static/main.css" />
+    <script src="../web/static/main.bundle.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="../">My Hakyll Blog</a>
+        </div>
+        <nav>
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+        </nav>
+    </header>
+
+    <main role="main">
+        <h1>2020-08-24-software-analysis</h1>
+        <article>
+    <section class="header">
+        
+    </section>
+    <section>
+        <p indent="0">Analyze a program to reason about its behaviors and determine whether it satisfies some properties </p>
+<h3><p indent="0">Sound & Complete</p></h3>
+<p indent="0"><b>Sound</b> : over-approximation</p>
+<p indent="0"><b>Complete</b> : under-approximation</p>
+<p indent="1">e.g. 某个程序有 10 个指针错误，一个 Sound 的分析可能得出除了真实的那 10 个错误外还有其他错误，一个 Complete 的分析可能得出在那 10 个错误中的 2 个错误</p>
+<code-snippet indent="1" block="true">
++------------------------------+
+|                              |
+|        +---------------------+
+|        |                     |
+|        |         +-----------+
+|        |         |           |
+| Sound  |  Truth  |  Complete |
+|        |         |           |
++--------+---------+-----------+
+
+</code-snippet>
+<p indent="0">Rice Theorem tells us that we cannot build an analyzer thats both  <b>sound</b> and  <b>complete</b></p>
+<p indent="0">Two options:</p>
+<p indent="1">- Compromise Soundness: 造成漏报</p>
+<p indent="1">- Compromise Completeness: 造成误报</p>
+<p indent="0">Most of the time we prefer compromising completeness. </p>
+<p indent="0">Static Analysis ensure (or get close to) Soundness while making good trade offs between precision and speed.</p>
+<h3><p indent="0">Static Analysis</p></h3>
+<p indent="0">Static Analysis = Abstraction + over-approximation</p>
+<p indent="1">e.g. 例如分析程序中变量的符号</p>
+<p indent="2">- Abstraction: </p>
+<code-snippet indent="3" block="true">
+Concrete Domain         Abstract Domain
+    v = 100                 P
+    v = - 1                 N 
+    v = 0                   O
+    v = e ? 1 : -1          T (unknown)
+
+</code-snippet>
+<p indent="2">- over-approximation: Transfer function</p>
+<p indent="3">defines how to evaluate different program statements on abstract values</p>
+<p indent="4">e.g. </p>
+<code-snippet indent="4" block="true">
+P + P = P
+P + N = T
+
+</code-snippet>
+<h3><p indent="0">IR</p></h3>
+<h4><p indent="0">Ast vs IR</p></h4>
+<p indent="0">Ast: </p>
+<p indent="1">- high level and close to grammar structure</p>
+<p indent="1">- usually language dependent </p>
+<p indent="1">- lack of control flow information</p>
+<p indent="1">- suitable for fast type checking </p>
+<p indent="0">IR:</p>
+<p indent="1">- low level and closed to machine code</p>
+<p indent="1">- usually language independent</p>
+<p indent="1">- contains control flow information</p>
+<p indent="0">IR is usually considered as the basis for static analysis.</p>
+<h4><p indent="0">3-addr-code </p></h4>
+<p indent="0">omitted.</p>
+<h4><p indent="0">Static Single Assignment</p></h4>
+<p indent="0">All assignments in SSA are to variables with distinct names</p>
+<br />
+<p indent="0">What if a variable use is at control flow merges?</p>
+<code-snippet indent="1" block="true">
+if a = 1                if a = 1 
+then x_0 = 1            then x_0 = 1
+else x_1 = 2            else x_1 = 2
+y = x + 7        =&gt;     x = phi(x_0, x_1)
+                        y = x + 7
+
+</code-snippet>
+<p indent="0">A special merge operator  <mathjax-panel>\phi</mathjax-panel> , (called phi-function), is introduced to select the values at merge nodes</p>
+<p indent="0"><mathjax-panel>\phi(x_0, x_1)</mathjax-panel> has the value  <mathjax-panel>x_0</mathjax-panel> if the control flow passes through the true part of the conditional and the value  <mathjax-panel>x_1</mathjax-panel> otherwise</p>
+<h5><p indent="0">Advantages & Disadvantages</p></h5>
+<p indent="0">Advantages of SSA:</p>
+<p indent="1">Flow information is indirectly incorporated into the unique variable names</p>
+<p indent="2">(even flow-insensitive analysis gains partial precision of flow-sensitive analysis via SSA</p>
+<p indent="1">Define-and-Use pairs are explicit</p>
+<p indent="2">Enable more effective data facts storage and propagation in some on-demand tasks</p>
+<p indent="2">Some optimization tasks perform better on SSA (e.g. conditional constant propagation, global value numbering</p>
+<p indent="0">Disadvantages of SSA: </p>
+<p indent="1">May introduce too many variables and phi-functions</p>
+<p indent="1">May introduce inefficiency problem when translating to machine code (due to copy operations)</p>
+<h3><p indent="0">Control Flow Analysis</p></h3>
+<p indent="0">Usually refer to building Control Flow Graph (CFG)</p>
+<p indent="1">CFG serves as the basic structure for static analysis. The node in CFG is a Basic Block (BB). </p>
+<p indent="0"><b>Basic blocks (BB)</b> are maximal sequences of consecutive three-address instructions with the properties that</p>
+<p indent="1">It can be entered only at the beginning</p>
+<p indent="1">It can be exited only at the end</p>
+<p indent="0"><b>How to build Basic Blocks?</b></p>
+<p indent="0">INPUT: A sequence of three-address instructions </p>
+<p indent="0">OUTPUT: A list of basic blocks of P</p>
+<p indent="0">Steps: </p>
+<p indent="1">1. Determine the leaders in P</p>
+<p indent="2">- The first instruction in P is a leader</p>
+<p indent="2">- Any target instruction of a conditional or unconditional jump is a leader</p>
+<p indent="2">- Any instruction that immediately follows a conditional or unconditional jump is a leader</p>
+<p indent="1">2. Build BBs for P</p>
+<p indent="2">- A BB consists of a leader and all its subsequent instructions until the next leader</p>
+<p indent="0"><b>How to build CFG on top of BBs?</b></p>
+<p indent="1">The nodes of CFG are basic blocks. Usually we add two nodes, Entry and Exit. (They do not correspond to executable IR</p>
+<p indent="1">There is an edge from block A to block B if and only if</p>
+<p indent="2">- There is a conditional or unconditional jump from the end of A to the beginning of B</p>
+<p indent="2">- B immediately follows A in the original order of instructions</p>
+    </section>
+</article>
+    </main>
+
+    <footer>
+        Site proudly generated by
+        <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+</body>
+
+</html>

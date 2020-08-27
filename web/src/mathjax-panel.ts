@@ -2,7 +2,7 @@ import style from '!!lit-css-loader!katex/dist/katex.css'
 import katex from 'katex'
 // https://github.com/Polymer/lit-element/issues/1053#issuecomment-677973159
 import 'katex/dist/katex.css'
-import { customElement, html, LitElement, property } from 'lit-element'
+import { customElement, html, LitElement, property, css } from 'lit-element'
 import { styleMap } from 'lit-html/directives/style-map'
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
 
@@ -12,7 +12,17 @@ export class MathjaxPanel extends LitElement {
     @property({ reflect: true }) block = false
 
     static get styles() {
-        return [style]
+        return [
+            style,
+            css`
+                :host {
+                    display: inline-block;
+                }
+                :host([block='true']) {
+                    display: block;
+                }
+            `,
+        ]
     }
 
     slotchange = (event: Event) => {
@@ -30,15 +40,18 @@ export class MathjaxPanel extends LitElement {
     render() {
         const rstyle = this.rendered ? '' : styleMap({ display: 'none' })
         const pstyle = this.rendered ? styleMap({ display: 'none' }) : ''
+
+        const slot = html`<slot @slotchange=${this.slotchange}></slot>`
+
         if (this.block) {
             return html`
                 <div style=${rstyle}>${unsafeHTML(this.rendered)}</div>
-                <pre style=${pstyle}><div><slot @slotchange=${this.slotchange}></slot></div></pre>
+                <pre style=${pstyle}>${slot}</pre>
             `
         }
         return html`
             <span style=${rstyle}>${unsafeHTML(this.rendered)}</span>
-            <pre style=${pstyle}><span><slot @slotchange=${this.slotchange}></slot></span></pre>
+            <span style=${pstyle}>${slot}</span>
         `
     }
 }

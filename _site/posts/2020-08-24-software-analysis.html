@@ -35,8 +35,7 @@
 <p indent="0"><b>Sound</b> : over-approximation</p>
 <p indent="0"><b>Complete</b> : under-approximation</p>
 <p indent="1">e.g. 某个程序有 10 个指针错误，一个 Sound 的分析可能得出除了真实的那 10 个错误外还有其他错误，一个 Complete 的分析可能得出在那 10 个错误中的 2 个错误</p>
-<code-snippet indent="1" block="true">
-+------------------------------+
+<code-snippet indent="1" block="true">+------------------------------+
 |                              |
 |        +---------------------+
 |        |                     |
@@ -57,8 +56,7 @@
 <p indent="0">Static Analysis = Abstraction + over-approximation</p>
 <p indent="1">e.g. 例如分析程序中变量的符号</p>
 <p indent="2">- Abstraction: </p>
-<code-snippet indent="3" block="true">
-Concrete Domain         Abstract Domain
+<code-snippet indent="3" block="true">Concrete Domain         Abstract Domain
     v = 100                 P
     v = - 1                 N 
     v = 0                   O
@@ -68,8 +66,7 @@ Concrete Domain         Abstract Domain
 <p indent="2">- over-approximation: Transfer function</p>
 <p indent="3">defines how to evaluate different program statements on abstract values</p>
 <p indent="4">e.g. </p>
-<code-snippet indent="4" block="true">
-P + P = P
+<code-snippet indent="4" block="true">P + P = P
 P + N = T
 
 </code-snippet>
@@ -91,8 +88,7 @@ P + N = T
 <p indent="0">All assignments in SSA are to variables with distinct names</p>
 <br />
 <p indent="0">What if a variable use is at control flow merges?</p>
-<code-snippet indent="1" block="true">
-if a = 1                if a = 1 
+<code-snippet indent="1" block="true">if a = 1                if a = 1 
 then x_0 = 1            then x_0 = 1
 else x_1 = 2            else x_1 = 2
 y = x + 7        =&gt;     x = phi(x_0, x_1)
@@ -153,8 +149,7 @@ y = x + 7        =&gt;     x = phi(x_0, x_1)
 <p indent="0">abstraction: definitions can be represented by bit vectors</p>
 <p indent="1"><code-snippet>e.g., D1, D2, D3, D4, ..., D100 (100 definitions)</code-snippet></p>
 <p indent="0">transfer function: </p>
-<code-snippet indent="0" block="true">
-D: v = x op y
+<code-snippet indent="0" block="true">D: v = x op y
 
 </code-snippet>
 <p indent="0">This statement </p>
@@ -163,8 +158,7 @@ D: v = x op y
 <p indent="0"><code-snippet>OUT[B] = genB U (IN[B] - killB)</code-snippet></p>
 <p indent="0">A definition reaches a program point as long as there exists at least one path along which the definition reaches.</p>
 <p indent="0"><mathjax-panel>IN [B]=\bigcup_{P \text { predecessors of } B}</mathjax-panel> OUT  <mathjax-panel>[P]</mathjax-panel></p>
-<code-snippet indent="0" block="true">
-output[entry] = empty
+<code-snippet indent="0" block="true">output[entry] = empty
 for block of all_other_blocks:
     output[block] = empty 
 

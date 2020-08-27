@@ -26,7 +26,7 @@ const configs = {
                         loader: 'file-loader',
                         options: {
                             name: '[name].[ext]',
-                            outputPath: '/web/static',
+                            // outputPath: '/web/static',
                         },
                     },
                 ],

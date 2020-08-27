@@ -1,11 +1,5 @@
-import './code-snippet.ts'
-import './mathjax-panel.ts'
-import './swappable-card.ts'
-import './mathjax-panel'
-import './small-br'
-import './switchable-explanation'
-import './important-sentence'
-
 import 'normalize.css'
 import 'typeface-arvo'
 import './app.css'
+
+import './register_elements'

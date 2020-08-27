@@ -28,8 +28,14 @@ pscn = L.space space1 empty empty
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme psc
 
+lexeme' :: Parser a -> Parser a
+lexeme' = L.lexeme pscn
+
 symbol :: Text -> Parser Text
 symbol = L.symbol psc
+
+symbol' :: Text -> Parser Text
+symbol' = L.symbol pscn
 
 pCharLiteral :: Parser Char
 pCharLiteral = lexeme $ between (char '\'') (char '\'') L.charLiteral
@@ -77,28 +83,28 @@ pText = lexeme $ SText . T.pack <$> some p
         (Nothing, c : r') -> c <$ skipCount (length r - length r') anySingle
 
 pSentence :: Parser Element
-pSentence = L.lexeme pscn $ Sentence <$> some (pBoldText <|> pInlineCode <|> pInlineEquation <|> pText)
+pSentence = lexeme' $ Sentence <$> some (pBoldText <|> pInlineCode <|> pInlineEquation <|> pText)
 
 -- | block
 pBlockCode :: Parser Element
-pBlockCode = L.lexeme pscn p <?> "block_code"
+pBlockCode = lexeme' p <?> "block_code"
   where
     content = many $ do
       r <- lookAhead (count' 1 10 anySingle)
       case r of
         '`' : '`' : '`' : r' -> unexpected (Tokens (head r :| []))
         c : r' -> c <$ skipCount (length r - length r') anySingle
-    p = Code . T.pack <$> between (symbol "```") (symbol "```") content
+    p = Code . T.pack <$> between (symbol' "```") (symbol' "```") content
 
 pBlockEquation :: Parser Element
-pBlockEquation = L.lexeme pscn p <?> "block_equation"
+pBlockEquation = lexeme' p <?> "block_equation"
   where
     content = many $ do
       r <- lookAhead (count' 1 10 anySingle)
       case r of
         '$' : '$' : r' -> unexpected (Tokens (head r :| []))
         c : r' -> c <$ skipCount (length r - length r') anySingle
-    p = Equation . T.pack <$> between (symbol "$$") (symbol "$$") content
+    p = Equation . T.pack <$> between (symbol' "$$") (symbol' "$$") content
 
 -- | component
 pClassnames :: Parser Classnames
@@ -113,7 +119,7 @@ pAttrs = p <?> "attrs"
     p = Attrs . (maybe [] id) <$> (optional . parens) (sepBy1 pAttr (symbol ","))
 
 pComponent :: Parser Element
-pComponent = L.lexeme pscn p <?> "component"
+pComponent = lexeme' p <?> "component"
   where
     meta = lexeme $ (,,) <$> (char ':' *> pIdent) <*> pClassnames <*> pAttrs
     inline = do
@@ -126,7 +132,7 @@ pComponent = L.lexeme pscn p <?> "component"
 
 -- | element
 pElement :: Parser Element
-pElement = L.lexeme pscn p <?> "element"
+pElement = lexeme' p <?> "element"
   where
     p = pComponent <|> pBlockCode <|> pBlockEquation <|> pSentence
 
@@ -139,4 +145,4 @@ pAtom = (,) <$> pIndent <*> pElement
 pDocument :: Parser Document
 pDocument = Document <$> p <* eof <?> "document"
   where
-    p = L.lexeme pscn $ many (L.nonIndented pscn pAtom)
+    p = lexeme' $ many (L.nonIndented pscn pAtom)

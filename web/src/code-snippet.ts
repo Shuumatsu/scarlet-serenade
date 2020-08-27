@@ -1,6 +1,6 @@
 import hljs from 'highlight.js'
 import style from '!!lit-css-loader!highlight.js/styles/github.css'
-import { customElement, html, LitElement, property, unsafeCSS } from 'lit-element'
+import { customElement, html, LitElement, property, css } from 'lit-element'
 import { styleMap } from 'lit-html/directives/style-map'
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
 
@@ -10,7 +10,17 @@ export class CodeSnippet extends LitElement {
     @property({ reflect: true }) block = false
 
     static get styles() {
-        return [style]
+        return [
+            style,
+            css`
+                :host {
+                    display: inline-block;
+                }
+                :host([block='true']) {
+                    display: block;
+                }
+            `,
+        ]
     }
 
     slotchange = (event: Event) => {
@@ -22,17 +32,19 @@ export class CodeSnippet extends LitElement {
     render() {
         const rstyle = this.rendered ? '' : styleMap({ display: 'none' })
         const pstyle = this.rendered ? styleMap({ display: 'none' }) : ''
+
+        const slot = html`<slot style=${style} @slotchange=${this.slotchange}></slot>`
+        const content = html`<code>${unsafeHTML(this.rendered)}</code>`
+
         if (this.block) {
             return html`
-                <pre style=${rstyle}><code>${unsafeHTML(this.rendered)}</code></pre>
-                <pre style=${pstyle}><code><slot @slotchange=${this.slotchange}></slot></code></pre>
+                <pre style=${rstyle}>${content}</pre>
+                <pre style=${pstyle}>${slot}</pre>
             `
         }
         return html`
-            <span style=${rstyle}><code>${unsafeHTML(this.rendered)}</code></span>
-            <span style=${pstyle}
-                ><code><slot @slotchange=${this.slotchange}></slot></code
-            ></span>
+            <span style=${rstyle}>${content}</span>
+            <span style=${pstyle}>${slot}</span>
         `
     }
 }

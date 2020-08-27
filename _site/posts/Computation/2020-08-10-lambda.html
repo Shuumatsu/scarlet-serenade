@@ -40,8 +40,7 @@
 <h3>substitution</h3>
 <p indent="0"><b>α-equivalence</b> : we can change the name of bound variables without changing the meaning of functions. Thus λx.x is the same function as λy.y. Expressions e1 and e2 that differ only in the name of bound variables are called α-equivalent ("alpha equivalent"), sometimes written e1 =α e2.</p>
 <p indent="0"><b>β-equivalence</b> : We write e1{e2/x} to mean expression e1 with all free occurrences of x replaced with e2.</p>
-<code-snippet indent="1" block="true">
-((λx.λy.x)y)z
+<code-snippet indent="1" block="true">((λx.λy.x)y)z
         -&gt;  ((λy.x)[y/x])z   // substitute y for x in the body of &quot;λy.x&quot;
         -&gt;  ((λy'.x)[y/x])z  // after alpha reduction
         -&gt;  (λy'.y)z         // first beta-reduction complete!
@@ -65,8 +64,7 @@
 <p indent="0">In terms of the abstract-syntax tree, an "apply" node represents an outermost redex iff</p>
 <p indent="1">it represents a redex (its left child is a lambda), and</p>
 <p indent="2">it has no ancestor "apply" node in the tree that also represents a redex.</p>
-<code-snippet indent="0" block="true">
-                            apply  &lt;-- not a redex
+<code-snippet indent="0" block="true">apply  &lt;-- not a redex
                            /     \
 an outermost redex --&gt; apply      apply &lt;-- another outermost redex
                       /    \      /    \

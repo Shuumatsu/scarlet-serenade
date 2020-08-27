@@ -1,2 +1,2 @@
-import './code-snippet.ts'
-import './mathjax-panel.ts'
+import './mathjax-panel'
+import './code-snippet'

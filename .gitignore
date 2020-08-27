@@ -1,3 +1,6 @@
+# hakyll cache files
+_cache/
+
 .stack-work/
 *~
 

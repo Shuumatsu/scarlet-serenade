@@ -37,7 +37,7 @@
 <br />
 <p indent="0">In the pure lambda calculus, any abstraction is a value. Remember, an abstraction λx. e is a function; in the pure lambda calculus, the only values are functions. </p>
 <p indent="0">In an applied lambda calculus with integers and arithmetic operations, values also include integers. Intuitively, a value is an expression that can not be reduced/executed/simplified any further.</p>
-<h3><p indent="0">substitution</p></h3>
+<h3>substitution</h3>
 <p indent="0"><b>α-equivalence</b> : we can change the name of bound variables without changing the meaning of functions. Thus λx.x is the same function as λy.y. Expressions e1 and e2 that differ only in the name of bound variables are called α-equivalent ("alpha equivalent"), sometimes written e1 =α e2.</p>
 <p indent="0"><b>β-equivalence</b> : We write e1{e2/x} to mean expression e1 with all free occurrences of x replaced with e2.</p>
 <code-snippet indent="1" block="true">
@@ -54,7 +54,7 @@
 <p indent="1">not change:  <code-snippet>(λx.xx)(λx.xx) → (λx.xx)(λx.xx)</code-snippet></p>
 <p indent="1">increase:  <code-snippet>(λx.xxx)(λx.xxx) → (λx.xxx)(λx.xxx)(λx.xxx) → (λx.xxx)(λx.xxx)(λx.xxx)(λx.xxx)</code-snippet></p>
 <p indent="1">decrease:  <code-snippet>(λx.xx)(λa.λb.bbb) → (λa.λb.bbb)(λa.λb.bbb) → λb.bbb</code-snippet></p>
-<h3><p indent="0">normal form</p></h3>
+<h3>normal form</h3>
 <p indent="0">We say that a lambda expression without redexes (applications of a function to an argument) is in  <b>normal form</b> , and that a lambda expression  <b>has</b> a normal form iff there is some sequence of beta-reductions and/or expansions that leads to a normal form.</p>
 <p indent="0"><code-snippet>(λx.λy.y)((λz.zz)(λz.zz))</code-snippet> . This lambda expression contains two redexes:</p>
 <p indent="1">the whole expression</p>
@@ -76,7 +76,7 @@ an outermost redex --&gt; apply      apply &lt;-- another outermost redex
 
 </code-snippet>
 <p indent="0">If it is a function that ignores its argument, then reducing that redex can make other redexes (those that define the argument) "go away"; however, reducing an argument will never make the function "go away".</p>
-<h3><p indent="0">Evaluation strategy</p></h3>
+<h3>Evaluation strategy</h3>
 <p indent="1">call by value: leftmost-innermost (applicative-order reduction (AOR))</p>
 <p indent="1">call by name: leftmost-outermost (normal-order-reduction (NOR))</p>
 <p indent="1">call by need: like call by name but the result of the evaluation is saved and is then reused for each subsequent use of the formal.</p>

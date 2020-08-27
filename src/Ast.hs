@@ -1,4 +1,7 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Ast where
 
@@ -34,7 +37,8 @@ instance Monoid Classnames where
   mempty = Classnames []
 
 instance Show Classnames where
-  show (Classnames cs) = intercalate "," $ T.unpack <$> cs
+  show (Classnames []) = ""
+  show (Classnames cs) = printf "class=\"%s\"" $ intercalate "," $ T.unpack <$> cs
 
 -- |
 data SentenceComponent = SText Text | SCode Text | SEquation Text | SBold Text
@@ -59,11 +63,23 @@ instance Show Document where
       f (n, (Sentence p)) = printf "<p indent=\"%s\">%s</p>" (show n) (intercalate " " $ fmap show p)
       f (n, (Code code)) = printf "<code-snippet indent=\"%s\" block=\"true\">%s</code-snippet>" (show n) (renderHtml . toHtml . text $ code)
       f (n, (Equation eq)) = printf "<mathjax-panel indent=\"%s\" block=\"true\">%s</mathjax-panel>" (show n) (renderHtml . toHtml . text $ eq)
-      f (n, (Component tag cs@(Classnames cs') attrs children)) =
-        printf
-          "<%s %s %s>%s</%s>"
-          tag
-          (if length cs' == 0 then "" else "class=" ++ show (show cs))
-          (show attrs)
-          (show children)
-          tag
+      f (n, (Component tag cs attrs children)) =
+        let content = case children of
+              Document [(0, (Sentence p))] -> intercalate " " $ fmap show p
+              _ -> show children
+         in printf "<%s %s %s>%s</%s>" tag (show cs) (show attrs) content tag
+
+-- |
+-- data Piece
+
+-- data Component
+
+-- data Element a where
+--   Code :: Text -> Element Component
+--   Equation :: Text -> Element Component
+--   Element :: Text -> Classnames -> Attrs -> Document -> Element Component
+--   Sentence :: [Element Piece] -> Element Component
+--   PText :: Text -> Element Piece
+--   PCode :: Text -> Element Piece
+--   PEquation :: Text -> Element Piece
+--   PBold :: Text -> Element Piece

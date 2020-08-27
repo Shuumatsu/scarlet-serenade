@@ -31,7 +31,7 @@
     </section>
     <section>
         <p indent="0">Analyze a program to reason about its behaviors and determine whether it satisfies some properties </p>
-<h3><p indent="0">Sound & Complete</p></h3>
+<h3>Sound & Complete</h3>
 <p indent="0"><b>Sound</b> : over-approximation</p>
 <p indent="0"><b>Complete</b> : under-approximation</p>
 <p indent="1">e.g. 某个程序有 10 个指针错误，一个 Sound 的分析可能得出除了真实的那 10 个错误外还有其他错误，一个 Complete 的分析可能得出在那 10 个错误中的 2 个错误</p>
@@ -53,7 +53,7 @@
 <p indent="1">- Compromise Completeness: 造成误报</p>
 <p indent="0">Most of the time we prefer compromising completeness. </p>
 <p indent="0">Static Analysis ensure (or get close to) Soundness while making good trade offs between precision and speed.</p>
-<h3><p indent="0">Static Analysis</p></h3>
+<h3>Static Analysis</h3>
 <p indent="0">Static Analysis = Abstraction + over-approximation</p>
 <p indent="1">e.g. 例如分析程序中变量的符号</p>
 <p indent="2">- Abstraction: </p>
@@ -73,8 +73,8 @@ P + P = P
 P + N = T
 
 </code-snippet>
-<h3><p indent="0">IR</p></h3>
-<h4><p indent="0">Ast vs IR</p></h4>
+<h3>IR</h3>
+<h4>Ast vs IR</h4>
 <p indent="0">Ast: </p>
 <p indent="1">- high level and close to grammar structure</p>
 <p indent="1">- usually language dependent </p>
@@ -85,9 +85,9 @@ P + N = T
 <p indent="1">- usually language independent</p>
 <p indent="1">- contains control flow information</p>
 <p indent="0">IR is usually considered as the basis for static analysis.</p>
-<h4><p indent="0">3-addr-code </p></h4>
+<h4>3-addr-code </h4>
 <p indent="0">omitted.</p>
-<h4><p indent="0">Static Single Assignment</p></h4>
+<h4>Static Single Assignment</h4>
 <p indent="0">All assignments in SSA are to variables with distinct names</p>
 <br />
 <p indent="0">What if a variable use is at control flow merges?</p>
@@ -101,7 +101,7 @@ y = x + 7        =&gt;     x = phi(x_0, x_1)
 </code-snippet>
 <p indent="0">A special merge operator  <mathjax-panel>\phi</mathjax-panel> , (called phi-function), is introduced to select the values at merge nodes</p>
 <p indent="0"><mathjax-panel>\phi(x_0, x_1)</mathjax-panel> has the value  <mathjax-panel>x_0</mathjax-panel> if the control flow passes through the true part of the conditional and the value  <mathjax-panel>x_1</mathjax-panel> otherwise</p>
-<h5><p indent="0">Advantages & Disadvantages</p></h5>
+<h5>Advantages & Disadvantages</h5>
 <p indent="0">Advantages of SSA:</p>
 <p indent="1">Flow information is indirectly incorporated into the unique variable names</p>
 <p indent="2">(even flow-insensitive analysis gains partial precision of flow-sensitive analysis via SSA</p>
@@ -111,7 +111,7 @@ y = x + 7        =&gt;     x = phi(x_0, x_1)
 <p indent="0">Disadvantages of SSA: </p>
 <p indent="1">May introduce too many variables and phi-functions</p>
 <p indent="1">May introduce inefficiency problem when translating to machine code (due to copy operations)</p>
-<h3><p indent="0">Control Flow Analysis</p></h3>
+<h3>Control Flow Analysis</h3>
 <p indent="0">Usually refer to building Control Flow Graph (CFG)</p>
 <p indent="1">CFG serves as the basic structure for static analysis. The node in CFG is a Basic Block (BB). </p>
 <p indent="0"><b>Basic blocks (BB)</b> are maximal sequences of consecutive three-address instructions with the properties that</p>
@@ -143,9 +143,9 @@ y = x + 7        =&gt;     x = phi(x_0, x_1)
 <p indent="0">Data-flow analysis is to find a solution to a set of safe-approximation directed constraints on the IN[s]’s and OUT[s]’s, for all statements s.</p>
 <p indent="1">- constraints based on semantics of statements (transfer functions)</p>
 <p indent="1">- constraints based on the flows of control</p>
-<h3><p indent="0">Forward Analysis & Backward Analysis</p></h3>
+<h3>Forward Analysis & Backward Analysis</h3>
 <p indent="0">omitted</p>
-<h3><p indent="0">Reaching Definitions Analysis</p></h3>
+<h3>Reaching Definitions Analysis</h3>
 <p indent="0">Definition: A definition  <code-snippet>d</code-snippet> at program point  <code-snippet>p</code-snippet> reaches a point  <code-snippet>q</code-snippet> if there is a path from  <code-snippet>p</code-snippet> to  <code-snippet>q</code-snippet> such that  <code-snippet>d</code-snippet> is not “killed” along that path</p>
 <img src="./reaching-definition.png" height="120" />
 <p indent="0">Reaching definitions can be used to detect possible undefined variables.</p>
@@ -179,7 +179,7 @@ while changes to any output:
 <p indent="0">When a fact is added to  <code-snippet>output[block]</code-snippet> , whether it's from  <code-snippet>gen(block)</code-snippet> or survived from  <code-snippet>input[block] - kill(block)</code-snippet> , it stays there forever</p>
 <p indent="0">Thus output never shrinks.</p>
 <p indent="0">As the set of facts is finite (e.g., all definitions in the program), there must exist a pass of iteration during which nothing is added to any OUT, and then the algorithm terminates</p>
-<h3><p indent="0">Live Variables Analysis</p></h3>
+<h3>Live Variables Analysis</h3>
 <p indent="0">Live variables analysis tells whether the value of variable v at program point p could be used along some path in CFG starting at p. If so, v is live at p; otherwise, v is dead at p.</p>
 <img src="./live-variable.png" height="120" />
 <p indent="0">Information of live variables can be used for register allocations. e.g., at some point all registers are full and we need to use one, then we should favor using a register with a dead value.</p>
@@ -191,7 +191,7 @@ while changes to any output:
 <p indent="0">output[block]: It is live coming out of B and is not redefined in B</p>
 <p indent="0">uses: It is used before redefinition in B</p>
 <p indent="0">kills: It is redefined in B</p>
-<h3><p indent="0">Available Expressions Analysis</p></h3>
+<h3>Available Expressions Analysis</h3>
 <p indent="0">An expression x op y is available at program point p if </p>
 <p indent="1">1.  <b>all paths</b> from the entry to p  <b>must</b> pass through the evaluation of x op y</p>
 <p indent="1">2. after the last evaluation of x op y, there is no redefinition of x or y</p>

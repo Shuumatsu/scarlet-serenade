@@ -19,6 +19,10 @@ export class CodeSnippet extends LitElement {
                 :host([block='true']) {
                     display: block;
                 }
+                code {
+                    font-family: Iosevka, inconsolata, dm, Consolas, 'Courier New', monospace, 'Microsoft YaHei';
+                    color: var(--font-color);
+                }
             `,
         ]
     }

@@ -60,7 +60,6 @@
         -&gt;  (λy'.y)z         // first beta-reduction complete!
         -&gt;  y[z/y']          // substitute z for y' in &quot;y&quot;
         -&gt;  y                // second beta-reduction complete!
-
 </code-snippet>
 <p indent="0">we call ((λx.λy.x)y)z and y are beta-equivalent</p>
 <p indent="0">Note that the term "beta-*reduction*" is perhaps misleading, since doing beta-reduction does not always produce a smaller lambda expression. In fact, a beta-reduction can:</p>
@@ -85,7 +84,6 @@ an outermost redex --&gt; apply      apply &lt;-- another outermost redex
                      λ     ...   λ      apply  &lt;-- redex, but not outermost
                     / \         / \     /   \     
                   ... ...      ... ... λ    ...
-
 </code-snippet>
 <p indent="0">If it is a function that ignores its argument, then reducing that redex can make other redexes (those that define the argument) "go away"; however, reducing an argument will never make the function "go away".</p>
 <h3>Evaluation strategy</h3>

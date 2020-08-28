@@ -58,7 +58,6 @@
 | Sound  |  Truth  |  Complete |
 |        |         |           |
 +--------+---------+-----------+
-
 </code-snippet>
 <p indent="0">Rice Theorem tells us that we cannot build an analyzer thats both  <b>sound</b> and  <b>complete</b></p>
 <p indent="0">Two options:</p>
@@ -75,14 +74,12 @@
     v = - 1                 N 
     v = 0                   O
     v = e ? 1 : -1          T (unknown)
-
 </code-snippet>
 <p indent="2">- over-approximation: Transfer function</p>
 <p indent="3">defines how to evaluate different program statements on abstract values</p>
 <p indent="4">e.g. </p>
 <code-snippet indent="4" block="true">P + P = P
 P + N = T
-
 </code-snippet>
 <h3>IR</h3>
 <h4>Ast vs IR</h4>
@@ -107,7 +104,6 @@ then x_0 = 1            then x_0 = 1
 else x_1 = 2            else x_1 = 2
 y = x + 7        =&gt;     x = phi(x_0, x_1)
                         y = x + 7
-
 </code-snippet>
 <p indent="0">A special merge operator  <mathjax-panel>\phi</mathjax-panel> , (called phi-function), is introduced to select the values at merge nodes</p>
 <p indent="0"><mathjax-panel>\phi(x_0, x_1)</mathjax-panel> has the value  <mathjax-panel>x_0</mathjax-panel> if the control flow passes through the true part of the conditional and the value  <mathjax-panel>x_1</mathjax-panel> otherwise</p>
@@ -164,7 +160,6 @@ y = x + 7        =&gt;     x = phi(x_0, x_1)
 <p indent="1"><code-snippet>e.g., D1, D2, D3, D4, ..., D100 (100 definitions)</code-snippet></p>
 <p indent="0">transfer function: </p>
 <code-snippet indent="0" block="true">D: v = x op y
-
 </code-snippet>
 <p indent="0">This statement </p>
 <p indent="1">- "generates" a definition D of variable v</p>
@@ -180,7 +175,6 @@ while changes to any output:
     for block of all_blocks:
         input = merge output of predecessors
         output[block] = gen(block) &lt;&gt; (input[block] - kill(block))
-
 </code-snippet>
 <p indent="0">Why this iterative can finally algorithm stop? </p>
 <p indent="0"><code-snippet>output[block] = gen(block) <> (input[block] - kill(block))</code-snippet> every part of this statement except input[block] is constant. </p>

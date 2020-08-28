@@ -1,7 +1,8 @@
 /* app.css */
 :root {
-    --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Oxygen, Ubuntu,
-        Cantarell, 'Helvetica Neue', sans-serif;
+    --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', Roboto, Oxygen-Sans,
+        Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    --font-color: #172b4d;
 }
 /* salmon */
 
@@ -34,11 +35,9 @@ body {
 
 p,
 pre {
-    margin: 0.5em;
-    color: #172b4d;
+    margin: 0.5em 0 0.5em 0;
     font-weight: 400;
     font-size: 14px;
-    color: #172b4d;
 }
 
 a {
@@ -73,8 +72,4 @@ h3 {
 
 .center-text {
     text-align: center;
-}
-
-code {
-    font-family: iosevka;
 }

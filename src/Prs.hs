@@ -94,7 +94,7 @@ pBlockCode = lexeme' p <?> "block_code"
       case r of
         '`' : '`' : '`' : r' -> unexpected (Tokens (head r :| []))
         c : r' -> c <$ skipCount (length r - length r') anySingle
-    p = Code . T.pack <$> between (symbol' "```") (symbol' "```") content
+    p = Code . T.stripEnd . T.pack <$> between (symbol' "```") (symbol' "```") content
 
 pBlockEquation :: Parser Element
 pBlockEquation = lexeme' p <?> "block_equation"
@@ -104,7 +104,7 @@ pBlockEquation = lexeme' p <?> "block_equation"
       case r of
         '$' : '$' : r' -> unexpected (Tokens (head r :| []))
         c : r' -> c <$ skipCount (length r - length r') anySingle
-    p = Equation . T.pack <$> between (symbol' "$$") (symbol' "$$") content
+    p = Equation . T.stripEnd . T.pack <$> between (symbol' "$$") (symbol' "$$") content
 
 -- | component
 pClassnames :: Parser Classnames

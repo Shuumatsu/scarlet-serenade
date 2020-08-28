@@ -1153,6 +1153,10 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
                 :host([block='true']) {
                     display: block;
                 }
+                code {
+                    font-family: Iosevka, inconsolata, dm, Consolas, 'Courier New', monospace, 'Microsoft YaHei';
+                    color: var(--font-color);
+                }
             `]}render(){const e=this.rendered?"":ue({display:"none"}),t=this.rendered?ue({display:"none"}):"",n=G`<slot style=${be} @slotchange=${this.slotchange}></slot>`,a=G`<code>${ge(this.rendered)}</code>`;return this.block?G`
                 <pre style=${e}>${a}</pre>
                 <pre style=${t}>${n}</pre>

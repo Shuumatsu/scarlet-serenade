@@ -1,4 +1,4 @@
-### Encoding Boolean
+:h3 Encoding Boolean
 
 `let cond p a b = if p then a else b` 是常见的 boolean 操作，我们从这个方法下手。可以看出如果将 `a b` 看作一个 tuple 那么 `p` 就像一个一个从 tuple 中取值的函数。`true` 为取第一个元素，`false` 为第二个。
 容易写出函数表达的 boolean:
@@ -22,7 +22,7 @@ AND == λa.λb.a b FALSE
 OR == λa.λb.a TRUE b
 ```
 
-### Encoding LISP-style lists
+:h3 Encoding LISP-style lists
 
 从 `car` 与 `cdr` 入手，The way we'll define a non-nil list is as a function that "stores" the head and tail of the list in its body. Its argument will be a selector function (head or tail). 
 
@@ -37,9 +37,9 @@ nil = λs.true
 CONS = λh.λt.(λs.s h t)
 ```
 
-### Encoding Natural Numbers
+:h3 Encoding Natural Numbers
 
-#### 可以用 list 来实现
+:h4 可以用 list 来实现
 
 ```
 ISZERO == ISEMPTY
@@ -47,7 +47,7 @@ PRED == TAIL
 SUCC is a function that adds one more element onto a given list, so: SUCC == λL.CONS x L
 ```
 
-#### 根据函数 apply 的次数来实现 
+:h4 根据函数 apply 的次数来实现 
 
 ```
 n = λx.λy.x^n y
@@ -71,7 +71,7 @@ $$\left(\operatorname{SUCC}\left(\lambda x . \lambda y . x^{n} y\right)\right) \
 `SUCC == λa.(λx.λy.a x (xy))`
 
 
-```ocaml
+```
 module type ChurchNumber = sig
   (* in untyped lambda calculus, we can use a generic type instead of bool *)
   (* we use bool here because of is_zero *)

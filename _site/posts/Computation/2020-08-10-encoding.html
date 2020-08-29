@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-10-encoding</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <h3 id="encoding-boolean">Encoding Boolean</h3>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-10-encoding</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><h3 id="encoding-boolean">Encoding Boolean</h3>
 <p><code>let cond p a b = if p then a else b</code> 是常见的 boolean 操作，我们从这个方法下手。可以看出如果将 <code>a b</code> 看作一个 tuple 那么 <code>p</code> 就像一个一个从 tuple 中取值的函数。<code>true</code> 为取第一个元素，<code>false</code> 为第二个。 容易写出函数表达的 boolean:</p>
 <pre><code>let true' a b = a
 
@@ -119,9 +128,9 @@ n == 0 即 y 直接返回就返回 true，那么 let `y` be `True`</code></pre>
 <span id="cb7-30"><a href="#cb7-30" aria-hidden="true"></a>  <span class="kw">let</span> add x y f b = x f (y f b)</span>
 <span id="cb7-31"><a href="#cb7-31" aria-hidden="true"></a></span>
 <span id="cb7-32"><a href="#cb7-32" aria-hidden="true"></a>  <span class="kw">let</span> mult x y f b = x (y f) b</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
-    </section>
-</article>
-        </main>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div></section>
+    </article>
+</main>
+
     </body>
 </html>

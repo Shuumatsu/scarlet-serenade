@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-11-combinatory-logic</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <h1>combinatory logic</h1>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-11-combinatory-logic</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><h1>combinatory logic</h1>
 <p indent="0">1. 所有的变量，常量，以及组合子  <mathjax-panel>I</mathjax-panel> ,  <mathjax-panel>K</mathjax-panel> ,  <mathjax-panel>S</mathjax-panel> 都是合法的  <mathjax-panel>CL</mathjax-panel> 项</p>
 <p indent="0">2. 如果  <mathjax-panel>X</mathjax-panel> 和  <mathjax-panel>Y</mathjax-panel> 是合法的  <mathjax-panel>CL</mathjax-panel> 项，那么  <mathjax-panel>XY</mathjax-panel> 也是</p>
 <p indent="0">例如，以下字符串都是合法的  <mathjax-panel>CL</mathjax-panel> 项  <mathjax-panel>((S(K S)) K)</mathjax-panel> ,  <mathjax-panel>\left(\left(S\left(K\right)\right)((S K) K)\right)</mathjax-panel></p>
@@ -69,9 +78,9 @@ S(K S) K X Y Z &amp;= (K S K) (K X) Y Z \\
 <p indent="1"><mathjax-panel>\lambda x . U x</mathjax-panel> 则等价于 U (就是 eta-conversion)</p>
 <p indent="1">在上述三种情况外，一定形如  <mathjax-panel>\lambda x . U V</mathjax-panel> ，则等价于  <mathjax-panel>S (\lambda . U) (\lambda . V)</mathjax-panel></p>
 <p indent="2">在  <mathjax-panel>\lambda</mathjax-panel> 演算中，当我们做 application 的时候，我们对 function body 做 substitution 也就是 beta-reduction；也就是说如果我们的项将对某个变量  <mathjax-panel>x</mathjax-panel> 做 substitution，我们可以将其写成 function application 的形式。所以在这里  <mathjax-panel>U</mathjax-panel> 被改写为了  <mathjax-panel>(\lambda . U)</mathjax-panel></p>
-<p indent="0">例如  <mathjax-panel>[x] . x y=S([x] . x)([x] . y)=S I(K y)</mathjax-panel></p>
-    </section>
-</article>
-        </main>
+<p indent="0">例如  <mathjax-panel>[x] . x y=S([x] . x)([x] . y)=S I(K y)</mathjax-panel></p></section>
+    </article>
+</main>
+
     </body>
 </html>

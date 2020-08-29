@@ -1,0 +1,312 @@
+:h3 Introduction 
+
+**Definition:** A **type system** is a tractable syntactic method for proving the absence of certain program behaviors by classifying phrases according to the kinds of values they compute.
+- - this definition identifies type systems as tools for reasoning about programs.
+
+**Definition:** A **safe language** is one that protects its own abstractions. Every high-level language provides abstractions of machine services. Safety refers to the language's ability to guarantee the integrity of these abstractions and of higher-level abstractions introduced by the programmer using the definitional facilities of the language.
+- - e.g., a programmer using this language then expects that an array can be changed only by using the update operation on it explicitly—and not, for example, by writing past the end of some other data structure. 
+
+Language safety can be achieved by static checking, but also by run-time checks that trap nonsensical operations just at the moment when they are attempted and stop the program or raise an exception. For example, Scheme is a safe language, even though it has no static type system
+
+```
+       | statically checked      | dynamically checked
+       | ----------------------- | -------------------------
+safe   | ML, Haskell, Java, etc. | Lisp, Scheme, Perl, etc.  
+unsafe | C, C++, etc.            |
+```
+
+Language safety is seldom absolute. Safe languages often offer programmers "escape hatches," such as foreign function calls to code written in other, possibly unsafe, languages.
+
+:h3 Mathematical Preliminaries
+
+**Definition:** The **domain** of a relation $R$ on sets $S$ and $T$, written $dom(R)$, is the set of elements $s \in S$ such that $(s, t) \in R$ for some $t$.
+**Definition:** The **codomain or range** of $R$, written $range(R)$ is the set of elements $t \in T$ such that $(s, t) \ in R$ for some $s$.
+
+**Definition:** A relation $R$ on sets $S$ and $T$ is called a **partial function** from $S$ to $T$ if, whenever $(s, t_1) \in R$ and $(s, t_2) \in R$, we have $t_1 = t_2$.
+- in addition, if $dom(R) = S$ then $R$ is called a **total function**.
+
+**Definition:** A partial function $R$ from $S$ to $T$ is said to be defined on an argument $s \in S$ if $s \in dom(R)$ and undefined otherwise.
+- - we write $f(x) = \uparrow$ to mean $f$ is undefined on $x$
+- - we write $f(x) = \downarrow $ to mean $f$ is defined on $x$
+
+We will also need to define functions that may fail on some inputs.  It is important to distinguish failure (which is a legitimate, observable result) from divergence.
+- （怎么没解释什么是 divergence 啊...
+
+**Definition:** Suppose $R$ is a binary relation on a set $S$ and $P$ is a predicate on $S$. We say that $P$ is **preserved** by $R$ if whenever we have $s R s'$ and $P(s)$ we also have $P(s')$
+
+**Definition:** A binary relation $R$ on a set $S$ 
+- - **reflexive** if $R$ relates every element of $S$ to itself - that is, $s R s$
+- - **transitive** $s R t$ and $t R u$ together implies $s R u$ 
+- - **symmetric** if $s R t$ implies $t R s$ 
+- - **antisymmetric** $s R t$ and $t R s$ together implies $s = t$ 
+
+**Definition:** A reflexive, transitive, and symmetric relation on a set $S$ is called an **equivalence** on $S$.
+
+**Definition:** A reflexive and transitive relation $R$ on a set $S$ is called a **preorder** on S.
+- Preorders are usually written using symbols like $\leq$. We write $s \lt t$ ($s$ is strictly less than $t$) to mean $s \leq t \wedge s \neq t$.
+**Definition:** A preorder (on a set $S$) that is also antisymmetric is called a **partial order** on $S$. 
+**Definition:** A partial order $\leq$ is called a **total order** if it also has the property that, for each $s$ and $t$ in $S$, either $s \leq t$ or $t \leq s$.
+
+**Definition:** Suppose R is a binary relation on a set $S$. 
+- - The **reflexive closure** of $R$ is the smallest reflexive relation $R'$ that contains R. 
+- - The **transitive closure** of $R$ is the smallest transitive relation $R^+$ that contains R. 
+- - The **reflexive and transitive closure** of $R$ is the smallest reflexive and transitive relation $R^*$ that contains R. 
+
+**Definition:** Suppose we have a set $S$ with a preorder $\leq$. We say that $\leq$ is **well founded** if it contains no infinite decreasing chains.
+- For example, the usual order on the natural numbers, with $0 < 1 < 2 < 3 < \dots$ is well founded, but the same order on the integers, $\dots < -3 < -2 < -1 < 0 < 1 < 2 < 3 < \dots$ is not. 
+-- （好像意思虽然序列的长度不是有界的，但是自然数下的这个关系，从任何元素开始，最小只能小到 $0$，而整数上的可以无限小下去？
+
+:h3 Untyped Arithmetic Expressions
+
+:h4 BNF definition
+
+One way to describe our grammar is using **BNF**. Parentheses are not mentioned in the grammar of terms, which defines only their abstract syntax.
+- ```
+t ::= true
+      false
+      if t then t else t
+      0
+      succ t
+      pred t
+      iszero t
+```
+The symbol `t` in the right-hand sides of the rules of this grammar is called a **metavariable**. It is a place-holder for some particular term.
+- "meta" means that it is not a variable of the object language - the language whose syntax we are currently describing but rather of the metalanguage - the notation in which the description is given.
+
+**Definition:** The term **metatheory** means the collection of true statements that we can make about some particular logical system (or programming language) and, by extension, the study of such statements. 
+
+:h4 inductive definition
+
+The set of terms is the smallest set $T$ such that
+- 1. $\{$ true, false, 0$\} \subseteq T$
+- 2. if $t_1 \in T$ then $\text{succ } t_1, \text{pred } t_1, \text{iszero } t_1 \subseteq T$
+- 3. if $t_1 \in T, t_2 \in T$ and $t_3 \in T$ then $\text{if } t_1 \text{ then } t_2 \text{ else } t_3 \in T$
+
+This can also be written as the "natural deduction style"
+$$
+\begin{gathered}
+true \in T \quad 
+false \in T \quad 
+0 \in T \\
+\frac{t_1 \in T}{\text{succ } t_1 \in T} \quad
+\frac{t_1 \in T}{\text{pred } t_1 \in T} \quad
+\frac{t_1 \in T}{\text{iszero } t_1 \in T} \\
+\frac{t_1 \in T \quad t_2 \in T \quad t_3 \in T}{\text{if } t_1 \text{ then } t_2 \text{ else } t_3 \in T} 
+\end{gathered}
+$$
+
+Each rule is read "If we have established the statements in the premise(s) listed above the line, then we may derive the conclusion below the line."
+- - rules with no premises (like the first three above) are often called axioms. 
+To be completely pedantic, what we are calling "inference rules" are actually rule schemas, since their premises and conclusions may include metavariables.
+- (for example, you can replace the metavariable $t_1$ by all phrases from the appropriate syntactic category
+
+Like the BNF grammar, this definition says nothing about the use of parentheses to mark compound subterms. Formally, what's really going on is that we are defining $T$ as a set of trees.
+
+:h4 concrete definition 
+
+For each natrual number $i$, define a set $S_i$ as follows: 
+$$
+\begin{aligned}
+S_0 = \;       & \phi \\
+S_{i + 1} = \; & \{true, false, 0\} \cup
+                 \{\text{succ } t_1, \text{pred } t_1, \text{iszero } t_1 | t_1 \in S_i \} \cup 
+                 \{\text{if } t_1 \text{ then } t_2 \text{ else } t_3 | t_1, t_2, t_3 \in S_i \}
+\end{aligned}
+$$
+
+Finally, let $S=\bigcup_{i} S_{i}$
+
+:h4 equivalence between inductive definition and concrete definition
+
+Use $T$ to represent the one defined by inductive definition and $S$ to represent the one defined by concrete definition.
+
+$T$ was defined as the smallest set satisfying certain conditions. so our proof consists of two pars: 
+- (a) $S$ satisfies these conditions
+- (b) $S$ is the smallest set, in other words, any set satisfying the conditions has $S$ as a subset
+
+part (a) $S$ satisfies these conditions:
+:div(indent="1")
+    1. the constants are trivial 
+    2. if $t \in S$ then $\exists i, s.t.\ t \in S_i$, then by definition of $S_{i+1}$, we have $\text{succ } t \in S_{i + 1} \subseteq S$, similarly, we see that $\text{pred } t \in S_{i + 1} \subseteq S$ and $\text{iszero } t \in S_{i + 1} \subseteq S$
+    3. if $t_1 \in T, t_2 \in T$ and $t_3 \in T$, similarly $\text{if } t_1 \text{ then } t_2 \text{ else } t_3 \in S{i+1} \subseteq S$
+
+
+part (b) $S$ is the smallest set: suppose that some set $S'$ satisfies the conditions, we will argue by complete induction on $i$, that every $S_i \subseteq S'$, from which it clearly follows $S \subseteq S'$
+:div(indent="1")
+    Suppose that $S_{j} \subseteq S'$ for all $j \lt i$, we are to show that $S_i \subseteq S'$. 
+    by the definition of $S_i$, there are two cases to consider
+    :div(indent="1")
+        1. $i = 0$: it's trivial 
+        2. $i > 0$: $\exists j, s.t.\ i = j + 1$. Since $S_{j + 1}$ is defined as the union of three smaller sets, an element $t \in S_{j + 1}$ must come from one of these sets:
+        :div(indent="1")
+            (i) if $t$ is constant, then it's trivial $t \in S'$
+            (ii) if $t$ has the form $\text{succ } t_1$ for some $t_1 \ S_j$, then by the induction hypothesis, $t_1 \in S'$ and by condition (2) $t \in S'$
+            (iii) if $t$ has the form $\text{if } t_1 \text{ then } t_2 \text{ else } t_3$, for the same reason in (ii), $t \in S'$ 
+    Thus, we have shown that each $S_i \subseteq S'$. By the definition of S as the union of all the $S_i$, this gives $S \subseteq S'$, completing the argument.
+
+
+:h4 Semantic Styles
+
+**Definition:** the **semantics** of the language: precise definition of how terms are evaluated
+
+There are three basic approaches to formalizing semantics:
+- 1. **Operational semantics** specifies the behavior of a programming language by defining a simple **abstract machine** for it.
+-- This machine is "abstract" in the sense that it uses the terms of the language as its machine code, rather than some low-level microprocessor instruction set. 
+-- - A **state** of the machine is just a term, and the machine's behavior is defined by a **translation function** that , for each state, either gives the next state by performing a step of simplification on the term or declares that the machine has halted
+-- - The **meaning** of a term `t` can be taken to be the final state that the machine reaches when started with `t` as its initial state
+-- (Strictly speaking, what we are describing here is the so-called **small-step style** of operational semantics
+
+- 2. **Denotational semantics** takes 
+-- - The **meaning** of a term is taken to be some mathematical object, such as a number or a function. 
+-- - Giving denotational semantics for a language consists of 
+--- 1. finding a collection of **semantic domains**
+---- btw. **domain theory**: the search for appropriate semantic domains for modeling various language features
+--- 2. defining an **interpretation** function mapping terms into elements of these domains
+
+- 3. **Axiomatic semantics** instead of first defining the behaviors of programs (by giving some operational or denotational semantics) and then deriving laws from this definition, axiomatic methods take the laws themselves as the definition of the language. 
+-- - The **meaning** of a term is what can be proved about it.
+
+:h3 Evaluation
+
+**Definition:** An **instance** of an inference rule is obtained by consistently replacing each metavariable by the same term in the rule's conclusions and all its premises.
+- for example, `if true then true else false -> true` is an instance of $\text{if } v_1 \text{ then } v_2 \text{ else } v_3$
+
+**Definition:** **evaluation relation** on terms, written $t \rightarrow t'$, is defined by inference rules.
+
+**Definition:** A rule is **satisfied** by a relation if, for each instance of the rule, either the conclusion is in the relation or one of the premises is not.
+- 没懂...
+
+**Definition:** A term $t$ is **normal form** if no evaluation rule applies to it - i.e., there is no $t'$ such that $t \rightarrow^{*} t'$
+
+
+**Definition:** A term is **stuck** if it is in normal form but not a value.
+:div(indent="1")
+    "Stuckness" gives us a simple notion of run-time error for our simple machine.
+    Intuitively, it characterizes the situations where the operational semantics does not know what to do because the program has reached a "meaningless state." 
+    - (segmentation faults, execution of illegal instructions, etc.
+
+:p --- 这两个定理好像是针对特定的规则的
+
+**Determinacy of One-Step Evaluation** Theorem: If $t \rightarrow u$ and $t \rightarrow v$, then $u = v$
+Proof: by induction on a derivation of $t \rightarrow u$.
+- We can as well say that we are performing induction on the structure of $t$, since t he structure of an "evaluation derivation" directly follows the structure of the term being reduced.
+- TODO...
+
+**Uniqueness of Normal Forms** Theorem: If $t \rightarrow^{*} u$ and $t \rightarrow^{*} v$, where $u$ and $v$ are both normal forms, then $u = v$
+Proof: Just a corollary of the determinacy of single-step evaluation.
+
+:h2 An ML Implementation of Arithmetic Expressions
+
+:p 
+    :span implementation: 
+    :a(href="https://github.com/Shuumatsu/TAPL/tree/chapter-4") https://github.com/Shuumatsu/TAPL/tree/chapter-4
+
+:div(class="flex")
+    :div 
+        syntactic forms:
+        $$
+        \begin{aligned}
+        t \; ::= \;  & \ldots                   \quad \quad & terms \\
+                    & 0                        \quad \quad & \text{constant zero} \\
+                    & \operatorname{succ} t    \quad \quad & \text{successor} \\
+                    & \operatorname{pred} t    \quad \quad & \text{pred} \\
+                    & \operatorname{iszero} t  \quad \quad & \text{iszero} \\
+        \\
+        v \; ::= \;  & \ldots                   \quad \quad & values \\
+                    & nv                       \quad \quad & \text{numeric value} \\
+        \\
+        nv \; ::= \; & \ldots                   \quad \quad & \text{numeric values} \\
+                    & 0                        \quad \quad & \text{zero value} \\
+                    & \operatorname{succ} nv   \quad \quad & \text{successor value} \\
+        \end{aligned}
+        $$
+
+    :div
+        evaluation rules:
+        $$
+        \begin{aligned}
+        & \frac
+            {t _{1} \longrightarrow t _{1}^{\prime}}
+            {\operatorname{succ} t_{1} \rightarrow \operatorname{succ} t_{1}^{\prime}}
+        & \text{(E-Succ)} \\
+        \\
+        & \operatorname{pred} 0 \rightarrow 0
+        & \text{(E-PredZero)} \\
+        \\
+        & \operatorname{pred}\left(\operatorname{succ} n v_{1}\right) \rightarrow n v_{1}
+        & \text{(E-PredSucc)} \\
+        \\
+        & \frac
+            {t _{1} \longrightarrow t _{1}^{\prime}}
+            {\operatorname{pred} t_{1} \rightarrow \operatorname{pred} t_{1}^{\prime}}
+        & \text{(E-Pred)} \\
+        \\
+        & \operatorname{iszero} 0 \rightarrow true
+        & \text{(E-IszeroZero)} \\
+        \\
+        & \operatorname{iszero}(\operatorname{succ} nv_1) \rightarrow false
+        & \text{(E-IszeroSucc)} \\
+        \\
+        & \frac
+            {t _{1} \longrightarrow t _{1}^{\prime}}
+            {\operatorname{iszero} t_{1} \rightarrow \operatorname{iszero} t_{1}^{\prime}}
+        & \text{(E-IsZero)} \\
+        \end{aligned}
+        $$
+
+:h2 The Untyped Lambda Calculus
+In the lambda-calculus **everything is a function**: the arguments accepted by functions are themselves functions and the result returned by a function is another function
+
+An occurrence of the variable $x$ is said to be **bound** when it occurs in the body t of an abstraction $\lambda x.t$.
+An occurrence of $x$ is **free** if it appears in a position where it is not bound by an enclosing abstraction on $x$. 
+
+**Definition:** A term with no free variables is said to be **closed**; closed terms are also called **combinators**
+
+:h3 TODO...
+
+:h2 Nameless Representation of Terms
+
+We can devise some "canonical" representation of variables and terms that does not require renaming.
+
+De Bruijn's idea was that we can represent terms by making variable occurrences point directly to their binders, rather than referring to them by name.  This can be accomplished by replacing named variables by natural numbers, where the number k stands for "the variable bound by the k'th enclosing $\lambda$.
+- - e.g., $\lambda x.x$ corresponds to the nameless term $λ.0$
+- - e.g., $\lambda x. \lambda y. x (y x)$ corresponds to the nameless term $\lambda. \lambda. 1 (0 1)$
+
+**Nameless terms** are also sometimes called **de Bruijn terms**,  and the numeric variables in them are called **de Bruijn indices**. Compiler writers use the term **static distances** for the same concept.
+
+**Definition:** let $T$ be the smallest family of sets $\{ T _{0}, T _{1}, T _{2}, \ldots\}$ such that 
+- 1. $k \in T_n$ whenever $0 \leq k \leq n$
+- 2. if $t_1 \in T_n$ and $n > 0$ then $\lambda. t_1 \in T_{n - 1}$
+- 3. if $t_1 \in T_n$ and $t_2 \in T_n$ then $(t_1 t_2) \in T_n$
+
+
+TODO...
+
+
+:h2 Simple Types
+
+**Definition:** A term $t$ is **typable (or well typed)** if there is some $T$ such that $t: T$
+
+:h3 Safety = Progress + Preservation
+
+**Progress** theorem: A well-typed term is not stuck (either it is a value or it can take a step according to the evaluation rules)
+**Preservation** theorem: If a well-typed term takes a step of evaluation, then the resulting term is also well typed.
+
+**Definition:** Languages in which type annotations in terms are used to guide the typechecker are called **explicitly typed**.
+**Definition:** Languages in which we ask the typechecker to infer or reconstruct his information are called **implicitly typed**.
+
+**Definition:** A **typing context** (also called a **type enviroment**) $\Gamma$ is a sequence of variables and their types.
+
+We write $dom(\Gamma)$ for the set of variables bound by $\Gamma$
+
+An **inversion lemma** records a collection of observations about how typing derivations are built: the clause for each syntactic form tell use "if a term of this form is well typed, then its subterms must have types of these forms..."
+e.g., if $\Gamma \vdash \lambda x : T _{1} \cdot t _{2}: R$, then $R = T _{1} \rightarrow R _{2}$ for some $R_2$ with $\Gamma, x : T _{1} \vdash t _{2}: R _{2}$
+
+
+
+:h3 The Curry-Howard Correspondence 
+
+The $\rightarrow$ type constructor comes with typing rules of two kinds:
+- 1. an "introduction rule (T-ABS)" describing how elements of the type can be created
+- 2. an "elimination rule (T-APP)" describes how elements of the type can be used
+

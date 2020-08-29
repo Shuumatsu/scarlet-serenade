@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-28-bankers-algorithm</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <p indent="0">银行家算法的核心思想是检查安全状态，假设某个进程 p 请求了某些资源，计算分配之后是否依然是安全状态，如果依然是，就允许分配，不然拒绝。</p>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-28-bankers-algorithm</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">银行家算法的核心思想是检查安全状态，假设某个进程 p 请求了某些资源，计算分配之后是否依然是安全状态，如果依然是，就允许分配，不然拒绝。</p>
 <code-snippet indent="0" block="true">MAX is a n * m matrix, MAX_Matrix[i, j] 表示进程 i 总共需要多少资源 j 
 Allocated is a n * m matrix, Allocated[i, j] 表示已经分配给了进程 i 多少资源 j
 Resources is a vector of length m, Resources[i] 表示系统中还有有多少资源 i
@@ -74,9 +83,9 @@ else
     return unsafe
     
 &lt;!-- 稍加修改此代码我们也能得出一个安全序列 --&gt;
-</code-snippet>
-    </section>
-</article>
-        </main>
+</code-snippet></section>
+    </article>
+</main>
+
     </body>
 </html>

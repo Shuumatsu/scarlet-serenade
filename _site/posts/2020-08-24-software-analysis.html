@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-24-software-analysis</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <p indent="0">Analyze a program to reason about its behaviors and determine whether it satisfies some properties </p>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-24-software-analysis</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">Analyze a program to reason about its behaviors and determine whether it satisfies some properties </p>
 <h3>Sound & Complete</h3>
 <p indent="0"><b>Sound</b> : over-approximation</p>
 <p indent="0"><b>Complete</b> : under-approximation</p>
@@ -139,9 +148,7 @@ y = x + 7        =&gt;     x = phi(x_0, x_1)
 <p indent="2">- There is a conditional or unconditional jump from the end of A to the beginning of B</p>
 <p indent="2">- B immediately follows A in the original order of instructions</p>
 <p indent="0">may analysis: outputs information that may be true (over-approximation)</p>
-<p indent="1">假设正确答案是一个集合S，返回的集合总是S的子集</p>
 <p indent="0">must analysis: outputs information that must be true (under-approximation)</p>
-<p indent="1">假设正确答案是一个集合S，返回的集合总是S的超集</p>
 <p indent="0">Input and Output States</p>
 <p indent="0">Each execution of an IR statement transforms an input state to a new output state</p>
 <p indent="0">The input (output) state is associated with the program point before (after) the statement</p>
@@ -202,8 +209,32 @@ while changes to any output:
 <p indent="0">对于一个  <code-snippet>a = x op y</code-snippet></p>
 <p indent="1">Add to OUT the expression x op y (gen)</p>
 <p indent="1">Delete from IN any expression involving variable  <code-snippet>a</code-snippet> (kill)</p>
-    </section>
-</article>
-        </main>
+<h3>Foundations</h3>
+<p indent="0">Given a CFG (program) with k nodes, the iterative algorithm updates  <code-snippet>output[n]</code-snippet> for every node n in each iteration.</p>
+<p indent="0">Then we can make a k-tuple:  <mathjax-panel>(output[n_1], output[n_2], \dots, output[n_k])</mathjax-panel> as an element of set  <mathjax-panel>\left( V _{1} \times V _{2} \ldots \times V _{ k }\right)</mathjax-panel> denoted as  <mathjax-panel>V^k</mathjax-panel> , to hold the values of the analysis after each iteration.</p>
+<p indent="0">Then each iteration can be considered as taking an action to map an element of  <mathjax-panel>V^k</mathjax-panel> to a new element of  <mathjax-panel>V^k</mathjax-panel> . Abstracted as a function  <mathjax-panel>F : V ^{ k } \rightarrow V ^{ k }</mathjax-panel></p>
+<p indent="0">Then the algorithm outputs a series of k-tuples iteratively until a k-tuple is the same as the last one in two consecutive iterations.</p>
+<p indent="0">Data flow analysis can be seen as iteratively applying transfer functions and meet/join operations on the values of a lattice until we reach.</p>
+<p indent="0">If we guarantee that  <mathjax-panel>F</mathjax-panel> is monotonic, then its compromised to terminate, and finally reach the fixed point.</p>
+<p indent="0">In each iteration, it is equivalent to think that we apply function  <mathjax-panel>F</mathjax-panel> which consists of</p>
+<p indent="1">1. transfer function  <mathjax-panel>f_i: L \rightarrow L</mathjax-panel> for every node</p>
+<p indent="1">2. join/meet function  <mathjax-panel>\sqcup / \sqcap : L \times L \rightarrow L</mathjax-panel> for control-flow confluence</p>
+<h3>Meet-Over-All-Paths Solution (MOP)</h3>
+<p indent="0">MOP 和上面讨论的 iterative approach 的区别在于 CFG 中汇聚点的处理方式不同。</p>
+<p indent="0">以  <mathjax-panel>S_4</mathjax-panel> 为例</p>
+<p indent="1"><mathjax-panel>input[S_4] = f_{s_3}(f_{s_1}(output[entry]) \sqcup f_{s_2}(output[entry]))</mathjax-panel></p>
+<p indent="1"><mathjax-panel>mop[S_4] = f_{s_3}(f_{s_1}(output[entry])) \sqcup f_{s_3}(f_{s_2}(output[entry]))</mathjax-panel></p>
+<p indent="0">四舍五入就是 </p>
+<p indent="1">-  <mathjax-panel>input = F ( x \sqcup y )</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>mop = F ( x ) \sqcup F ( y )</mathjax-panel></p>
+<p indent="2">(如果 F 满足分配律的话二者就是相同的</p>
+<p indent="0">我们可以证明，MOP 有着更高的精度：</p>
+<p indent="1">by definition of lub  <mathjax-panel>\sqcup</mathjax-panel> , we have  <mathjax-panel>x \subseteq x \sqcup y</mathjax-panel> and  <mathjax-panel>y \subseteq x \sqcup y</mathjax-panel></p>
+<p indent="1">as  <mathjax-panel>F</mathjax-panel> is monotonic, we have  <mathjax-panel>F ( x ) \sqsubseteq F ( x \sqcup y )</mathjax-panel> and  <mathjax-panel>F ( y ) \sqsubseteq F ( x \sqcup y )</mathjax-panel> , which means  <mathjax-panel>F ( x \sqcup y )</mathjax-panel> is a upper bound for  <mathjax-panel>x</mathjax-panel> and also for  <mathjax-panel>y</mathjax-panel></p>
+<p indent="1">thus we have the lub  <mathjax-panel>F(x) \sqcup F(y) \sqsubseteq F ( x \sqcup y )</mathjax-panel></p>
+<h3>Constant Propagation</h3></section>
+    </article>
+</main>
+
     </body>
 </html>

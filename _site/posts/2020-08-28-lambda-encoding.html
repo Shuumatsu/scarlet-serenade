@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-28-lambda-encoding</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <h3>Encoding Boolean</h3>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-28-lambda-encoding</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><h3>Encoding Boolean</h3>
 <p indent="0"><code-snippet>let cond p a b = if p then a else b</code-snippet> 是常见的 boolean 操作，我们从这个方法下手。可以看出如果将  <code-snippet>a b</code-snippet> 看作一个 tuple 那么  <code-snippet>p</code-snippet> 就像一个一个从 tuple 中取值的函数。 <code-snippet>true</code-snippet> 为取第一个元素， <code-snippet>false</code-snippet> 为第二个。</p>
 <p indent="0">容易写出函数表达的 boolean:</p>
 <code-snippet indent="0" block="true">let true' a b = a
@@ -129,9 +138,9 @@ module ChurchNumber : ChurchNumber = struct
 
   let mult x y f b = x (y f) b
 end
-</code-snippet>
-    </section>
-</article>
-        </main>
+</code-snippet></section>
+    </article>
+</main>
+
     </body>
 </html>

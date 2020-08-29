@@ -1,7 +1,7 @@
 /* app.css */
 :root {
-    --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', Roboto, Oxygen-Sans,
-        Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    --font-family: iosevka, Roboto, 'Microsoft YaHei', Oxygen-Sans, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue',
+        sans-serif;
     --font-color: #172b4d;
 }
 /* salmon */
@@ -54,14 +54,20 @@ h5,
 h6 {
     padding-bottom: 0.5em;
     color: #c30000;
+    font-family: Arvo, Monaco, serif;
 }
 h1,
 h2,
 h3 {
     display: block;
-    font-family: Arvo, Monaco, serif;
     line-height: 1.3;
     font-weight: normal;
+}
+
+.flex {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
 }
 
 .center-block {

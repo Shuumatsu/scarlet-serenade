@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-08-28-lattice</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-28-lattice</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><h3>partial order   (partial means for a pair of set elements in  <mathjax-panel>P</mathjax-panel> , they could be incomparable.</h3>
+<p indent="0"><b>Definition:</b> A relation  <mathjax-panel>R</mathjax-panel> on a set  <mathjax-panel>S</mathjax-panel> is called a partial order if it is </p>
+<p indent="1">- reflexive:  <mathjax-panel>\forall x \in P, x \sqsubseteq x</mathjax-panel></p>
+<p indent="1">- antisymmetric:  <mathjax-panel>\forall x, y \in P, x \sqsubseteq y \wedge y \sqsubseteq x \Rightarrow x = y</mathjax-panel></p>
+<p indent="1">- transitive:  <mathjax-panel>\forall x, y, z \in P, x \sqsubseteq y \wedge y \sqsubseteq z \Rightarrow x \sqsubseteq z</mathjax-panel></p>
+<p indent="0"><b>Definition:</b> A set  <mathjax-panel>S</mathjax-panel> together with a partial ordering  <mathjax-panel>R</mathjax-panel> is called a partially ordered set or poset for short </p>
+<h3>upper & lower bounds</h3>
+<p indent="0"><b>Definition:</b> Given a poset  <mathjax-panel>(P, \sqsubseteq)</mathjax-panel> and its subset  <mathjax-panel>S</mathjax-panel> that  <mathjax-panel>S \subseteq P</mathjax-panel> , we say that</p>
+<p indent="1">-  <mathjax-panel>u \in P</mathjax-panel> is an upper bound of S, if  <mathjax-panel>\forall x \in S, x \sqsubseteq u</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>l \in P</mathjax-panel> is a lower bound of S, if  <mathjax-panel>\forall x \in S, l \sqsubseteq x</mathjax-panel></p>
+<p indent="1">- least upper bound (lub or join) of  <mathjax-panel>S</mathjax-panel> , written  <mathjax-panel>\sqcup S</mathjax-panel> , if for every upper bound of  <mathjax-panel>S</mathjax-panel> , say  <mathjax-panel>u</mathjax-panel> ,  <mathjax-panel>\sqcup S \sqsubseteq u</mathjax-panel></p>
+<p indent="1">- greatest lower bound (glb or meet) of  <mathjax-panel>S</mathjax-panel> , written  <mathjax-panel>\sqcap S</mathjax-panel> , if for every lower bound of  <mathjax-panel>S</mathjax-panel> , say  <mathjax-panel>l</mathjax-panel> ,  <mathjax-panel>l \sqsubseteq \sqcup S</mathjax-panel></p>
+<img height="120" src="./upper&lower-bound.png" />
+<p indent="0">Usaually, if  <mathjax-panel>S</mathjax-panel> contains only two elements  <mathjax-panel>a</mathjax-panel> and  <mathjax-panel>b</mathjax-panel> ( <mathjax-panel>S = \{a, b\}</mathjax-panel> ), then </p>
+<p indent="1">-  <mathjax-panel>\sqcap S</mathjax-panel> can be written as  <mathjax-panel>a \sqcup b</mathjax-panel> (the join of  <mathjax-panel>a</mathjax-panel> and  <mathjax-panel>b</mathjax-panel> )</p>
+<p indent="1">-  <mathjax-panel>\sqcup S</mathjax-panel> can be written as  <mathjax-panel>a \sqcap b</mathjax-panel> (the meet of  <mathjax-panel>a</mathjax-panel> and  <mathjax-panel>b</mathjax-panel> )</p>
+<p indent="0">Note that not every poset has lub or glb, but if a poset has lub or glb, it will be  <b>unique</b></p>
+<p indent="0">Proof. assume  <mathjax-panel>a</mathjax-panel> and  <mathjax-panel>b</mathjax-panel> are both glbs of poset  <mathjax-panel>P</mathjax-panel></p>
+<p indent="1">because  <mathjax-panel>a</mathjax-panel> is the glb then  <mathjax-panel>b \sqsubseteq a</mathjax-panel></p>
+<p indent="1">because  <mathjax-panel>b</mathjax-panel> is the glb then  <mathjax-panel>a \sqsubseteq b</mathjax-panel></p>
+<p indent="1">by the antisymmetry of partial order  <mathjax-panel>a = b</mathjax-panel> , so the glb is unique. </p>
+<h3>Lattice</h3>
+<p indent="0"><b>Definition:</b> Given a poset,  <mathjax-panel>\forall a, b \in P</mathjax-panel> , if  <mathjax-panel>a \sqcup b</mathjax-panel> and  <mathjax-panel>a \sqcap b</mathjax-panel> exist, then its called a  <b>lattice</b></p>
+<p indent="1">In other words, a poset is called lattice if every pair of its elements has a least upper bound and a greatest lower bound</p>
+<p indent="0"><b>Definition:</b> All subsets of a lattice have a least upper bound and a greatest lower bound </p>
+<p indent="1">- the lub is called top </p>
+<p indent="1">- the glb is called bottom  <mathjax-panel>\perp</mathjax-panel></p>
+<p indent="0"><b>Definition:</b> lattice  <mathjax-panel>A</mathjax-panel> 是分配的（distributive），当且仅当：</p>
+<p indent="1">-  <mathjax-panel>(a \sqcup b) \sqcap c=(a \sqcap c) \sqcup(b \sqcap c)</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>(a \sqcap b) \sqcup c=(a \sqcup c) \sqcap(b \sqcup c)</mathjax-panel></p>
+<p indent="1">设  <mathjax-panel>A</mathjax-panel> 顶端元素为  <mathjax-panel>1</mathjax-panel> ，底端元素为  <mathjax-panel>0</mathjax-panel> ，那么我们称  <mathjax-panel>b</mathjax-panel> 是  <mathjax-panel>a</mathjax-panel> 的补，当且仅当  <mathjax-panel>a \sqcup b = 1</mathjax-panel> 且  <mathjax-panel>a \sqcap b = 0</mathjax-panel></p>
+<p indent="0"><b>Definition:</b> The height of a lattice h is the length of the longest path from Top to Bottom in the lattice</p>
+<h4>semilattice</h4>
+<p indent="0"><b>Definition:</b> If only  <mathjax-panel>a \sqcup b</mathjax-panel> exists, then it's called a  <b>join semilattice</b></p>
+<p indent="0"><b>Definition:</b> If only  <mathjax-panel>a \sqcap b</mathjax-panel> exists, then it's called a  <b>meet semilattice</b></p>
+<h4>complete lattice</h4>
+<p indent="0"><b>Definition:</b> Given a lattice, for arbitrary subset  <mathjax-panel>S</mathjax-panel> , if  <mathjax-panel>\sqcap S</mathjax-panel> and  <mathjax-panel>\sqcup S</mathjax-panel> exist, then it's called a complete lattice</p>
+<p indent="0">e.g., is  <mathjax-panel>(S, \sqsubseteq)</mathjax-panel> a complete lattice where  <mathjax-panel>S</mathjax-panel> is a set of integers and  <mathjax-panel>\sqsubseteq</mathjax-panel> represents  <mathjax-panel>\leq</mathjax-panel> ?</p>
+<p indent="1">no. the subset can be an infinite set, e.g. all even numbers, and it has no least upper bound.</p>
+<p indent="0">Theorem: Every finite lattice is a complete lattice.</p>
+<p indent="0">Proof. </p>
+<h4>Product Lattice</h4>
+<p indent="0"><b>Definition:</b> Given lattices  <mathjax-panel>L1 = (P_1, \sqsubseteq_1), \cdots, L1 = (P_n, \sqsubseteq_n)</mathjax-panel> , if  <mathjax-panel>\forall i, L_i</mathjax-panel> has least upper bound and greatest lower bound, then we can have a  <b>Product Lattice</b> defined by </p>
+<p indent="1">-  <mathjax-panel>P = P _{1} \times \ldots \times P _{ n }</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>( x _{1}, \ldots, x _{ n }) \sqsubseteq( y _{1}, \ldots, y _{ n }) \Leftrightarrow( x _{1} \sqsubseteq y _{1}) \wedge \ldots \wedge( x _{ n } \sqsubseteq y _{ n })</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>( x _{1}, \ldots, x _{ n }) \sqcup( y _{1}, \ldots, y _{ n })=( x _{1} \sqcup_{1} y _{1}, \ldots, x _{ n } \sqcup_{ n } y _{ n })</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>( x _{1}, \ldots, x _{ n }) \sqcap( y _{1}, \ldots, y _{ n })=( x _{1} \sqcap_{1} y _{1}, \ldots, x _{ n } \sqcap_{ n } y _{ n })</mathjax-panel></p>
+<p indent="0">Lemma: If all latices are complete lattices, then the product lattice is a complete lattice</p>
+<h4>Fixed-Point Theorem </h4>
+<p indent="0">Given a complete lattice  <mathjax-panel>(L, \sqsubseteq)</mathjax-panel> , if</p>
+<p indent="1">1.  <mathjax-panel>f : L \rightarrow L</mathjax-panel> is monotonic</p>
+<p indent="1">2. L is finite </p>
+<p indent="0">then the least fixed point of  <mathjax-panel>f</mathjax-panel> can be found by iterating  <mathjax-panel>f (\perp), f ( f (\perp)), \ldots, f ^{ k }(\perp)</mathjax-panel> until a fixed point is reached</p>
+<p indent="0">then the greatest fixed point of  <mathjax-panel>f</mathjax-panel> can be found by iterating  <mathjax-panel>f (T), f ( f (T)), \ldots, f ^{ k }(T)</mathjax-panel> until a fixed point is reached</p>
+<p indent="0">Proof. (only least fixed point part, The proof for greatest fixed point is similar)</p>
+<div indent="1"><p indent="0">first part: will finally reach a fixed point</p>
+<div indent="1"><p indent="0">by definition of  <mathjax-panel>\perp</mathjax-panel> , we have  <mathjax-panel>\perp \subseteq f(\perp)</mathjax-panel></p>
+<p indent="0">as  <mathjax-panel>f</mathjax-panel> is monotonic, we have  <mathjax-panel>\perp \sqsubseteq f (\perp) \sqsubseteq f ^{2}(\perp) \sqsubseteq \ldots \sqsubseteq f ^{ i }(\perp)</mathjax-panel></p>
+<p indent="0">as  <mathjax-panel>L</mathjax-panel> is finite, we have  <mathjax-panel>f ^{ Fix }= f ^{ k }(\perp)= f ^{ k +1}(\perp)</mathjax-panel></p></div>
+<p indent="0">second part: the fixed point is least (prove by contradiction:</p>
+<div indent="1"><p indent="0">Assume we have another fixed point  <mathjax-panel>x</mathjax-panel> , i.e.,  <mathjax-panel>x = f(x)</mathjax-panel></p>
+<p indent="0">by definition of  <mathjax-panel>\perp</mathjax-panel> , we have  <mathjax-panel>\perp \subseteq x</mathjax-panel></p>
+<p indent="0">as  <mathjax-panel>f</mathjax-panel> is monotonic, we have  <mathjax-panel>f^{i+1}(\perp) \sqsubseteq f^{i+1}(x)</mathjax-panel></p>
+<p indent="0">thus  <mathjax-panel>f ^{ Fix }= f ^{ k }(\perp) \sqsubseteq f^k(x) =  x</mathjax-panel></p>
+<p indent="0">thus the fixed point is the least</p></div></div>
+<p indent="0"><mathjax-panel>\sqcup / \sqcap</mathjax-panel> are both monotonic</p>
+<p indent="0">Proof. </p>
+<p indent="1"><mathjax-panel>\forall x, y, z \in L, x \subseteq y</mathjax-panel> , we want to prove  <mathjax-panel>x \sqcup z \sqsubseteq y \sqcup z</mathjax-panel></p>
+<p indent="1">by definition of  <mathjax-panel>\sqcup</mathjax-panel> ,  <mathjax-panel>y \subseteq y \sqcup z</mathjax-panel></p>
+<p indent="1">by transitivity of  <mathjax-panel>\subseteq</mathjax-panel> ,  <mathjax-panel>x \subseteq y \subseteq y \sqcup z</mathjax-panel></p>
+<p indent="1">thus  <mathjax-panel>y \sqcup z</mathjax-panel> is an upper bound for  <mathjax-panel>x</mathjax-panel> and also for  <mathjax-panel>y</mathjax-panel> , then we have the least upper bound for  <mathjax-panel>x</mathjax-panel> and  <mathjax-panel>y</mathjax-panel> ,  <mathjax-panel>x \sqcup z \sqsubseteq y \sqcup Z</mathjax-panel></p>
+<p indent="0">那么 Data Flow Analysis 可被看作沿某方向（正向分析或逆向分析），不停的应用  <mathjax-panel>F : V ^{ k } \rightarrow V ^{ k }</mathjax-panel> 直到达到某不动点：</p>
+<p indent="0"><b>Definition:</b> A function  <mathjax-panel>f : L \rightarrow L</mathjax-panel> (L is a lattice) is monotonic if  <mathjax-panel>\forall x, y \in L, x \sqsubseteq y \Rightarrow f ( x ) \sqsubseteq f ( y )</mathjax-panel></p>
+<p indent="0">The the maximum iterations i needed to reach the fixed point is no greater than h</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-28-fork</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <code-snippet indent="0" block="true">#include &lt;sys/types.h&gt;
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-28-fork</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><code-snippet indent="0" block="true">#include &lt;sys/types.h&gt;
 #include &lt;sys/wait.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;pthread.h&gt;
@@ -67,9 +76,9 @@ int main() {
 </code-snippet>
 <p indent="0"><code-snippet>fork</code-snippet> 在父进程返回子进程的 id，在失败的时候返回 -1，在子进程返回 0</p>
 <p indent="0"><code-snippet>wait(&status)</code-snippet> 等待一个状态，并不指定是哪个子进程返回的状态，取第一个</p>
-<p indent="0">通常状态存储在  status 的低 16 位的高 8 位，用  <code-snippet>WEXITSTATUS</code-snippet> 取得状态</p>
-    </section>
-</article>
-        </main>
+<p indent="0">通常状态存储在  status 的低 16 位的高 8 位，用  <code-snippet>WEXITSTATUS</code-snippet> 取得状态</p></section>
+    </article>
+</main>
+
     </body>
 </html>

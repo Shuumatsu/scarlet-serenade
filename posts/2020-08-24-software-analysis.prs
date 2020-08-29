@@ -128,9 +128,7 @@ Steps:
 
 
 may analysis: outputs information that may be true (over-approximation)
-- 假设正确答案是一个集合S，返回的集合总是S的子集
 must analysis: outputs information that must be true (under-approximation)
-- 假设正确答案是一个集合S，返回的集合总是S的超集
 
 
 Input and Output States
@@ -224,3 +222,45 @@ transfer function
 对于一个 `a = x op y` 
 - Add to OUT the expression x op y (gen)
 - Delete from IN any expression involving variable `a` (kill)
+
+
+:h3 Foundations
+
+Given a CFG (program) with k nodes, the iterative algorithm updates `output[n]` for every node n in each iteration.
+
+Then we can make a k-tuple: $(output[n_1], output[n_2], \dots, output[n_k])$ as an element of set $\left( V _{1} \times V _{2} \ldots \times V _{ k }\right)$ denoted as $V^k$, to hold the values of the analysis after each iteration.
+
+Then each iteration can be considered as taking an action to map an element of $V^k$ to a new element of $V^k$. Abstracted as a function $F : V ^{ k } \rightarrow V ^{ k }$
+
+Then the algorithm outputs a series of k-tuples iteratively until a k-tuple is the same as the last one in two consecutive iterations.
+
+
+Data flow analysis can be seen as iteratively applying transfer functions and meet/join operations on the values of a lattice until we reach.
+
+If we guarantee that $F$ is monotonic, then its compromised to terminate, and finally reach the fixed point.
+
+In each iteration, it is equivalent to think that we apply function $F$ which consists of
+- 1. transfer function $f_i: L \rightarrow L$ for every node
+- 2. join/meet function $\sqcup / \sqcap : L \times L \rightarrow L$ for control-flow confluence
+
+
+:h3 Meet-Over-All-Paths Solution (MOP)
+
+MOP 和上面讨论的 iterative approach 的区别在于 CFG 中汇聚点的处理方式不同。
+以 $S_4$ 为例
+- $input[S_4] = f_{s_3}(f_{s_1}(output[entry]) \sqcup f_{s_2}(output[entry]))$
+- $mop[S_4] = f_{s_3}(f_{s_1}(output[entry])) \sqcup f_{s_3}(f_{s_2}(output[entry]))$
+
+四舍五入就是 
+- - $input = F ( x \sqcup y )$
+- - $mop = F ( x ) \sqcup F ( y )$
+-- (如果 F 满足分配律的话二者就是相同的
+
+我们可以证明，MOP 有着更高的精度：
+- by definition of lub $\sqcup$, we have $x \subseteq x \sqcup y$ and $y \subseteq x \sqcup y$
+- as $F$ is monotonic, we have $F ( x ) \sqsubseteq F ( x \sqcup y )$ and $F ( y ) \sqsubseteq F ( x \sqcup y )$, which means $F ( x \sqcup y )$ is a upper bound for $x$ and also for $y$
+- thus we have the lub $F(x) \sqcup F(y) \sqsubseteq F ( x \sqcup y )$
+
+
+:h3 Constant Propagation
+

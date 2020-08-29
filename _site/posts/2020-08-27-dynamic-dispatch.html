@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-27-dynamic-dispatch</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <p indent="0">CPP 的 virtual function 以及 Java 的方法采用动态分发的方式，方法的 receiver 在运行时才能确定</p>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-27-dynamic-dispatch</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">CPP 的 virtual function 以及 Java 的方法采用动态分发的方式，方法的 receiver 在运行时才能确定</p>
 <p indent="0">例如下面的程序，输出为</p>
 <code-snippet indent="1" block="true">FOO: print
 FOO: print
@@ -80,9 +89,9 @@ int main() {
 
     return 0;
 }
-</code-snippet>
-    </section>
-</article>
-        </main>
+</code-snippet></section>
+    </article>
+</main>
+
     </body>
 </html>

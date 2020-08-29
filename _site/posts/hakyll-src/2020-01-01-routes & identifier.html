@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-01-01-routes & identifier</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <p indent="0"><code-snippet>data Identifier</code-snippet> contains version and path </p>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-01-01-routes & identifier</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0"><code-snippet>data Identifier</code-snippet> contains version and path </p>
 <p indent="0"><code-snippet>data RoutesRead</code-snippet> contains provider and underlying identifer</p>
 <p indent="0"><code-snippet>runRoutes</code-snippet> takes in a routese, a provider and an identifier</p>
 <p indent="1"><code-snippet>unRoutes routes (RoutesRead provider identifier) identifier</code-snippet></p>
@@ -54,9 +63,9 @@
 <p indent="2">if the result is nothing then use the second </p>
 <p indent="1">instance of Monoid </p>
 <p indent="2">mempty = pure (Nothing, False)</p>
-<p indent="0"><code-snippet>data Provider</code-snippet> contains directory</p>
-    </section>
-</article>
-        </main>
+<p indent="0"><code-snippet>data Provider</code-snippet> contains directory</p></section>
+    </article>
+</main>
+
     </body>
 </html>

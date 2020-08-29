@@ -21,6 +21,9 @@ export class MathjaxPanel extends LitElement {
                 :host([block='true']) {
                     display: block;
                 }
+                .katex {
+                    font-size: 1em;
+                }
             `,
         ]
     }

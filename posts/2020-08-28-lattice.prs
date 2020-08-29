@@ -1,0 +1,113 @@
+:h3 partial order   (partial means for a pair of set elements in $P$, they could be incomparable.
+
+
+**Definition:** A relation $R$ on a set $S$ is called a partial order if it is 
+- - reflexive: $\forall x \in P, x \sqsubseteq x$
+- - antisymmetric: $\forall x, y \in P, x \sqsubseteq y \wedge y \sqsubseteq x \Rightarrow x = y$
+- - transitive: $\forall x, y, z \in P, x \sqsubseteq y \wedge y \sqsubseteq z \Rightarrow x \sqsubseteq z$
+
+**Definition:** A set $S$ together with a partial ordering $R$ is called a partially ordered set or poset for short 
+
+:h3 upper & lower bounds
+
+**Definition:** Given a poset $(P, \sqsubseteq)$ and its subset $S$ that $S \subseteq P$, we say that
+- - $u \in P$ is an upper bound of S, if $\forall x \in S, x \sqsubseteq u$
+- - $l \in P$ is a lower bound of S, if $\forall x \in S, l \sqsubseteq x$
+- - least upper bound (lub or join) of $S$, written $\sqcup S$, if for every upper bound of $S$, say $u$, $\sqcup S \sqsubseteq u$
+- - greatest lower bound (glb or meet) of $S$, written $\sqcap S$, if for every lower bound of $S$, say $l$, $l \sqsubseteq \sqcup S$
+
+:img(height="120", src="./upper&lower-bound.png")
+
+Usaually, if $S$ contains only two elements $a$ and $b$ ($S = \{a, b\}$), then 
+- - $\sqcap S$ can be written as $a \sqcup b$ (the join of $a$ and $b$)
+- - $\sqcup S$ can be written as $a \sqcap b$ (the meet of $a$ and $b$)
+
+
+Note that not every poset has lub or glb, but if a poset has lub or glb, it will be **unique**
+Proof. assume $a$ and $b$ are both glbs of poset $P$
+- because $a$ is the glb then $b \sqsubseteq a$
+- because $b$ is the glb then $a \sqsubseteq b$
+- by the antisymmetry of partial order $a = b$, so the glb is unique. 
+
+
+:h3 Lattice
+
+**Definition:** Given a poset, $\forall a, b \in P$, if $a \sqcup b$ and $a \sqcap b$ exist, then its called a **lattice**
+- In other words, a poset is called lattice if every pair of its elements has a least upper bound and a greatest lower bound
+
+**Definition:** All subsets of a lattice have a least upper bound and a greatest lower bound 
+- - the lub is called top 
+- - the glb is called bottom $\perp$
+
+**Definition:** lattice $A$ 是分配的（distributive），当且仅当：
+- - $(a \sqcup b) \sqcap c=(a \sqcap c) \sqcup(b \sqcap c)$
+- - $(a \sqcap b) \sqcup c=(a \sqcup c) \sqcap(b \sqcup c)$
+- 设 $A$ 顶端元素为 $1$ ，底端元素为 $0$ ，那么我们称 $b$ 是 $a$ 的补，当且仅当 $a \sqcup b = 1$ 且 $a \sqcap b = 0$
+
+**Definition:** The height of a lattice h is the length of the longest path from Top to Bottom in the lattice
+
+:h4 semilattice
+
+**Definition:** If only $a \sqcup b$ exists, then it's called a **join semilattice**
+**Definition:** If only $a \sqcap b$ exists, then it's called a **meet semilattice**
+
+:h4 complete lattice
+
+**Definition:** Given a lattice, for arbitrary subset $S$, if $\sqcap S$ and $\sqcup S$ exist, then it's called a complete lattice
+
+e.g., is $(S, \sqsubseteq)$ a complete lattice where $S$ is a set of integers and $\sqsubseteq$ represents $\leq$?
+- no. the subset can be an infinite set, e.g. all even numbers, and it has no least upper bound.
+
+Theorem: Every finite lattice is a complete lattice.
+Proof. 
+
+:h4 Product Lattice
+
+**Definition:** Given lattices $L1 = (P_1, \sqsubseteq_1), \cdots, L1 = (P_n, \sqsubseteq_n)$, if $\forall i, L_i$ has least upper bound and greatest lower bound, then we can have a **Product Lattice** defined by 
+- - $P = P _{1} \times \ldots \times P _{ n }$
+- - $( x _{1}, \ldots, x _{ n }) \sqsubseteq( y _{1}, \ldots, y _{ n }) \Leftrightarrow( x _{1} \sqsubseteq y _{1}) \wedge \ldots \wedge( x _{ n } \sqsubseteq y _{ n })$
+- - $( x _{1}, \ldots, x _{ n }) \sqcup( y _{1}, \ldots, y _{ n })=( x _{1} \sqcup_{1} y _{1}, \ldots, x _{ n } \sqcup_{ n } y _{ n })$
+- - $( x _{1}, \ldots, x _{ n }) \sqcap( y _{1}, \ldots, y _{ n })=( x _{1} \sqcap_{1} y _{1}, \ldots, x _{ n } \sqcap_{ n } y _{ n })$
+
+Lemma: If all latices are complete lattices, then the product lattice is a complete lattice
+
+
+:h4 Fixed-Point Theorem 
+
+Given a complete lattice $(L, \sqsubseteq)$, if
+- 1. $f : L \rightarrow L$ is monotonic
+- 2. L is finite 
+then the least fixed point of $f$ can be found by iterating $f (\perp), f ( f (\perp)), \ldots, f ^{ k }(\perp)$ until a fixed point is reached
+then the greatest fixed point of $f$ can be found by iterating $f (T), f ( f (T)), \ldots, f ^{ k }(T)$ until a fixed point is reached
+Proof. (only least fixed point part, The proof for greatest fixed point is similar)
+:div(indent="1")
+    first part: will finally reach a fixed point
+    :div(indent="1")
+        by definition of $\perp$, we have $\perp \subseteq f(\perp)$
+        as $f$ is monotonic, we have $\perp \sqsubseteq f (\perp) \sqsubseteq f ^{2}(\perp) \sqsubseteq \ldots \sqsubseteq f ^{ i }(\perp)$
+        as $L$ is finite, we have $f ^{ Fix }= f ^{ k }(\perp)= f ^{ k +1}(\perp)$
+    second part: the fixed point is least (prove by contradiction:
+    :div(indent="1") 
+        Assume we have another fixed point $x$, i.e., $x = f(x)$
+        by definition of $\perp$, we have $\perp \subseteq x$
+        as $f$ is monotonic, we have $f^{i+1}(\perp) \sqsubseteq f^{i+1}(x)$
+        thus $f ^{ Fix }= f ^{ k }(\perp) \sqsubseteq f^k(x) =  x$
+        thus the fixed point is the least
+
+
+
+$\sqcup / \sqcap$ are both monotonic
+Proof. 
+- $\forall x, y, z \in L, x \subseteq y$, we want to prove $x \sqcup z \sqsubseteq y \sqcup z$
+- by definition of $\sqcup$, $y \subseteq y \sqcup z$
+- by transitivity of $\subseteq$, $x \subseteq y \subseteq y \sqcup z$
+- thus $y \sqcup z$ is an upper bound for $x$ and also for $y$, then we have the least upper bound for $x$ and $y$, $x \sqcup z \sqsubseteq y \sqcup Z$
+
+那么 Data Flow Analysis 可被看作沿某方向（正向分析或逆向分析），不停的应用 $F : V ^{ k } \rightarrow V ^{ k }$ 直到达到某不动点：
+
+
+**Definition:** A function $f : L \rightarrow L$ (L is a lattice) is monotonic if $\forall x, y \in L, x \sqsubseteq y \Rightarrow f ( x ) \sqsubseteq f ( y )$
+
+
+The the maximum iterations i needed to reach the fixed point is no greater than h
+

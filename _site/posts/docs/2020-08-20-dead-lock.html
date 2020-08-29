@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-20-dead-lock</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <h1 id="deadlock">Deadlock</h1>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-20-dead-lock</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><h1 id="deadlock">Deadlock</h1>
 <p>Deadlock is a situation where a set of processes are blocked because each process is holding a resource and waiting for another resource acquired by some other process.</p>
 <p>Deadlock can arise if the following four conditions hold simultaneously (Necessary Conditions)</p>
 <ul>
@@ -118,9 +127,9 @@ void increment() {
 <p>Must free up some resources so that some processes can run. So, preempt resources - take them away from processes. Several different preemption cases:</p>
 <p>Can preempt some resources without killing job - for example, main memory. Can just swap out to disk and resume job later.</p>
 <p>If job provides rollback points, can roll job back to point before acquired resources. At a later time, restart job from rollback point. Default rollback point - start of job.</p>
-<p>For some resources must just kill job. All resources are then free. Can either kill processes one by one until your system is no longer deadlocked. Or, just go ahead and kill all deadlocked processes.</p>
-    </section>
-</article>
-        </main>
+<p>For some resources must just kill job. All resources are then free. Can either kill processes one by one until your system is no longer deadlocked. Or, just go ahead and kill all deadlocked processes.</p></section>
+    </article>
+</main>
+
     </body>
 </html>

@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-20-k-sum</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <p indent="0">2 Sum is easy to implement using a hash.</p>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-20-k-sum</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">2 Sum is easy to implement using a hash.</p>
 <p indent="0">and to generalize to a K-Sum problem, all you really have to do is make a recursive function that keeps calling K-1 Sums until you get to 2sum at which point you just do a 2 sum, outputing all of the answers that you find</p>
 <p indent="0">(to avoid duplicate results, you need to sort the array first, it will be convenient to skip duplicate numbers</p>
 <p indent="0">e.g. https://leetcode.com/problems/4sum/</p>
@@ -90,9 +99,9 @@ var fourSum = function (nums, target) {
     }
     return kSum(4, 0, nums.length - 1, target)
 }
-</code-snippet>
-    </section>
-</article>
-        </main>
+</code-snippet></section>
+    </article>
+</main>
+
     </body>
 </html>

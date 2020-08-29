@@ -1,0 +1,82 @@
+**propagate data-flow information along interprocedural control-flow edges**
+- (i.e., call and return edges
+
+:h3 Call Graph Construction (CHA)
+
+Definition: a call graph is a set of call edges from call-sites to their target methods (callees)
+
+:h4 Method Calls (Invocations) in Java
+:ul
+    :li static call: invokestatic
+    - - target methods: static methods
+    - - # target methods: 1
+    - - determinacy: compile-time
+    :li special call: invokespecial 
+    - - target methods: constructors; private instance methods; superclass instance methods
+    - - # target methods: 1
+    - - determinacy: compile-time
+    :li virtual call: invokeinterface; invokevirtual 
+    - - target methods: other instance methods
+    - - # target methods: >= 1
+    - - determinacy: runtime
+
+During run-time, a virtual call is resolved based on
+- 1. type of the receiver object: `c`
+- 2. method signature at the call site: `m`
+-- (signature = class type + method name + descriptor
+-- (descriptor = return type + parameter types
+
+We define a function `dispatch(c, m)` to simulate the procedure of run-time method dispatch
+- - `m'`: if `c` contains non-abstract method `m'` that has the same name and descriptor
+- - `dispatch(c', m)` where `c'` is a superclass of `c`: otherwise
+
+e.g. consider `dispatch(B, A.foo)` with the following classes.
+```
+class A { void foo() {} }
+class B extends A {}
+```
+here `A.` is not considered according to rule 1. and B has no mathed method, so we go to its superclass `dispatch(A, A.foo()) == A.foo()`
+
+:h4 Call Resolution of CHA
+
+Resolve a virtual call based on the declared type of receiver variable of the call site `A a = ...; a.foo();`
+- the receiver variable a may point to objects of class `A` and all subclasses of `A`
+
+```
+resolve(cs) // I think it's call site...
+    m = method signature at cs 
+    if cs is a static call then:
+        return {m}
+    else if cs is a special call then:
+        cm = class type of m
+        return {dispatch(cm, m)}
+    else: 
+        c = declared type of receiver 
+        return $ fmap (fun c' -> dispatch c' m) all_subclasses
+```
+
+:h4 Call Graph Construction
+
+1. start from entry methods 
+2. for each reachable method `m`, resolve target methods for each call site `cs` in `m` via CHA. **Record every edges**.
+3. Repeat until no new method is discovered
+
+四舍五入就是个图的搜索算法
+
+:h3 Interprocedural Control-Flow Graph (ICFG
+
+An ICFG of a program consists of CFGs of the methods in the program, plus two kinds of additional edges:
+- - **Call edges**: from call sites to the entry nodes of their callees 
+- - **Return edges**: from return statements of the callees to the statements fowllowing their call sites
+
+```
+void foo() {
+    bar(…); // call site
+    int n = 3; // return site
+}
+```
+
+:h2 Interprocedural Data-Flow Analysis
+
+**transfer function**: same as intra-procedural constant propagation, plus that
+- - for each call node, kill data-flow value for the left-hand-side variable. 

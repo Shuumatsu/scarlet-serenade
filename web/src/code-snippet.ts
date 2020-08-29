@@ -15,13 +15,13 @@ export class CodeSnippet extends LitElement {
             css`
                 :host {
                     display: inline-block;
+                    font-size: 0.8em;
                 }
                 :host([block='true']) {
                     display: block;
                 }
                 code {
-                    font-family: Iosevka, inconsolata, dm, Consolas, 'Courier New', monospace, 'Microsoft YaHei';
-                    color: var(--font-color);
+                    font-family: 'JetBrains Mono', 'Microsoft YaHei';
                 }
             `,
         ]

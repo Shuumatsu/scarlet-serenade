@@ -1,0 +1,149 @@
+:h3 Permutations
+
+给定一个无重复数字的序列，返回这些数所能排列出所有序列。
+
+:a(href="https://leetcode.com/problems/permutations/#/description") https://leetcode.com/problems/permutations/#/description
+
+每次从剩下的元素中选择一个元素，然后重复这个过程，直到没有元素剩下。
+要满足已选择的元素在接下来的过程中不再出现，比起 naive 的直接从数组中删除这个元素的做法，更好的做法是将整个数组分为左右两个区域，分别代表已选择的和未选择的，当未选择区域为空时将当前排列加入结果。每次选择的时候，未选择区最左边的位置将属于已选择区，我们的做法是将选择的元素交换至该位置
+```
+const permute = nums => {
+    const ret = []
+    const h = pos => {
+        if (pos == nums.length) {
+            ret.push([...nums])
+            return
+        }
+
+        for (let selection = pos; selection < nums.length; selection++) {
+            ;[nums[pos], nums[selection]] = [nums[selection], nums[pos]]
+            h(pos + 1)
+            ;[nums[pos], nums[selection]] = [nums[selection], nums[pos]]
+        }
+    }
+    h(0)
+
+    return ret
+}
+```
+
+:h3 Permutations II
+
+给定一个含有重复数字的序列，返回这些数所能排列出的所有不同的序列。
+
+:a(href="https://leetcode.com/problems/permutations-ii/#/description") https://leetcode.com/problems/permutations-ii/#/description
+
+剪枝即可，在选取元素的那层循环中，如果遇到已选择过的元素，跳过即可。
+```
+const permuteUnique = nums => {
+    const ret = []
+    const h = pos => {
+        if (pos == nums.length) {
+            ret.push([...nums])
+            return
+        }
+
+        const seen = {}
+        for (let selection = pos; selection < nums.length; selection++) {
+            if (seen[nums[selection]]) continue
+            seen[nums[selection]] = true
+            ;[nums[pos], nums[selection]] = [nums[selection], nums[pos]]
+            h(pos + 1)
+            ;[nums[pos], nums[selection]] = [nums[selection], nums[pos]]
+        }
+    }
+    h(0)
+
+    return ret
+}
+```
+
+:h3 Next Permutation
+
+给定任一非空正整数序列，生成这些数所能排列出的下一个较大序列。若给出的序列为最大序列，则生成最小序列。
+
+:a(href="https://leetcode.com/problems/next-permutation/#/description") https://leetcode.com/problems/next-permutation/#/description
+
+从最右方开始寻找，一直到左直到遇到第一个元素 `x` 它小于其右侧的元素。
+这说明 `x` 右侧的元素达到了其所能达到的最大值，则 `x` 所在位置应该更新位一个更大的值。
+在 `x` 右侧找到最小的大于 `x` 的元素 `y`。交换 `x` 与 `y` 的位置，并将右侧的元素以递增排列（在这里其实就是 `reverse` 这部分
+如果没有这样的元素，说明原序列从右到左是一个递增序列，则返回从小到大排序的序列。（在这里其实就是 `reverse` 整个数组
+
+```
+const reverse = (nums, i, j) => {
+    while (i < j) {
+        ;[nums[i], nums[j]] = [nums[j], nums[i]]
+        i++
+        j--
+    }
+}
+
+/**
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+const nextPermutation = nums => {
+    if (nums.length <= 1) return
+
+    let i = nums.length - 2
+    for (; i >= 0; i -= 1) {
+        if (nums[i] < nums[i + 1]) {
+            break
+        }
+    }
+    if (i < 0) {
+        reverse(nums, 0, nums.length - 1)
+        return
+    }
+
+    // 因为右侧的序列是单调的，这里可以用二分搜索优化
+    let j = nums.length - 1
+    for (; j > i - 1; j -= 1) {
+        if (nums[i] < nums[j]) {
+            break
+        }
+    }
+    ;[nums[i], nums[j]] = [nums[j], nums[i]]
+
+    reverse(nums, i + 1, nums.length - 1)
+}
+```
+
+:h3 Permutation Sequence
+
+给定正整数 `n` 和 `k`，要求返回在 `[1, 2, ..., n]` 所有的全排列中，第 k 大的字符串序列。
+
+:a(href="https://leetcode.com/problems/permutation-sequence/#/description") https://leetcode.com/problems/permutation-sequence/#/description
+
+为方便，将 `k` 改作 0-based
+根据排列数公式，我们可以知道对于每个 `n` 总共有多少种排列 `A(n)`，并且有 `A(n) = n * A(n - 1)`。那么根据模 `A(n - 1)` 的值可以知道当前位于 `n` 的第几个最高位对应的那些序列中
+采取递归的算法，从最高位到最低位考虑每一位。维护一个有序数组记录待定元素。
+- 用 `Math.floor(k / A[arr.length - 1])` 得到当前应选的元素在待定元素数组的下标 
+- 用 `k % A[arr.length - 1]` 得到下一轮递归的 `k`
+
+```
+/**
+ * @param {number} n
+ * @param {number} k
+ * @return {string}
+ */
+const getPermutation = (n, k) => {
+    const dp = [0, 1]
+    for (let i = 2; i <= n; i += 1) {
+        dp[i] = dp[i - 1] * i
+    }
+
+    const f = (arr, k) => {
+        if (arr.length == 1) return arr
+        const nk = k % dp[arr.length - 1]
+        const p = Math.floor(k / dp[arr.length - 1])
+        return [arr[p], ...f([...arr.slice(0, p), ...arr.slice(p + 1)], nk)]
+    }
+
+    const arr = []
+    for (let i = 1; i <= n; i += 1) {
+        arr.push(i)
+    }
+    return f(arr, (k - 1) % dp[n]).join('')
+}
+```

@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-08-10-lambda</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <p indent="0">bound var: a var that's associated with some  <mathjax-panel>\lambda</mathjax-panel></p>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-10-lambda</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">bound var: a var that's associated with some  <mathjax-panel>\lambda</mathjax-panel></p>
 <p indent="0">free var: a var not associated with any  <mathjax-panel>\lambda</mathjax-panel></p>
 <p indent="1">直观上来说，如果 x is bound 则 x 在一个左边为 x 的  <mathjax-panel>\lambda</mathjax-panel> 的子树中</p>
 <p indent="0">A closed term is one in which all identifiers are bound.</p>
@@ -89,9 +98,9 @@ an outermost redex --&gt; apply      apply &lt;-- another outermost redex
 <h3>Evaluation strategy</h3>
 <p indent="1">call by value: leftmost-innermost (applicative-order reduction (AOR))</p>
 <p indent="1">call by name: leftmost-outermost (normal-order-reduction (NOR))</p>
-<p indent="1">call by need: like call by name but the result of the evaluation is saved and is then reused for each subsequent use of the formal.</p>
-    </section>
-</article>
-        </main>
+<p indent="1">call by need: like call by name but the result of the evaluation is saved and is then reused for each subsequent use of the formal.</p></section>
+    </article>
+</main>
+
     </body>
 </html>

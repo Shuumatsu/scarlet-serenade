@@ -37,14 +37,23 @@
             </nav>
         </header>
 
-        <main role="main">
-            <h1>2020-01-01-wallace</h1>
-            <article>
-    <section class="header">
-        
-    </section>
-    <section>
-        <p>注意到全加器接受三个输入并产生两个输出，可看作一个3: 2 compressor。Wallace 基于这个性质对乘法运算进行优化。</p>
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-01-01-wallace</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p>注意到全加器接受三个输入并产生两个输出，可看作一个3: 2 compressor。Wallace 基于这个性质对乘法运算进行优化。</p>
 <pre><code>                           a1   a2   a3   a4   a5   a6
 X                          b1   b2   b3   b4   b5   b6
 ------------------------------------------------------
@@ -64,9 +73,9 @@ X                          b1   b2   b3   b4   b5   b6
                a1b4 a2b4 a3b4 a4b4 a5b4 a6b4)
          (a1b3 a2b3 a3b3 a4b3 a5b3 a6b3
      a1b2 a2b2 a3b2 a4b2 a5b2 a6b2
-a1b1 a2b1 a3b1 a4b1 a5b1 a6b1)</code></pre>
-    </section>
-</article>
-        </main>
+a1b1 a2b1 a3b1 a4b1 a5b1 a6b1)</code></pre></section>
+    </article>
+</main>
+
     </body>
 </html>

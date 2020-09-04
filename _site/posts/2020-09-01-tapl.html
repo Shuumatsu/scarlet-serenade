@@ -54,9 +54,9 @@
     <article>
         <!-- <section class="header"></section> -->
         <section><h3>Introduction </h3>
-<p indent="0"><b>Definition:</b> A  <b>type system</b> is a tractable syntactic method for proving the absence of certain program behaviors by classifying phrases according to the kinds of values they compute.</p>
+<p indent="0"><b>Definition</b> : A  <b>type system</b> is a tractable syntactic method for proving the absence of certain program behaviors by classifying phrases according to the kinds of values they compute.</p>
 <p indent="1">- this definition identifies type systems as tools for reasoning about programs.</p>
-<p indent="0"><b>Definition:</b> A  <b>safe language</b> is one that protects its own abstractions. Every high-level language provides abstractions of machine services. Safety refers to the language's ability to guarantee the integrity of these abstractions and of higher-level abstractions introduced by the programmer using the definitional facilities of the language.</p>
+<p indent="0"><b>Definition</b> : A  <b>safe language</b> is one that protects its own abstractions. Every high-level language provides abstractions of machine services. Safety refers to the language's ability to guarantee the integrity of these abstractions and of higher-level abstractions introduced by the programmer using the definitional facilities of the language.</p>
 <p indent="1">- e.g., a programmer using this language then expects that an array can be changed only by using the update operation on it explicitly—and not, for example, by writing past the end of some other data structure. </p>
 <p indent="0">Language safety can be achieved by static checking, but also by run-time checks that trap nonsensical operations just at the moment when they are attempted and stop the program or raise an exception. For example, Scheme is a safe language, even though it has no static type system</p>
 <code-snippet indent="0" block="true">| statically checked      | dynamically checked
@@ -66,31 +66,34 @@ unsafe | C, C++, etc.            |
 </code-snippet>
 <p indent="0">Language safety is seldom absolute. Safe languages often offer programmers "escape hatches," such as foreign function calls to code written in other, possibly unsafe, languages.</p>
 <h3>Mathematical Preliminaries</h3>
-<p indent="0"><b>Definition:</b> The  <b>domain</b> of a relation  <mathjax-panel>R</mathjax-panel> on sets  <mathjax-panel>S</mathjax-panel> and  <mathjax-panel>T</mathjax-panel> , written  <mathjax-panel>dom(R)</mathjax-panel> , is the set of elements  <mathjax-panel>s \in S</mathjax-panel> such that  <mathjax-panel>(s, t) \in R</mathjax-panel> for some  <mathjax-panel>t</mathjax-panel> .</p>
-<p indent="0"><b>Definition:</b> The  <b>codomain or range</b> of  <mathjax-panel>R</mathjax-panel> , written  <mathjax-panel>range(R)</mathjax-panel> is the set of elements  <mathjax-panel>t \in T</mathjax-panel> such that  <mathjax-panel>(s, t) \ in R</mathjax-panel> for some  <mathjax-panel>s</mathjax-panel> .</p>
-<p indent="0"><b>Definition:</b> A relation  <mathjax-panel>R</mathjax-panel> on sets  <mathjax-panel>S</mathjax-panel> and  <mathjax-panel>T</mathjax-panel> is called a  <b>partial function</b> from  <mathjax-panel>S</mathjax-panel> to  <mathjax-panel>T</mathjax-panel> if, whenever  <mathjax-panel>(s, t_1) \in R</mathjax-panel> and  <mathjax-panel>(s, t_2) \in R</mathjax-panel> , we have  <mathjax-panel>t_1 = t_2</mathjax-panel> .</p>
+<p indent="0"><b>Definition</b> : The  <b>domain</b> of a relation  <mathjax-panel>R</mathjax-panel> on sets  <mathjax-panel>S</mathjax-panel> and  <mathjax-panel>T</mathjax-panel> , written  <mathjax-panel>dom(R)</mathjax-panel> , is the set of elements  <mathjax-panel>s \in S</mathjax-panel> such that  <mathjax-panel>(s, t) \in R</mathjax-panel> for some  <mathjax-panel>t</mathjax-panel> .</p>
+<p indent="0"><b>Definition</b> : The  <b>codomain or range</b> of  <mathjax-panel>R</mathjax-panel> , written  <mathjax-panel>range(R)</mathjax-panel> is the set of elements  <mathjax-panel>t \in T</mathjax-panel> such that  <mathjax-panel>(s, t) \ in R</mathjax-panel> for some  <mathjax-panel>s</mathjax-panel> .</p>
+<br />
+<p indent="0"><b>Definition</b> : A relation  <mathjax-panel>R</mathjax-panel> on sets  <mathjax-panel>S</mathjax-panel> and  <mathjax-panel>T</mathjax-panel> is called a  <b>partial function</b> from  <mathjax-panel>S</mathjax-panel> to  <mathjax-panel>T</mathjax-panel> if, whenever  <mathjax-panel>(s, t_1) \in R</mathjax-panel> and  <mathjax-panel>(s, t_2) \in R</mathjax-panel> , we have  <mathjax-panel>t_1 = t_2</mathjax-panel> .</p>
 <p indent="1">in addition, if  <mathjax-panel>dom(R) = S</mathjax-panel> then  <mathjax-panel>R</mathjax-panel> is called a  <b>total function</b> .</p>
-<p indent="0"><b>Definition:</b> A partial function  <mathjax-panel>R</mathjax-panel> from  <mathjax-panel>S</mathjax-panel> to  <mathjax-panel>T</mathjax-panel> is said to be defined on an argument  <mathjax-panel>s \in S</mathjax-panel> if  <mathjax-panel>s \in dom(R)</mathjax-panel> and undefined otherwise.</p>
+<p indent="0"><b>Definition</b> : A partial function  <mathjax-panel>R</mathjax-panel> from  <mathjax-panel>S</mathjax-panel> to  <mathjax-panel>T</mathjax-panel> is said to be defined on an argument  <mathjax-panel>s \in S</mathjax-panel> if  <mathjax-panel>s \in dom(R)</mathjax-panel> and undefined otherwise.</p>
 <p indent="1">- we write  <mathjax-panel>f(x) = \uparrow</mathjax-panel> to mean  <mathjax-panel>f</mathjax-panel> is undefined on  <mathjax-panel>x</mathjax-panel></p>
 <p indent="1">- we write  <mathjax-panel>f(x) = \downarrow </mathjax-panel> to mean  <mathjax-panel>f</mathjax-panel> is defined on  <mathjax-panel>x</mathjax-panel></p>
 <p indent="0">We will also need to define functions that may fail on some inputs.  It is important to distinguish failure (which is a legitimate, observable result) from divergence.</p>
 <p indent="1">（怎么没解释什么是 divergence 啊...</p>
-<p indent="0"><b>Definition:</b> Suppose  <mathjax-panel>R</mathjax-panel> is a binary relation on a set  <mathjax-panel>S</mathjax-panel> and  <mathjax-panel>P</mathjax-panel> is a predicate on  <mathjax-panel>S</mathjax-panel> . We say that  <mathjax-panel>P</mathjax-panel> is  <b>preserved</b> by  <mathjax-panel>R</mathjax-panel> if whenever we have  <mathjax-panel>s R s'</mathjax-panel> and  <mathjax-panel>P(s)</mathjax-panel> we also have  <mathjax-panel>P(s')</mathjax-panel></p>
-<p indent="0"><b>Definition:</b> A binary relation  <mathjax-panel>R</mathjax-panel> on a set  <mathjax-panel>S</mathjax-panel></p>
+<br />
+<p indent="0"><b>Definition</b> : Suppose  <mathjax-panel>R</mathjax-panel> is a binary relation on a set  <mathjax-panel>S</mathjax-panel> and  <mathjax-panel>P</mathjax-panel> is a predicate on  <mathjax-panel>S</mathjax-panel> . We say that  <mathjax-panel>P</mathjax-panel> is  <b>preserved</b> by  <mathjax-panel>R</mathjax-panel> if whenever we have  <mathjax-panel>s R s'</mathjax-panel> and  <mathjax-panel>P(s)</mathjax-panel> we also have  <mathjax-panel>P(s')</mathjax-panel></p>
+<br />
+<p indent="0"><b>Definition</b> : A binary relation  <mathjax-panel>R</mathjax-panel> on a set  <mathjax-panel>S</mathjax-panel></p>
 <p indent="1">-  <b>reflexive</b> if  <mathjax-panel>R</mathjax-panel> relates every element of  <mathjax-panel>S</mathjax-panel> to itself - that is,  <mathjax-panel>s R s</mathjax-panel></p>
 <p indent="1">-  <b>transitive</b> <mathjax-panel>s R t</mathjax-panel> and  <mathjax-panel>t R u</mathjax-panel> together implies  <mathjax-panel>s R u</mathjax-panel></p>
 <p indent="1">-  <b>symmetric</b> if  <mathjax-panel>s R t</mathjax-panel> implies  <mathjax-panel>t R s</mathjax-panel></p>
 <p indent="1">-  <b>antisymmetric</b> <mathjax-panel>s R t</mathjax-panel> and  <mathjax-panel>t R s</mathjax-panel> together implies  <mathjax-panel>s = t</mathjax-panel></p>
-<p indent="0"><b>Definition:</b> A reflexive, transitive, and symmetric relation on a set  <mathjax-panel>S</mathjax-panel> is called an  <b>equivalence</b> on  <mathjax-panel>S</mathjax-panel> .</p>
-<p indent="0"><b>Definition:</b> A reflexive and transitive relation  <mathjax-panel>R</mathjax-panel> on a set  <mathjax-panel>S</mathjax-panel> is called a  <b>preorder</b> on S.</p>
+<p indent="0"><b>Definition</b> : A reflexive, transitive, and symmetric relation on a set  <mathjax-panel>S</mathjax-panel> is called an  <b>equivalence</b> on  <mathjax-panel>S</mathjax-panel> .</p>
+<p indent="0"><b>Definition</b> : A reflexive and transitive relation  <mathjax-panel>R</mathjax-panel> on a set  <mathjax-panel>S</mathjax-panel> is called a  <b>preorder</b> on S.</p>
 <p indent="1">Preorders are usually written using symbols like  <mathjax-panel>\leq</mathjax-panel> . We write  <mathjax-panel>s \lt t</mathjax-panel> ( <mathjax-panel>s</mathjax-panel> is strictly less than  <mathjax-panel>t</mathjax-panel> ) to mean  <mathjax-panel>s \leq t \wedge s \neq t</mathjax-panel> .</p>
-<p indent="0"><b>Definition:</b> A preorder (on a set  <mathjax-panel>S</mathjax-panel> ) that is also antisymmetric is called a  <b>partial order</b> on  <mathjax-panel>S</mathjax-panel> . </p>
-<p indent="0"><b>Definition:</b> A partial order  <mathjax-panel>\leq</mathjax-panel> is called a  <b>total order</b> if it also has the property that, for each  <mathjax-panel>s</mathjax-panel> and  <mathjax-panel>t</mathjax-panel> in  <mathjax-panel>S</mathjax-panel> , either  <mathjax-panel>s \leq t</mathjax-panel> or  <mathjax-panel>t \leq s</mathjax-panel> .</p>
-<p indent="0"><b>Definition:</b> Suppose R is a binary relation on a set  <mathjax-panel>S</mathjax-panel> . </p>
+<p indent="0"><b>Definition</b> : A preorder (on a set  <mathjax-panel>S</mathjax-panel> ) that is also antisymmetric is called a  <b>partial order</b> on  <mathjax-panel>S</mathjax-panel> . </p>
+<p indent="0"><b>Definition</b> : A partial order  <mathjax-panel>\leq</mathjax-panel> is called a  <b>total order</b> if it also has the property that, for each  <mathjax-panel>s</mathjax-panel> and  <mathjax-panel>t</mathjax-panel> in  <mathjax-panel>S</mathjax-panel> , either  <mathjax-panel>s \leq t</mathjax-panel> or  <mathjax-panel>t \leq s</mathjax-panel> .</p>
+<p indent="0"><b>Definition</b> : Suppose R is a binary relation on a set  <mathjax-panel>S</mathjax-panel> . </p>
 <p indent="1">- The  <b>reflexive closure</b> of  <mathjax-panel>R</mathjax-panel> is the smallest reflexive relation  <mathjax-panel>R'</mathjax-panel> that contains R. </p>
 <p indent="1">- The  <b>transitive closure</b> of  <mathjax-panel>R</mathjax-panel> is the smallest transitive relation  <mathjax-panel>R^+</mathjax-panel> that contains R. </p>
 <p indent="1">- The  <b>reflexive and transitive closure</b> of  <mathjax-panel>R</mathjax-panel> is the smallest reflexive and transitive relation  <mathjax-panel>R^*</mathjax-panel> that contains R. </p>
-<p indent="0"><b>Definition:</b> Suppose we have a set  <mathjax-panel>S</mathjax-panel> with a preorder  <mathjax-panel>\leq</mathjax-panel> . We say that  <mathjax-panel>\leq</mathjax-panel> is  <b>well founded</b> if it contains no infinite decreasing chains.</p>
+<p indent="0"><b>Definition</b> : Suppose we have a set  <mathjax-panel>S</mathjax-panel> with a preorder  <mathjax-panel>\leq</mathjax-panel> . We say that  <mathjax-panel>\leq</mathjax-panel> is  <b>well founded</b> if it contains no infinite decreasing chains.</p>
 <p indent="1">For example, the usual order on the natural numbers, with  <mathjax-panel>0 < 1 < 2 < 3 < \dots</mathjax-panel> is well founded, but the same order on the integers,  <mathjax-panel>\dots < -3 < -2 < -1 < 0 < 1 < 2 < 3 < \dots</mathjax-panel> is not. </p>
 <p indent="2">（好像意思虽然序列的长度不是有界的，但是自然数下的这个关系，从任何元素开始，最小只能小到  <mathjax-panel>0</mathjax-panel> ，而整数上的可以无限小下去？</p>
 <h3>Untyped Arithmetic Expressions</h3>
@@ -106,7 +109,7 @@ unsafe | C, C++, etc.            |
 </code-snippet>
 <p indent="0">The symbol  <code-snippet>t</code-snippet> in the right-hand sides of the rules of this grammar is called a  <b>metavariable</b> . It is a place-holder for some particular term.</p>
 <p indent="1">"meta" means that it is not a variable of the object language - the language whose syntax we are currently describing but rather of the metalanguage - the notation in which the description is given.</p>
-<p indent="0"><b>Definition:</b> The term  <b>metatheory</b> means the collection of true statements that we can make about some particular logical system (or programming language) and, by extension, the study of such statements. </p>
+<p indent="0"><b>Definition</b> : The term  <b>metatheory</b> means the collection of true statements that we can make about some particular logical system (or programming language) and, by extension, the study of such statements. </p>
 <h4>inductive definition</h4>
 <p indent="0">The set of terms is the smallest set  <mathjax-panel>T</mathjax-panel> such that</p>
 <p indent="1">1.  <mathjax-panel>\{</mathjax-panel> true, false, 0 <mathjax-panel>\} \subseteq T</mathjax-panel></p>
@@ -127,6 +130,7 @@ false \in T \quad
 <p indent="1">- rules with no premises (like the first three above) are often called axioms. </p>
 <p indent="0">To be completely pedantic, what we are calling "inference rules" are actually rule schemas, since their premises and conclusions may include metavariables.</p>
 <p indent="1">(for example, you can replace the metavariable  <mathjax-panel>t_1</mathjax-panel> by all phrases from the appropriate syntactic category</p>
+<br />
 <p indent="0">Like the BNF grammar, this definition says nothing about the use of parentheses to mark compound subterms. Formally, what's really going on is that we are defining  <mathjax-panel>T</mathjax-panel> as a set of trees.</p>
 <h4>concrete definition </h4>
 <p indent="0">For each natrual number  <mathjax-panel>i</mathjax-panel> , define a set  <mathjax-panel>S_i</mathjax-panel> as follows: </p>
@@ -157,7 +161,7 @@ S_{i + 1} = \; &amp; \{true, false, 0\} \cup
 <p indent="0">(iii) if  <mathjax-panel>t</mathjax-panel> has the form  <mathjax-panel>\text{if } t_1 \text{ then } t_2 \text{ else } t_3</mathjax-panel> , for the same reason in (ii),  <mathjax-panel>t \in S'</mathjax-panel></p></div></div>
 <p indent="0">Thus, we have shown that each  <mathjax-panel>S_i \subseteq S'</mathjax-panel> . By the definition of S as the union of all the  <mathjax-panel>S_i</mathjax-panel> , this gives  <mathjax-panel>S \subseteq S'</mathjax-panel> , completing the argument.</p></div>
 <h4>Semantic Styles</h4>
-<p indent="0"><b>Definition:</b> the  <b>semantics</b> of the language: precise definition of how terms are evaluated</p>
+<p indent="0"><b>Definition</b> : the  <b>semantics</b> of the language: precise definition of how terms are evaluated</p>
 <p indent="0">There are three basic approaches to formalizing semantics:</p>
 <p indent="1">1.  <b>Operational semantics</b> specifies the behavior of a programming language by defining a simple  <b>abstract machine</b> for it.</p>
 <p indent="2">This machine is "abstract" in the sense that it uses the terms of the language as its machine code, rather than some low-level microprocessor instruction set. </p>
@@ -173,16 +177,19 @@ S_{i + 1} = \; &amp; \{true, false, 0\} \cup
 <p indent="1">3.  <b>Axiomatic semantics</b> instead of first defining the behaviors of programs (by giving some operational or denotational semantics) and then deriving laws from this definition, axiomatic methods take the laws themselves as the definition of the language. </p>
 <p indent="2">- The  <b>meaning</b> of a term is what can be proved about it.</p>
 <h3>Evaluation</h3>
-<p indent="0"><b>Definition:</b> An  <b>instance</b> of an inference rule is obtained by consistently replacing each metavariable by the same term in the rule's conclusions and all its premises.</p>
+<p indent="0"><b>Definition</b> : An  <b>instance</b> of an inference rule is obtained by consistently replacing each metavariable by the same term in the rule's conclusions and all its premises.</p>
 <p indent="1">for example,  <code-snippet>if true then true else false -> true</code-snippet> is an instance of  <mathjax-panel>\text{if } v_1 \text{ then } v_2 \text{ else } v_3</mathjax-panel></p>
-<p indent="0"><b>Definition:</b> <b>evaluation relation</b> on terms, written  <mathjax-panel>t \rightarrow t'</mathjax-panel> , is defined by inference rules.</p>
-<p indent="0"><b>Definition:</b> A rule is  <b>satisfied</b> by a relation if, for each instance of the rule, either the conclusion is in the relation or one of the premises is not.</p>
+<p indent="0"><b>Definition</b> :  <b>evaluation relation</b> on terms, written  <mathjax-panel>t \rightarrow t'</mathjax-panel> , is defined by inference rules.</p>
+<br />
+<p indent="0"><b>Definition</b> : A rule is  <b>satisfied</b> by a relation if, for each instance of the rule, either the conclusion is in the relation or one of the premises is not.</p>
 <p indent="1">没懂...</p>
-<p indent="0"><b>Definition:</b> A term  <mathjax-panel>t</mathjax-panel> is  <b>normal form</b> if no evaluation rule applies to it - i.e., there is no  <mathjax-panel>t'</mathjax-panel> such that  <mathjax-panel>t \rightarrow^{*} t'</mathjax-panel></p>
-<p indent="0"><b>Definition:</b> A term is  <b>stuck</b> if it is in normal form but not a value.</p>
+<br />
+<p indent="0"><b>Definition</b> : A term  <mathjax-panel>t</mathjax-panel> is  <b>normal form</b> if no evaluation rule applies to it - i.e., there is no  <mathjax-panel>t'</mathjax-panel> such that  <mathjax-panel>t \rightarrow^{*} t'</mathjax-panel></p>
+<p indent="0"><b>Definition</b> : A term is  <b>stuck</b> if it is in normal form but not a value.</p>
 <div indent="1"><p indent="0">"Stuckness" gives us a simple notion of run-time error for our simple machine.</p>
 <p indent="0">Intuitively, it characterizes the situations where the operational semantics does not know what to do because the program has reached a "meaningless state." </p>
 <p indent="1">(segmentation faults, execution of illegal instructions, etc.</p></div>
+<br />
 <p>--- 这两个定理好像是针对特定的规则的</p>
 <p indent="0"><b>Determinacy of One-Step Evaluation</b> Theorem: If  <mathjax-panel>t \rightarrow u</mathjax-panel> and  <mathjax-panel>t \rightarrow v</mathjax-panel> , then  <mathjax-panel>u = v</mathjax-panel></p>
 <p indent="0">Proof: by induction on a derivation of  <mathjax-panel>t \rightarrow u</mathjax-panel> .</p>
@@ -212,8 +219,8 @@ S_{i + 1} = \; &amp; \{true, false, 0\} \cup
 <div><p indent="0">evaluation rules:</p>
 <mathjax-panel indent="0" block="true">\begin{aligned}
         &amp; \frac
-            {t _{1} \longrightarrow t _{1}^{\prime}}
-            {\operatorname{succ} t_{1} \rightarrow \operatorname{succ} t_{1}^{\prime}}
+            {t _{1} \longrightarrow t _{1}'}
+            {\operatorname{succ} t_{1} \rightarrow \operatorname{succ} t_{1}'}
         &amp; \text{(E-Succ)} \\
         \\
         &amp; \operatorname{pred} 0 \rightarrow 0
@@ -223,8 +230,8 @@ S_{i + 1} = \; &amp; \{true, false, 0\} \cup
         &amp; \text{(E-PredSucc)} \\
         \\
         &amp; \frac
-            {t _{1} \longrightarrow t _{1}^{\prime}}
-            {\operatorname{pred} t_{1} \rightarrow \operatorname{pred} t_{1}^{\prime}}
+            {t _{1} \longrightarrow t _{1}'}
+            {\operatorname{pred} t_{1} \rightarrow \operatorname{pred} t_{1}'}
         &amp; \text{(E-Pred)} \\
         \\
         &amp; \operatorname{iszero} 0 \rightarrow true
@@ -234,39 +241,207 @@ S_{i + 1} = \; &amp; \{true, false, 0\} \cup
         &amp; \text{(E-IszeroSucc)} \\
         \\
         &amp; \frac
-            {t _{1} \longrightarrow t _{1}^{\prime}}
-            {\operatorname{iszero} t_{1} \rightarrow \operatorname{iszero} t_{1}^{\prime}}
+            {t _{1} \longrightarrow t _{1}'}
+            {\operatorname{iszero} t_{1} \rightarrow \operatorname{iszero} t_{1}'}
         &amp; \text{(E-IsZero)} \\
         \end{aligned}
 </mathjax-panel></div></div>
 <h2>The Untyped Lambda Calculus</h2>
 <p indent="0">In the lambda-calculus  <b>everything is a function</b> : the arguments accepted by functions are themselves functions and the result returned by a function is another function</p>
-<p indent="0">An occurrence of the variable  <mathjax-panel>x</mathjax-panel> is said to be  <b>bound</b> when it occurs in the body t of an abstraction  <mathjax-panel>\lambda x.t</mathjax-panel> .</p>
-<p indent="0">An occurrence of  <mathjax-panel>x</mathjax-panel> is  <b>free</b> if it appears in a position where it is not bound by an enclosing abstraction on  <mathjax-panel>x</mathjax-panel> . </p>
-<p indent="0"><b>Definition:</b> A term with no free variables is said to be  <b>closed</b> ; closed terms are also called  <b>combinators</b></p>
-<h3>TODO...</h3>
+<p indent="0">When discussing the syntax of programming languages, it is useful to distinguish two levels of structure.</p>
+<p indent="1">- The  <b>concrete syntax</b> of the language refers to the string of characters that programmers directly read and write.</p>
+<p indent="1">- The  <b>abstract syntax</b> is a much simpler internal representation of programs as labeled trees (called abstract syntax trees).</p>
+<br />
+<p indent="0"><b>Definition</b> : An occurrence of the variable  <mathjax-panel>x</mathjax-panel> is said to be  <b>bound</b> when it occurs in the body t of an abstraction  <mathjax-panel>\lambda x.t</mathjax-panel> .</p>
+<p indent="0"><b>Definition</b> : An occurrence of  <mathjax-panel>x</mathjax-panel> is  <b>free</b> if it appears in a position where it is not bound by an enclosing abstraction on  <mathjax-panel>x</mathjax-panel> . </p>
+<p indent="0"><b>Definition</b> : A term with no free variables is said to be  <b>closed</b> ; closed terms are also called  <b>combinators</b></p>
+<h3>evaluation strategies</h3>
+<p indent="0">redex...</p>
+<p indent="0">beta-reduction...</p>
+<p indent="0"><b>full beta-reduction</b></p>
+<p indent="0"><b>normal order strategy</b> , the left most outer most</p>
+<p indent="0"><b>call by name strategy</b></p>
+<h3>Lambda Encodings </h3>
+<h4>Encoding Booleans </h4>
+<p indent="0"><code-snippet>let cond p a b = if p then a else b</code-snippet> 是常见的 boolean 操作，我们从这个方法下手。可以看出如果将  <code-snippet>a b</code-snippet> 看作一个 tuple 那么  <code-snippet>p</code-snippet> 就像一个一个从 tuple 中取值的函数。 <code-snippet>true</code-snippet> 为取第一个元素， <code-snippet>false</code-snippet> 为第二个。</p>
+<p indent="0">容易写出函数表达的 boolean:</p>
+<code-snippet indent="0" block="true">let true' a b = a
+
+let false' a b = b
+
+let and' a b = a b false'
+
+let or' a b = a true' b
+</code-snippet>
+<code-snippet indent="0" block="true">cond == λp.λa.λb.p a b
+true == λx.λy.x
+false == λx.λy.y
+
+and == λa.λb.a b FALSE
+or == λa.λb.a TRUE b
+</code-snippet>
+<h4>Encoding Pairs </h4>
+<p indent="0">Using booleans, we can encode pairs of values as terms. </p>
+<code-snippet indent="0" block="true">construct_pair = λf. λs. λb. b f s 
+fst = λp. p true
+snd = λp. p false
+</code-snippet>
+<p indent="0">That is  <code-snippet>construct_pair f s</code-snippet> returns a pair which is a function that, when applied to a boolean value  <code-snippet>b</code-snippet> , applied b to  <code-snippet>f</code-snippet> and  <code-snippet>s</code-snippet></p>
+<h4>Encoding LISP-style lists</h4>
+<p indent="0">从  <code-snippet>car</code-snippet> 与  <code-snippet>cdr</code-snippet> 入手，The way we'll define a non-nil list is as a function that "stores" the head and tail of the list in its body. Its argument will be a selector function (head or tail). </p>
+<code-snippet indent="0" block="true">&lt;!-- type list = λs.s h t --&gt;
+car = λl.l (λh.λt.h) = λl.l true
+cdr = λl.l (λh.λt.t) = λl.l false
+
+is_empty = λl.l (λh.λt.false)
+nil = λs.true
+
+cons = λh.λt.(λs.s h t)
+</code-snippet>
+<h4>Encoding Numerals</h4>
+<p indent="0">1. 可以用 list 来实现</p>
+<code-snippet indent="0" block="true">is_zero == is_empty
+pred == TAIL
+&lt;!-- succ is a function that adds one more element onto a given list --&gt;
+succ == λl. cons x l
+</code-snippet>
+<p indent="0">2. 根据函数 apply 的次数来实现 </p>
+<code-snippet indent="0" block="true">n = λf.λx.f^n x
+
+0	==	λf.λx.x
+1	==	λf.λx.fy
+2	==	λf.λx.f(fx)
+3	==	λf.λx.f(f(fx))
+etc.
+
+succ (λf.λx.f^n x) = (λf.λx.f^(n + 1) x)
+</code-snippet>
+<code-snippet indent="0" block="true">is_zero = λn. n(λx. false) true
+    n != 0 即 f 一旦 apply 就返回 false，那么 let `f` be `λx.FALSE`
+    n == 0 即 x 直接返回就返回 true，那么 let `x` be `True`
+</code-snippet>
+<p indent="0"><code-snippet>succ</code-snippet> 函数需要接受一个数返回另一个数，即接受一个接受两个参数的函数返回一个接受两个参数的函数。区别在于第二个函数的第一个参数多 apply 一次，但是我们无法改变参数函数的 function body，不妨在 apply 到函数之前，先让 x apply y 一次。</p>
+<p indent="1"><code-snippet>succ == λn.(λf.λx.n f (fx))</code-snippet></p>
+<p indent="0">另一种  <code-snippet>succ</code-snippet> 的实现方式是直接在当前的数上加一层  <code-snippet>f</code-snippet></p>
+<p indent="1"><code-snippet>succ == λn.(λf.λx.f (n f x))</code-snippet></p>
+<code-snippet indent="0" block="true">module type ChurchNumber = sig
+  (* in untyped lambda calculus, we can use a generic type instead of bool *)
+  (* we use bool here because of is_zero *)
+  type t = (bool -&gt; bool) -&gt; bool -&gt; bool
+
+  val zero : t
+
+  val one : t
+
+  val two : t
+
+  val is_zero : t -&gt; bool
+
+  val add : t -&gt; t -&gt; t
+
+  val mult : t -&gt; t -&gt; t
+end
+
+module ChurchNumber : ChurchNumber = struct
+  type t = (bool -&gt; bool) -&gt; bool -&gt; bool
+
+  let zero f b = b
+
+  let one f b = f (f b)
+
+  let two f b = f (f (f b))
+
+  let is_zero n = n (fun _ -&gt; false) true
+
+  let add x y f b = x f (y f b)
+
+  let mult x y f b = x (y f) b
+end
+</code-snippet>
+<code-snippet indent="0" block="true">zz = pair 0 0
+ss = λp. pair (snd p) (succ (snd p))
+pred = λn. fst (n ss zz)
+</code-snippet>
+<p indent="0">The key part of this definition is  <code-snippet>ss (a, b) = (b, b + 1)</code-snippet> 。so we have  <code-snippet>ss^n (0, 0) = (n - 1, n)</code-snippet> ，所以可以有  <code-snippet>pred n = fst $ n ss (0, 0)</code-snippet></p>
+<p indent="0">substract: TODO...</p>
+<p indent="0">equal: TODO...</p>
+<h3>Recursion </h3>
+<p indent="0"><b>Definition</b> : Terms with no normal form are said to  <b>diverge</b> .</p>
+<p indent="1">e.g.,  <mathjax-panel>\omega = (\lambda x. x x) (\lambda x. x x)</mathjax-panel></p>
+<p indent="0">TODO: p61</p>
 <h2>Nameless Representation of Terms</h2>
 <p indent="0">We can devise some "canonical" representation of variables and terms that does not require renaming.</p>
 <p indent="0">De Bruijn's idea was that we can represent terms by making variable occurrences point directly to their binders, rather than referring to them by name.  This can be accomplished by replacing named variables by natural numbers, where the number k stands for "the variable bound by the k'th enclosing  <mathjax-panel>\lambda</mathjax-panel> .</p>
 <p indent="1">- e.g.,  <mathjax-panel>\lambda x.x</mathjax-panel> corresponds to the nameless term  <mathjax-panel>λ.0</mathjax-panel></p>
 <p indent="1">- e.g.,  <mathjax-panel>\lambda x. \lambda y. x (y x)</mathjax-panel> corresponds to the nameless term  <mathjax-panel>\lambda. \lambda. 1 (0 1)</mathjax-panel></p>
 <p indent="0"><b>Nameless terms</b> are also sometimes called  <b>de Bruijn terms</b> ,  and the numeric variables in them are called  <b>de Bruijn indices</b> . Compiler writers use the term  <b>static distances</b> for the same concept.</p>
-<p indent="0"><b>Definition:</b> let  <mathjax-panel>T</mathjax-panel> be the smallest family of sets  <mathjax-panel>\{ T _{0}, T _{1}, T _{2}, \ldots\}</mathjax-panel> such that </p>
+<h4>Converting to Nameless Representation</h4>
+<p indent="0">We will define a function  <mathjax-panel>db_{\Gamma}</mathjax-panel> mapping terms to nameless representation, and to deal with terms containing free variables, we need the idea of a  <b>naming context</b> <mathjax-panel>\Gamma</mathjax-panel> . </p>
+<p indent="1">For example, suppose we want to represent  <mathjax-panel>\lambda x. y x</mathjax-panel> as a nameless term. But we cannot see the binder for y, so it is not clear how "far away" it might be and we do not know what number to assign to it. </p>
+<p indent="1">suppose we have  <mathjax-panel>\Gamma=x \rightarrow 4 ; y \rightarrow 3 ; z \rightarrow 2 ; a \rightarrow 1 ; b \rightarrow 0</mathjax-panel> then </p>
+<p indent="2">-  <mathjax-panel>x (y z)</mathjax-panel> would be represented as  <mathjax-panel>4 \, (3 \, 2)</mathjax-panel></p>
+<p indent="2">-  <mathjax-panel>\lambda w. y w</mathjax-panel> would be represented as  <mathjax-panel>\lambda. 4 \, 0</mathjax-panel> . because of the abstraction of  <mathjax-panel>w</mathjax-panel> , the distance of  <mathjax-panel>y</mathjax-panel> is increased by 1, hence 3 + 1</p>
+<p indent="0">Let's simplify  <mathjax-panel>\Gamma</mathjax-panel> to be a sequence of var names: </p>
+<p indent="1"><mathjax-panel>\Gamma=x_{n-1}, \ldots, x_{1}, x_{0}</mathjax-panel></p>
+<p indent="0">Then we'll define  <mathjax-panel>\operatorname{dom}(\Gamma)=\left\{x_{n-1}, \ldots, x_{1}, x_{0}\right\}</mathjax-panel> and  <mathjax-panel>\Gamma(x) = \text{rightmost index of } x \text{ in } \Gamma</mathjax-panel></p>
+<p indent="0">So  <mathjax-panel>db_{\Gamma}</mathjax-panel> can be defined as:</p>
+<p indent="1">-  <mathjax-panel>db_{\Gamma}(x)                         = \Gamma(x)</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>db_{\Gamma}(\lambda x . t)             = \lambda . d b_{\Gamma, x}(t)</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>db_{\Gamma}\left(t_{1} t_{2}\right)    = d b_{\Gamma}\left(t_{1}\right) d b_{\Gamma}\left(t_{2}\right)</mathjax-panel></p>
+<p indent="0">The we have</p>
+<mathjax-panel indent="0" block="true">\begin{aligned}
+d b_{x, y, z}(\lambda x \cdot y x) &amp;=\lambda \cdot d b_{x, y, z, x}(y x) \\
+&amp;=\lambda \cdot d b_{x, y, z, x}(y) d b_{x, y, z, x}(x) \\
+&amp;=\lambda \cdot 20
+\end{aligned}
+</mathjax-panel>
+<br />
+<p indent="0">Note that each closed term has just one de Bruijn representation, and two ordinary terms are equivalent modulo renaming of bound vars iff they have the same de Bruijn representation.</p>
+<p indent="1">(没懂，modulo 是啥 </p>
+<br />
+<p indent="0">We need to keep track of how many free vars each term may contain. That is, we distinguish the sets of terms with no free vars (called the 0-terms), terms with at most one free vars (1-terms), and so on.</p>
+<p indent="0"><b>Definition</b> : let  <mathjax-panel>T</mathjax-panel> be the smallest family of sets  <mathjax-panel>\{ T _{0}, T _{1}, T _{2}, \ldots\}</mathjax-panel> such that </p>
 <p indent="1">1.  <mathjax-panel>k \in T_n</mathjax-panel> whenever  <mathjax-panel>0 \leq k \leq n</mathjax-panel></p>
 <p indent="1">2. if  <mathjax-panel>t_1 \in T_n</mathjax-panel> and  <mathjax-panel>n > 0</mathjax-panel> then  <mathjax-panel>\lambda. t_1 \in T_{n - 1}</mathjax-panel></p>
 <p indent="1">3. if  <mathjax-panel>t_1 \in T_n</mathjax-panel> and  <mathjax-panel>t_2 \in T_n</mathjax-panel> then  <mathjax-panel>(t_1 t_2) \in T_n</mathjax-panel></p>
+<p indent="0">The elements of  <mathjax-panel>T_n</mathjax-panel> are terms with at most  <mathjax-panel>n</mathjax-panel> free vars, numbered between  <mathjax-panel>0</mathjax-panel> and  <mathjax-panel>n - 1</mathjax-panel> .</p>
+<h4>Substitution on Nameless Terms</h4>
+<p indent="0">When a substitution goes under a λ-abstraction, as in  <mathjax-panel>([x \rightarrow s] \lambda y. x)</mathjax-panel> , the context in which the substitution is taking places becomes one var longer than the original, so we need to increment the indices of the freee vars inside  <mathjax-panel>s</mathjax-panel> . We define one auxiliary operation called  <b>shifting</b> to do this.</p>
 <p indent="0">TODO...</p>
 <h2>Simple Types</h2>
-<p indent="0"><b>Definition:</b> A term  <mathjax-panel>t</mathjax-panel> is  <b>typable (or well typed)</b> if there is some  <mathjax-panel>T</mathjax-panel> such that  <mathjax-panel>t: T</mathjax-panel></p>
+<p indent="0"><b>Definition</b> : A term  <mathjax-panel>t</mathjax-panel> is  <b>typable (or well typed)</b> if there is some  <mathjax-panel>T</mathjax-panel> such that  <mathjax-panel>t: T</mathjax-panel></p>
 <h3>Safety = Progress + Preservation</h3>
 <p indent="0"><b>Progress</b> theorem: A well-typed term is not stuck (either it is a value or it can take a step according to the evaluation rules)</p>
 <p indent="0"><b>Preservation</b> theorem: If a well-typed term takes a step of evaluation, then the resulting term is also well typed.</p>
-<p indent="0"><b>Definition:</b> Languages in which type annotations in terms are used to guide the typechecker are called  <b>explicitly typed</b> .</p>
-<p indent="0"><b>Definition:</b> Languages in which we ask the typechecker to infer or reconstruct his information are called  <b>implicitly typed</b> .</p>
-<p indent="0"><b>Definition:</b> A  <b>typing context</b> (also called a  <b>type enviroment</b> )  <mathjax-panel>\Gamma</mathjax-panel> is a sequence of variables and their types.</p>
+<p indent="0"><b>Definition</b> : Languages in which type annotations in terms are used to guide the typechecker are called  <b>explicitly typed</b> .</p>
+<p indent="0"><b>Definition</b> : Languages in which we ask the typechecker to infer or reconstruct his information are called  <b>implicitly typed</b> .</p>
+<p indent="0"><b>Definition</b> : A  <b>typing context</b> (also called a  <b>type enviroment</b> )  <mathjax-panel>\Gamma</mathjax-panel> is a sequence of variables and their types.</p>
 <p indent="0">We write  <mathjax-panel>dom(\Gamma)</mathjax-panel> for the set of variables bound by  <mathjax-panel>\Gamma</mathjax-panel></p>
 <p indent="0">An  <b>inversion lemma</b> records a collection of observations about how typing derivations are built: the clause for each syntactic form tell use "if a term of this form is well typed, then its subterms must have types of these forms..."</p>
-<p indent="0">e.g., if  <mathjax-panel>\Gamma \vdash \lambda x : T _{1} \cdot t _{2}: R</mathjax-panel> , then  <mathjax-panel>R = T _{1} \rightarrow R _{2}</mathjax-panel> for some  <mathjax-panel>R_2</mathjax-panel> with  <mathjax-panel>\Gamma, x : T _{1} \vdash t _{2}: R _{2}</mathjax-panel></p></section>
+<p indent="1">e.g., if  <mathjax-panel>\Gamma \vdash \lambda x : T _{1} \cdot t _{2}: R</mathjax-panel> , then  <mathjax-panel>R = T _{1} \rightarrow R _{2}</mathjax-panel> for some  <mathjax-panel>R_2</mathjax-panel> with  <mathjax-panel>\Gamma, x : T _{1} \vdash t _{2}: R _{2}</mathjax-panel></p>
+<h3>The Curry-Howard Correspondence (propositions as types analogy)</h3>
+<p indent="0">The  <mathjax-panel>\rightarrow</mathjax-panel> type constructor comes with typing rules of two kinds:</p>
+<p indent="1">1. an "introduction rule (T-ABS)" describing how elements of the type can be created</p>
+<p indent="1">2. an "elimination rule (T-APP)" describes how elements of the type can be used</p>
+<p indent="0">The introduction/elimination terminology arises from a connection between type theory and logic known as the  <b>Curry-Howard Correspondence</b> .</p>
+<p indent="0">The idea is that, in constructive logics, a proof of a proposition  <mathjax-panel>P</mathjax-panel> consists of concrete  <b>evidence</b> for P.</p>
+<p indent="1">For example, a proof of a proposition  <mathjax-panel>P \supset Q</mathjax-panel> can be viewed as a  mechanical procedure that, given a proof of  <mathjax-panel>P</mathjax-panel> , constructs a proof of  <mathjax-panel>Q</mathjax-panel> - or, if you like, a proof of  <mathjax-panel>Q</mathjax-panel> <b>abstracted</b> on a proof of  <mathjax-panel>P</mathjax-panel></p>
+<p indent="0">Most compilers for full-scale programming languges actually avoid carrying annotations at ru time: thery are used during typechecking</p>
+<p indent="0"><b>Definition</b> : The  <b>erasure</b> of a simply typed term  <mathjax-panel>t</mathjax-panel> is defined as follows</p>
+<mathjax-panel indent="0" block="true">\begin{aligned}
+\operatorname{erase}(x) \quad &amp;= x \\
+\operatorname{erase}(\lambda x: T_1. t_2) \quad &amp;= \lambda x. t_2 \\
+\operatorname{erase}(t_1 t_2) \quad &amp;= \operatorname{erase}(t_1) \operatorname{erase}(t_1) \\
+\end{aligned}
+</mathjax-panel>
+<p indent="0"><b>evaluation commutes with erasure</b> : we reach the same term by evaluating and then erasing as we do by erasing and then evaluating.</p>
+<p indent="1">If  <mathjax-panel>t \rightarrow t'</mathjax-panel> under the typed evaluation relation, then  <mathjax-panel>\operatorname {erase}( t ) \rightarrow \operatorname{erase} (t')</mathjax-panel></p>
+<p indent="0"><b>Definition</b> : A term  <mathjax-panel>m</mathjax-panel> in the untyped lambda-calculus is said to be  <b>typable</b> in  <mathjax-panel>\lambda_{\rightarrow}</mathjax-panel> if there are some simply typed term  <mathjax-panel>t</mathjax-panel> , type  <mathjax-panel>T</mathjax-panel> , and context  <mathjax-panel>\Gamma</mathjax-panel> such that  <mathjax-panel>\operatorname{erase}(t) = m</mathjax-panel> and  <mathjax-panel>\Gamma \vdash t: T</mathjax-panel></p>
+<h3>Curry-Style vs. Church-Style </h3>
+<p indent="0"><b>Curry-Style</b> : We first define the terms, then define a semantics showing how they behave, then give a type system that rejects some terms whose behaviors we don't like. Semantics is prior to typing.</p>
+<p indent="0"><b>Church-Style</b> : We first define terms, then identify the well-typed terms, then give semantics just to these. Typing is prior to semantics.</p>
+<p indent="1">In deed, strictly speaking, what we actually evaluate in Church-style systems is typing derivations, not terms.</p>
+<p indent="0">implicitly typed presentations of lambda-calculi are often given in the Curry style, while Church-style presentations are common only for explicitly typed systems.</p></section>
     </article>
 </main>
 

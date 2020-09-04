@@ -1,9 +1,9 @@
 :h3 Introduction 
 
-**Definition:** A **type system** is a tractable syntactic method for proving the absence of certain program behaviors by classifying phrases according to the kinds of values they compute.
+**Definition**: A **type system** is a tractable syntactic method for proving the absence of certain program behaviors by classifying phrases according to the kinds of values they compute.
 - - this definition identifies type systems as tools for reasoning about programs.
 
-**Definition:** A **safe language** is one that protects its own abstractions. Every high-level language provides abstractions of machine services. Safety refers to the language's ability to guarantee the integrity of these abstractions and of higher-level abstractions introduced by the programmer using the definitional facilities of the language.
+**Definition**: A **safe language** is one that protects its own abstractions. Every high-level language provides abstractions of machine services. Safety refers to the language's ability to guarantee the integrity of these abstractions and of higher-level abstractions introduced by the programmer using the definitional facilities of the language.
 - - e.g., a programmer using this language then expects that an array can be changed only by using the update operation on it explicitly—and not, for example, by writing past the end of some other data structure. 
 
 Language safety can be achieved by static checking, but also by run-time checks that trap nonsensical operations just at the moment when they are attempted and stop the program or raise an exception. For example, Scheme is a safe language, even though it has no static type system
@@ -19,40 +19,46 @@ Language safety is seldom absolute. Safe languages often offer programmers "esca
 
 :h3 Mathematical Preliminaries
 
-**Definition:** The **domain** of a relation $R$ on sets $S$ and $T$, written $dom(R)$, is the set of elements $s \in S$ such that $(s, t) \in R$ for some $t$.
-**Definition:** The **codomain or range** of $R$, written $range(R)$ is the set of elements $t \in T$ such that $(s, t) \ in R$ for some $s$.
+**Definition**: The **domain** of a relation $R$ on sets $S$ and $T$, written $dom(R)$, is the set of elements $s \in S$ such that $(s, t) \in R$ for some $t$.
+**Definition**: The **codomain or range** of $R$, written $range(R)$ is the set of elements $t \in T$ such that $(s, t) \ in R$ for some $s$.
 
-**Definition:** A relation $R$ on sets $S$ and $T$ is called a **partial function** from $S$ to $T$ if, whenever $(s, t_1) \in R$ and $(s, t_2) \in R$, we have $t_1 = t_2$.
+:br
+
+**Definition**: A relation $R$ on sets $S$ and $T$ is called a **partial function** from $S$ to $T$ if, whenever $(s, t_1) \in R$ and $(s, t_2) \in R$, we have $t_1 = t_2$.
 - in addition, if $dom(R) = S$ then $R$ is called a **total function**.
 
-**Definition:** A partial function $R$ from $S$ to $T$ is said to be defined on an argument $s \in S$ if $s \in dom(R)$ and undefined otherwise.
+**Definition**: A partial function $R$ from $S$ to $T$ is said to be defined on an argument $s \in S$ if $s \in dom(R)$ and undefined otherwise.
 - - we write $f(x) = \uparrow$ to mean $f$ is undefined on $x$
 - - we write $f(x) = \downarrow $ to mean $f$ is defined on $x$
 
 We will also need to define functions that may fail on some inputs.  It is important to distinguish failure (which is a legitimate, observable result) from divergence.
 - （怎么没解释什么是 divergence 啊...
 
-**Definition:** Suppose $R$ is a binary relation on a set $S$ and $P$ is a predicate on $S$. We say that $P$ is **preserved** by $R$ if whenever we have $s R s'$ and $P(s)$ we also have $P(s')$
+:br
 
-**Definition:** A binary relation $R$ on a set $S$ 
+**Definition**: Suppose $R$ is a binary relation on a set $S$ and $P$ is a predicate on $S$. We say that $P$ is **preserved** by $R$ if whenever we have $s R s'$ and $P(s)$ we also have $P(s')$
+
+:br
+
+**Definition**: A binary relation $R$ on a set $S$ 
 - - **reflexive** if $R$ relates every element of $S$ to itself - that is, $s R s$
 - - **transitive** $s R t$ and $t R u$ together implies $s R u$ 
 - - **symmetric** if $s R t$ implies $t R s$ 
 - - **antisymmetric** $s R t$ and $t R s$ together implies $s = t$ 
 
-**Definition:** A reflexive, transitive, and symmetric relation on a set $S$ is called an **equivalence** on $S$.
+**Definition**: A reflexive, transitive, and symmetric relation on a set $S$ is called an **equivalence** on $S$.
 
-**Definition:** A reflexive and transitive relation $R$ on a set $S$ is called a **preorder** on S.
+**Definition**: A reflexive and transitive relation $R$ on a set $S$ is called a **preorder** on S.
 - Preorders are usually written using symbols like $\leq$. We write $s \lt t$ ($s$ is strictly less than $t$) to mean $s \leq t \wedge s \neq t$.
-**Definition:** A preorder (on a set $S$) that is also antisymmetric is called a **partial order** on $S$. 
-**Definition:** A partial order $\leq$ is called a **total order** if it also has the property that, for each $s$ and $t$ in $S$, either $s \leq t$ or $t \leq s$.
+**Definition**: A preorder (on a set $S$) that is also antisymmetric is called a **partial order** on $S$. 
+**Definition**: A partial order $\leq$ is called a **total order** if it also has the property that, for each $s$ and $t$ in $S$, either $s \leq t$ or $t \leq s$.
 
-**Definition:** Suppose R is a binary relation on a set $S$. 
+**Definition**: Suppose R is a binary relation on a set $S$. 
 - - The **reflexive closure** of $R$ is the smallest reflexive relation $R'$ that contains R. 
 - - The **transitive closure** of $R$ is the smallest transitive relation $R^+$ that contains R. 
 - - The **reflexive and transitive closure** of $R$ is the smallest reflexive and transitive relation $R^*$ that contains R. 
 
-**Definition:** Suppose we have a set $S$ with a preorder $\leq$. We say that $\leq$ is **well founded** if it contains no infinite decreasing chains.
+**Definition**: Suppose we have a set $S$ with a preorder $\leq$. We say that $\leq$ is **well founded** if it contains no infinite decreasing chains.
 - For example, the usual order on the natural numbers, with $0 < 1 < 2 < 3 < \dots$ is well founded, but the same order on the integers, $\dots < -3 < -2 < -1 < 0 < 1 < 2 < 3 < \dots$ is not. 
 -- （好像意思虽然序列的长度不是有界的，但是自然数下的这个关系，从任何元素开始，最小只能小到 $0$，而整数上的可以无限小下去？
 
@@ -73,7 +79,7 @@ t ::= true
 The symbol `t` in the right-hand sides of the rules of this grammar is called a **metavariable**. It is a place-holder for some particular term.
 - "meta" means that it is not a variable of the object language - the language whose syntax we are currently describing but rather of the metalanguage - the notation in which the description is given.
 
-**Definition:** The term **metatheory** means the collection of true statements that we can make about some particular logical system (or programming language) and, by extension, the study of such statements. 
+**Definition**: The term **metatheory** means the collection of true statements that we can make about some particular logical system (or programming language) and, by extension, the study of such statements. 
 
 :h4 inductive definition
 
@@ -99,6 +105,8 @@ Each rule is read "If we have established the statements in the premise(s) liste
 - - rules with no premises (like the first three above) are often called axioms. 
 To be completely pedantic, what we are calling "inference rules" are actually rule schemas, since their premises and conclusions may include metavariables.
 - (for example, you can replace the metavariable $t_1$ by all phrases from the appropriate syntactic category
+
+:br
 
 Like the BNF grammar, this definition says nothing about the use of parentheses to mark compound subterms. Formally, what's really going on is that we are defining $T$ as a set of trees.
 
@@ -147,7 +155,7 @@ part (b) $S$ is the smallest set: suppose that some set $S'$ satisfies the condi
 
 :h4 Semantic Styles
 
-**Definition:** the **semantics** of the language: precise definition of how terms are evaluated
+**Definition**: the **semantics** of the language: precise definition of how terms are evaluated
 
 There are three basic approaches to formalizing semantics:
 - 1. **Operational semantics** specifies the behavior of a programming language by defining a simple **abstract machine** for it.
@@ -168,23 +176,28 @@ There are three basic approaches to formalizing semantics:
 
 :h3 Evaluation
 
-**Definition:** An **instance** of an inference rule is obtained by consistently replacing each metavariable by the same term in the rule's conclusions and all its premises.
+**Definition**: An **instance** of an inference rule is obtained by consistently replacing each metavariable by the same term in the rule's conclusions and all its premises.
 - for example, `if true then true else false -> true` is an instance of $\text{if } v_1 \text{ then } v_2 \text{ else } v_3$
 
-**Definition:** **evaluation relation** on terms, written $t \rightarrow t'$, is defined by inference rules.
+**Definition**: **evaluation relation** on terms, written $t \rightarrow t'$, is defined by inference rules.
 
-**Definition:** A rule is **satisfied** by a relation if, for each instance of the rule, either the conclusion is in the relation or one of the premises is not.
+:br
+
+**Definition**: A rule is **satisfied** by a relation if, for each instance of the rule, either the conclusion is in the relation or one of the premises is not.
 - 没懂...
 
-**Definition:** A term $t$ is **normal form** if no evaluation rule applies to it - i.e., there is no $t'$ such that $t \rightarrow^{*} t'$
+:br
+
+**Definition**: A term $t$ is **normal form** if no evaluation rule applies to it - i.e., there is no $t'$ such that $t \rightarrow^{*} t'$
 
 
-**Definition:** A term is **stuck** if it is in normal form but not a value.
+**Definition**: A term is **stuck** if it is in normal form but not a value.
 :div(indent="1")
     "Stuckness" gives us a simple notion of run-time error for our simple machine.
     Intuitively, it characterizes the situations where the operational semantics does not know what to do because the program has reached a "meaningless state." 
     - (segmentation faults, execution of illegal instructions, etc.
 
+:br
 :p --- 这两个定理好像是针对特定的规则的
 
 **Determinacy of One-Step Evaluation** Theorem: If $t \rightarrow u$ and $t \rightarrow v$, then $u = v$
@@ -226,8 +239,8 @@ Proof: Just a corollary of the determinacy of single-step evaluation.
         $$
         \begin{aligned}
         & \frac
-            {t _{1} \longrightarrow t _{1}^{\prime}}
-            {\operatorname{succ} t_{1} \rightarrow \operatorname{succ} t_{1}^{\prime}}
+            {t _{1} \longrightarrow t _{1}'}
+            {\operatorname{succ} t_{1} \rightarrow \operatorname{succ} t_{1}'}
         & \text{(E-Succ)} \\
         \\
         & \operatorname{pred} 0 \rightarrow 0
@@ -237,8 +250,8 @@ Proof: Just a corollary of the determinacy of single-step evaluation.
         & \text{(E-PredSucc)} \\
         \\
         & \frac
-            {t _{1} \longrightarrow t _{1}^{\prime}}
-            {\operatorname{pred} t_{1} \rightarrow \operatorname{pred} t_{1}^{\prime}}
+            {t _{1} \longrightarrow t _{1}'}
+            {\operatorname{pred} t_{1} \rightarrow \operatorname{pred} t_{1}'}
         & \text{(E-Pred)} \\
         \\
         & \operatorname{iszero} 0 \rightarrow true
@@ -248,8 +261,8 @@ Proof: Just a corollary of the determinacy of single-step evaluation.
         & \text{(E-IszeroSucc)} \\
         \\
         & \frac
-            {t _{1} \longrightarrow t _{1}^{\prime}}
-            {\operatorname{iszero} t_{1} \rightarrow \operatorname{iszero} t_{1}^{\prime}}
+            {t _{1} \longrightarrow t _{1}'}
+            {\operatorname{iszero} t_{1} \rightarrow \operatorname{iszero} t_{1}'}
         & \text{(E-IsZero)} \\
         \end{aligned}
         $$
@@ -257,12 +270,166 @@ Proof: Just a corollary of the determinacy of single-step evaluation.
 :h2 The Untyped Lambda Calculus
 In the lambda-calculus **everything is a function**: the arguments accepted by functions are themselves functions and the result returned by a function is another function
 
-An occurrence of the variable $x$ is said to be **bound** when it occurs in the body t of an abstraction $\lambda x.t$.
-An occurrence of $x$ is **free** if it appears in a position where it is not bound by an enclosing abstraction on $x$. 
+When discussing the syntax of programming languages, it is useful to distinguish two levels of structure.
+- - The **concrete syntax** of the language refers to the string of characters that programmers directly read and write.
+- - The **abstract syntax** is a much simpler internal representation of programs as labeled trees (called abstract syntax trees).
 
-**Definition:** A term with no free variables is said to be **closed**; closed terms are also called **combinators**
+:br
 
-:h3 TODO...
+**Definition**: An occurrence of the variable $x$ is said to be **bound** when it occurs in the body t of an abstraction $\lambda x.t$.
+**Definition**: An occurrence of $x$ is **free** if it appears in a position where it is not bound by an enclosing abstraction on $x$. 
+
+**Definition**: A term with no free variables is said to be **closed**; closed terms are also called **combinators**
+
+:h3 evaluation strategies
+
+redex...
+
+beta-reduction...
+
+**full beta-reduction**
+**normal order strategy**, the left most outer most
+**call by name strategy**
+
+:h3 Lambda Encodings 
+
+:h4 Encoding Booleans 
+
+`let cond p a b = if p then a else b` 是常见的 boolean 操作，我们从这个方法下手。可以看出如果将 `a b` 看作一个 tuple 那么 `p` 就像一个一个从 tuple 中取值的函数。`true` 为取第一个元素，`false` 为第二个。
+
+容易写出函数表达的 boolean:
+```
+let true' a b = a
+
+let false' a b = b
+
+let and' a b = a b false'
+
+let or' a b = a true' b
+```
+```
+cond == λp.λa.λb.p a b
+true == λx.λy.x
+false == λx.λy.y
+
+and == λa.λb.a b FALSE
+or == λa.λb.a TRUE b
+```
+
+:h4 Encoding Pairs 
+
+Using booleans, we can encode pairs of values as terms. 
+```
+construct_pair = λf. λs. λb. b f s 
+fst = λp. p true
+snd = λp. p false
+```
+That is `construct_pair f s` returns a pair which is a function that, when applied to a boolean value `b`, applied b to `f` and `s`
+
+:h4 Encoding LISP-style lists
+
+从 `car` 与 `cdr` 入手，The way we'll define a non-nil list is as a function that "stores" the head and tail of the list in its body. Its argument will be a selector function (head or tail). 
+
+```
+<!-- type list = λs.s h t -->
+car = λl.l (λh.λt.h) = λl.l true
+cdr = λl.l (λh.λt.t) = λl.l false
+
+is_empty = λl.l (λh.λt.false)
+nil = λs.true
+
+cons = λh.λt.(λs.s h t)
+```
+
+:h4 Encoding Numerals
+
+1. 可以用 list 来实现
+```
+is_zero == is_empty
+pred == TAIL
+<!-- succ is a function that adds one more element onto a given list -->
+succ == λl. cons x l
+```
+
+2. 根据函数 apply 的次数来实现 
+```
+n = λf.λx.f^n x
+
+0	==	λf.λx.x
+1	==	λf.λx.fy
+2	==	λf.λx.f(fx)
+3	==	λf.λx.f(f(fx))
+etc.
+
+succ (λf.λx.f^n x) = (λf.λx.f^(n + 1) x)
+```
+
+```
+is_zero = λn. n(λx. false) true
+    n != 0 即 f 一旦 apply 就返回 false，那么 let `f` be `λx.FALSE`
+    n == 0 即 x 直接返回就返回 true，那么 let `x` be `True`
+```
+
+`succ` 函数需要接受一个数返回另一个数，即接受一个接受两个参数的函数返回一个接受两个参数的函数。区别在于第二个函数的第一个参数多 apply 一次，但是我们无法改变参数函数的 function body，不妨在 apply 到函数之前，先让 x apply y 一次。
+- `succ == λn.(λf.λx.n f (fx))`
+
+另一种 `succ` 的实现方式是直接在当前的数上加一层 `f`
+- `succ == λn.(λf.λx.f (n f x))`
+
+```
+module type ChurchNumber = sig
+  (* in untyped lambda calculus, we can use a generic type instead of bool *)
+  (* we use bool here because of is_zero *)
+  type t = (bool -> bool) -> bool -> bool
+
+  val zero : t
+
+  val one : t
+
+  val two : t
+
+  val is_zero : t -> bool
+
+  val add : t -> t -> t
+
+  val mult : t -> t -> t
+end
+
+module ChurchNumber : ChurchNumber = struct
+  type t = (bool -> bool) -> bool -> bool
+
+  let zero f b = b
+
+  let one f b = f (f b)
+
+  let two f b = f (f (f b))
+
+  let is_zero n = n (fun _ -> false) true
+
+  let add x y f b = x f (y f b)
+
+  let mult x y f b = x (y f) b
+end
+```
+
+```
+zz = pair 0 0
+ss = λp. pair (snd p) (succ (snd p))
+pred = λn. fst (n ss zz)
+```
+
+The key part of this definition is `ss (a, b) = (b, b + 1)`。so we have `ss^n (0, 0) = (n - 1, n)`，所以可以有 `pred n = fst $ n ss (0, 0)`
+
+substract: TODO...
+equal: TODO...
+
+:h3 Recursion 
+
+**Definition**: Terms with no normal form are said to **diverge**.
+- e.g., $\omega = (\lambda x. x x) (\lambda x. x x)$
+
+
+TODO: p61
 
 :h2 Nameless Representation of Terms
 
@@ -274,10 +441,51 @@ De Bruijn's idea was that we can represent terms by making variable occurrences 
 
 **Nameless terms** are also sometimes called **de Bruijn terms**,  and the numeric variables in them are called **de Bruijn indices**. Compiler writers use the term **static distances** for the same concept.
 
-**Definition:** let $T$ be the smallest family of sets $\{ T _{0}, T _{1}, T _{2}, \ldots\}$ such that 
+:h4 Converting to Nameless Representation
+
+We will define a function $db_{\Gamma}$ mapping terms to nameless representation, and to deal with terms containing free variables, we need the idea of a **naming context** $\Gamma$. 
+- For example, suppose we want to represent $\lambda x. y x$ as a nameless term. But we cannot see the binder for y, so it is not clear how "far away" it might be and we do not know what number to assign to it. 
+- suppose we have $\Gamma=x \rightarrow 4 ; y \rightarrow 3 ; z \rightarrow 2 ; a \rightarrow 1 ; b \rightarrow 0$ then 
+-- - $x (y z)$ would be represented as $4 \, (3 \, 2)$
+-- - $\lambda w. y w$ would be represented as $\lambda. 4 \, 0$. because of the abstraction of $w$, the distance of $y$ is increased by 1, hence 3 + 1
+Let's simplify $\Gamma$ to be a sequence of var names: 
+- $\Gamma=x_{n-1}, \ldots, x_{1}, x_{0}$
+Then we'll define $\operatorname{dom}(\Gamma)=\left\{x_{n-1}, \ldots, x_{1}, x_{0}\right\}$ and $\Gamma(x) = \text{rightmost index of } x \text{ in } \Gamma$
+So $db_{\Gamma}$ can be defined as:
+- - $db_{\Gamma}(x)                         = \Gamma(x)$
+- - $db_{\Gamma}(\lambda x . t)             = \lambda . d b_{\Gamma, x}(t)$
+- - $db_{\Gamma}\left(t_{1} t_{2}\right)    = d b_{\Gamma}\left(t_{1}\right) d b_{\Gamma}\left(t_{2}\right)$
+The we have
+$$
+\begin{aligned}
+d b_{x, y, z}(\lambda x \cdot y x) &=\lambda \cdot d b_{x, y, z, x}(y x) \\
+&=\lambda \cdot d b_{x, y, z, x}(y) d b_{x, y, z, x}(x) \\
+&=\lambda \cdot 20
+\end{aligned}
+$$
+
+:br 
+
+
+
+Note that each closed term has just one de Bruijn representation, and two ordinary terms are equivalent modulo renaming of bound vars iff they have the same de Bruijn representation.
+- (没懂，modulo 是啥 
+
+:br
+
+We need to keep track of how many free vars each term may contain. That is, we distinguish the sets of terms with no free vars (called the 0-terms), terms with at most one free vars (1-terms), and so on.
+
+**Definition**: let $T$ be the smallest family of sets $\{ T _{0}, T _{1}, T _{2}, \ldots\}$ such that 
 - 1. $k \in T_n$ whenever $0 \leq k \leq n$
 - 2. if $t_1 \in T_n$ and $n > 0$ then $\lambda. t_1 \in T_{n - 1}$
 - 3. if $t_1 \in T_n$ and $t_2 \in T_n$ then $(t_1 t_2) \in T_n$
+The elements of $T_n$ are terms with at most $n$ free vars, numbered between $0$ and $n - 1$.
+
+:h4 Substitution on Nameless Terms
+
+When a substitution goes under a λ-abstraction, as in $([x \rightarrow s] \lambda y. x)$, the context in which the substitution is taking places becomes one var longer than the original, so we need to increment the indices of the freee vars inside $s$. We define one auxiliary operation called **shifting** to do this.
+
+
 
 
 TODO...
@@ -285,28 +493,58 @@ TODO...
 
 :h2 Simple Types
 
-**Definition:** A term $t$ is **typable (or well typed)** if there is some $T$ such that $t: T$
+**Definition**: A term $t$ is **typable (or well typed)** if there is some $T$ such that $t: T$
 
 :h3 Safety = Progress + Preservation
 
 **Progress** theorem: A well-typed term is not stuck (either it is a value or it can take a step according to the evaluation rules)
 **Preservation** theorem: If a well-typed term takes a step of evaluation, then the resulting term is also well typed.
 
-**Definition:** Languages in which type annotations in terms are used to guide the typechecker are called **explicitly typed**.
-**Definition:** Languages in which we ask the typechecker to infer or reconstruct his information are called **implicitly typed**.
+**Definition**: Languages in which type annotations in terms are used to guide the typechecker are called **explicitly typed**.
+**Definition**: Languages in which we ask the typechecker to infer or reconstruct his information are called **implicitly typed**.
 
-**Definition:** A **typing context** (also called a **type enviroment**) $\Gamma$ is a sequence of variables and their types.
+**Definition**: A **typing context** (also called a **type enviroment**) $\Gamma$ is a sequence of variables and their types.
 
 We write $dom(\Gamma)$ for the set of variables bound by $\Gamma$
 
 An **inversion lemma** records a collection of observations about how typing derivations are built: the clause for each syntactic form tell use "if a term of this form is well typed, then its subterms must have types of these forms..."
-e.g., if $\Gamma \vdash \lambda x : T _{1} \cdot t _{2}: R$, then $R = T _{1} \rightarrow R _{2}$ for some $R_2$ with $\Gamma, x : T _{1} \vdash t _{2}: R _{2}$
+- e.g., if $\Gamma \vdash \lambda x : T _{1} \cdot t _{2}: R$, then $R = T _{1} \rightarrow R _{2}$ for some $R_2$ with $\Gamma, x : T _{1} \vdash t _{2}: R _{2}$
 
 
 
-:h3 The Curry-Howard Correspondence 
+:h3 The Curry-Howard Correspondence (propositions as types analogy)
 
 The $\rightarrow$ type constructor comes with typing rules of two kinds:
 - 1. an "introduction rule (T-ABS)" describing how elements of the type can be created
 - 2. an "elimination rule (T-APP)" describes how elements of the type can be used
+
+The introduction/elimination terminology arises from a connection between type theory and logic known as the **Curry-Howard Correspondence**.
+The idea is that, in constructive logics, a proof of a proposition $P$ consists of concrete **evidence** for P.
+- For example, a proof of a proposition $P \supset Q$ can be viewed as a  mechanical procedure that, given a proof of $P$, constructs a proof of $Q$ - or, if you like, a proof of $Q$ **abstracted** on a proof of $P$
+
+Most compilers for full-scale programming languges actually avoid carrying annotations at ru time: thery are used during typechecking
+
+**Definition**: The **erasure** of a simply typed term $t$ is defined as follows
+$$
+\begin{aligned}
+\operatorname{erase}(x) \quad &= x \\
+\operatorname{erase}(\lambda x: T_1. t_2) \quad &= \lambda x. t_2 \\
+\operatorname{erase}(t_1 t_2) \quad &= \operatorname{erase}(t_1) \operatorname{erase}(t_1) \\
+\end{aligned}
+$$
+
+**evaluation commutes with erasure**: we reach the same term by evaluating and then erasing as we do by erasing and then evaluating.
+- If $t \rightarrow t'$ under the typed evaluation relation, then $\operatorname {erase}( t ) \rightarrow \operatorname{erase} (t')$
+
+
+**Definition**: A term $m$ in the untyped lambda-calculus is said to be **typable** in $\lambda_{\rightarrow}$ if there are some simply typed term $t$, type $T$, and context $\Gamma$ such that $\operatorname{erase}(t) = m$ and $\Gamma \vdash t: T$
+
+:h3 Curry-Style vs. Church-Style 
+
+**Curry-Style**: We first define the terms, then define a semantics showing how they behave, then give a type system that rejects some terms whose behaviors we don't like. Semantics is prior to typing.
+
+**Church-Style**: We first define terms, then identify the well-typed terms, then give semantics just to these. Typing is prior to semantics.
+- In deed, strictly speaking, what we actually evaluate in Church-style systems is typing derivations, not terms.
+
+implicitly typed presentations of lambda-calculi are often given in the Curry style, while Church-style presentations are common only for explicitly typed systems.
 

@@ -1,5 +1,6 @@
 import hljs from 'highlight.js'
-import style from '!!lit-css-loader!highlight.js/styles/github.css'
+// import style from '!!lit-css-loader!highlight.js/styles/github.css'
+import style from '!!lit-css-loader!highlight.js/styles/solarized-light.css'
 import { customElement, html, LitElement, property, css } from 'lit-element'
 import { styleMap } from 'lit-html/directives/style-map'
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
@@ -15,13 +16,13 @@ export class CodeSnippet extends LitElement {
             css`
                 :host {
                     display: inline-block;
-                    font-size: 0.8em;
+                    font-size: 0.85em;
                 }
                 :host([block='true']) {
                     display: block;
                 }
                 code {
-                    font-family: 'JetBrains Mono', 'Microsoft YaHei';
+                    font-family: monospace, 'JetBrains Mono', 'Microsoft YaHei';
                 }
             `,
         ]

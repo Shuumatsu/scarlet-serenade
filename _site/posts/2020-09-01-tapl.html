@@ -406,8 +406,38 @@ d b_{x, y, z}(\lambda x \cdot y x) &amp;=\lambda \cdot d b_{x, y, z, x}(y x) \\
 <p indent="1">3. if  <mathjax-panel>t_1 \in T_n</mathjax-panel> and  <mathjax-panel>t_2 \in T_n</mathjax-panel> then  <mathjax-panel>(t_1 t_2) \in T_n</mathjax-panel></p>
 <p indent="0">The elements of  <mathjax-panel>T_n</mathjax-panel> are terms with at most  <mathjax-panel>n</mathjax-panel> free vars, numbered between  <mathjax-panel>0</mathjax-panel> and  <mathjax-panel>n - 1</mathjax-panel> .</p>
 <h4>Substitution on Nameless Terms</h4>
-<p indent="0">When a substitution goes under a λ-abstraction, as in  <mathjax-panel>([x \rightarrow s] \lambda y. x)</mathjax-panel> , the context in which the substitution is taking places becomes one var longer than the original, so we need to increment the indices of the freee vars inside  <mathjax-panel>s</mathjax-panel> . We define one auxiliary operation called  <b>shifting</b> to do this.</p>
-<p indent="0">TODO...</p>
+<p indent="0">When a substitution goes under a λ-abstraction, as in  <mathjax-panel>([x \rightarrow s] \lambda y. x)</mathjax-panel> , the context in which the substitution is taking places becomes one var longer than the original, so we need to increment the indices of the free vars inside  <mathjax-panel>s</mathjax-panel> . We define one auxiliary operation called  <b>shifting</b> to do this.</p>
+<code-snippet indent="0" block="true">(* 每当 `term` 被代入到一个 abs 的 body 内，都需要将其所有自由变量移动一位 *)
+let shift term =
+  (* 根据与当前深度判断是否是自由变量 *)
+  let rec h depth t =
+    match t with
+    (* 如果变量的编号大于等于当前深度，说明 its binder is outside of `term` *)
+    (* 那么对于 `term` 来说它是一个自由变量，否则不是 *)
+    | TmVar n -&gt; TmVar (if n &gt;= depth then n + 1 else n)
+    (* 当前深度 + 1 *)
+    | TmAbs (arg_name, body) -&gt; TmAbs (arg_name, h (depth + 1) body)
+    | TmApp (t1, t2) -&gt; TmApp (h depth t1, h depth t2)
+  in
+  (* it starts off at 0 (meaning all vars should be shifted) *)
+  h 0 term
+
+let rec substitute from to' term =
+  match term with
+  (* 如果刚好是目标变量，那么替换 *)
+  | TmVar n -&gt; if from = n then to' else TmVar n
+  (* 因为更深入了一层，所以需要 shift 一次 `to'` *)
+  (* 因为更深入了一层，所以目标变量离 its binder 的距离也增加了 1 *)
+  | TmAbs (arg_name, body) -&gt;
+      TmAbs (arg_name, substitute (from + 1) (shift to') body)
+  | TmApp (t1, t2) -&gt; TmApp (substitute from to' t1, substitute from to' t2)
+
+let app (TmApp (TmAbs (_, body), t2)) =
+  (* 这里 `t2` 进入了更深的一层，所以需要 `shift` 一次 *)
+  (* 当 reducing redex，function body 的深度减小了一，则其中所有的自由变量需要负向移动一位，
+     我们可以通过与 `shift` 相同的方式定义一个 `unshift` *)
+  unshift (substitute 0 (shift t2) body)
+</code-snippet>
 <h2>Simple Types</h2>
 <p indent="0"><b>Definition</b> : A term  <mathjax-panel>t</mathjax-panel> is  <b>typable (or well typed)</b> if there is some  <mathjax-panel>T</mathjax-panel> such that  <mathjax-panel>t: T</mathjax-panel></p>
 <h3>Safety = Progress + Preservation</h3>

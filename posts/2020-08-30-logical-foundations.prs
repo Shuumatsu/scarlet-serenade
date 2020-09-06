@@ -317,7 +317,13 @@ Proof. intros n H. apply ev_inversion in H. destruct H.
 Qed.
 ```
 
-inversion 的工作原理大致如下：假设 `H` 指代上下文中的假设 `P`， 且 `P` 由 `Inductive` 归纳定义，则对于 `P` 每一种可能的构造，`inversion H` 各为其生成子目标。子目标中自相矛盾者被忽略，证明其余子命题即可得证原命题。 在证明子目标时，上下文中的 `H` 会替换为 `P` 的构造条件， 即其构造子所需参数以及必要的等式关系。例如：倘若 `ev n` 由 `evSS` 构造， 上下文中会引入参数 `n'`、`ev n'`，以及等式 `S (S n') = n`。
+`inversion` 的工作原理大致如下：
+- - 接受一个前提 `H`，该前提的类型 `P` 是通过归纳定义的，以及
+- - 对于 `P` 的定义里的每一个构造子 `C`，
+-- - 产生一个新的子目标，在该子目标中我们假设 `H` 是通过 `C` 构造的，
+-- - 作为额外的假设，在子目标的上下文中增加 `C` 的论据（前提），
+-- - 将 `C` 的结论（结果类型）与当前的目标相匹配，计算出为了能够应用 `C` 而必须成立的一些相等关系，将这些相等关系加入上下文中（以及，为了方便，在目标中替换它们），以及
+-- - 如果这些相等关系无法满足（例如，它们涉及到 S n = O），那么立即解决这个子目标。
 
 :h4 Induction on Evidence
 
@@ -327,3 +333,190 @@ inversion 的工作原理大致如下：假设 `H` 指代上下文中的假设 `
 
 我们可以认为被一个数所参数化的命题（比如 ev）是一个' 性质'，也即， 它定义了 nat　的一个子集，其中的数可以被证明满足此命题。 以同样的方式，我们可认为有两个参数的命题是一个' 关系'，也即，它定义了一个 可满足此命题的序对集合。
 
+:h4 remember tactics
+
+在 Coq 中调用 remember e as x 策略会（1）替换所有表达式 e 为变量 x， （2）在当前上下文中添加一个等式 x = e。
+
+// TODO
+
+:h4 Improving Reflection
+
+TODO 
+
+:h3 Total And Partial Maps
+
+omitted 
+
+:h3 The Curry-Howard Correspondence
+
+该同构启发很多看问题的新方法。例如考虑偶数的 inductive 定义：
+```
+Inductive ev : nat -> Prop :=
+  | ev_0 : ev 0
+  | ev_SS : forall n, ev n -> ev (S (S n)).
+```
+
+`ev` 定义中第二行的 `ev_0 : ev 0` 可以读作 “ev_0 是 ev 0 的证明” 也可以读作 “ev_0 的类型为 ev 0”。
+`Check ev_SS : forall n, ev n -> ev (S (S n)).` 可以将其读作 “ev_SS 构造子接受两个参数 —— 数字 n 以及命题 ev n 的证明 —— 并产生 ev (S (S n)) 的证明。”
+
+既在类型层面表达 “具有……类型”，又在命题层面表示 “是……的证明”。 这种双关称为' 柯里 - 霍华德同构（Curry-Howard correspondence）'。 
+
+:br 
+
+有关 `ev` 的一个证明, `Theorem ev_4 : ev 4. Proof. apply ev_SS. apply ev_SS. apply ev_0. Qed.` 产生了一个 **'证据对象' (proof object)**
+实际上，我们也可以不借助脚本 '直接' 写出表达式作为证明。`Check (ev_SS 2 (ev_SS 0 ev_0)) : ev 4.`
+
+:br 
+
+在 Coq 的计算世界里（即所有的数据结构和程序存在的地方），有两种值的 类型中拥有箭头：一种是' 构造子 (Constructor)'，它通过归纳地定义数据类型 引入，另一种是' 函数 (Function)'。
+
+类似地，在 Coq 的逻辑世界里（即我们运用证明的地方），有两种方式来给 与蕴含式需要的证据：构造子，通过归纳地定义命题引入，和函数
+- 考虑下列陈述：`Theorem ev_plus4 : forall n, ev n → ev (4 + n).` 我们在寻找一个 '类型 (Type)' 是 `forall n, ev n -> ev (4 + n)` 的表达式 —— 也 就是说，一个接受两个参数（一个数字和一个证据）并返回一个证据的 ' 函数 (Function)'
+
+:br 
+
+到蕴含式（->）和量化（∀）都表示证据上的函数。事实上，他们 是同一个东西：当我们使用 `∀` 时没有依赖，就可以简写为当 `->`。即，我们没有必要给与箭头左边的类型一个名字：`forall (x:nat), nat = forall (_: nat), nat = nat -> nat`
+总的来说，"P -> Q"只是"forall (_:P), Q" 的语法糖。
+
+```
+Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R := 
+  fun P Q R (H1: P /\ Q) (H2: Q /\ R) => match H1 with 
+    | conj P _ => match H2 with 
+      | conj _ R => conj P R
+    end
+  end.
+```
+
+:br 
+
+归纳定义足够用于表达我们目前为止遇到的大多数的联结词。事实上， 只有全称量化（以及作为特殊情况的蕴含式）是 Coq 内置的，所有其他的都是被归纳 定义的。
+```
+Inductive and (A B:Prop) : Prop :=
+  conj : A -> B -> A /\ B
+
+Inductive or (A B:Prop) : Prop :=
+  | or_introl : A -> A \/ B
+  | or_intror : B -> A \/ B
+where "A \/ B" := (or A B) : type_scope.
+
+Inductive ex {A : Type} (P : A → Prop) : Prop :=
+| ex_intro : ∀ x : A, P x → ex P.
+
+Inductive True : Prop :=
+  I : True.
+
+(* False 是一个 '没有' 构造子的归纳类型 -- 即，没有任何方式能够构造一个它的证明。 *)
+Inductive False : Prop :=.
+
+Definition not (A:Prop) := A -> False.
+
+Inductive ex (A:Type) (P:A -> Prop) : Prop :=
+  ex_intro : forall x:A, P x -> ex (A:=A) P.
+```
+
+在 Coq 里，甚至连相等关系都不是内置的。它拥有如下的归纳定义。
+```
+Inductive eq (A:Type) (x:A) : A -> Prop :=
+    eq_refl : x = x :>A
+```
+事实上，相等关系的归纳定义和 Leibniz 相等关系是 '等价的 (equivalent)'。
+```
+Lemma leibniz_equality_equality : forall (X : Type) (x y: X),
+  (forall P: X -> Prop, P x -> P y) -> x = y.
+Proof.
+  intros. apply (H (fun z => x = z)). apply eq_refl.
+Qed.
+```
+
+:h3 IndPrinciples
+
+每当我们使用 Inductive 来声明数据类型时，Coq 就会自动为该类型生成 '归纳法则'。通常，为归纳类型 t 生成的归纳法则形式如下：每个构造子 c 都会生成归纳法则中的一种情况
+- - 若 c 不接受参数，该情况为 
+-- P 对 c 成立
+- - 若 c 接受参数 x1:a1 ... xn:an，该情况为：
+-- 对于所有的 `x1:a1 ... xn:an`，若 `P` 对每个类型为 `t` 的参数都成立，则 `P` 对于 `c x1 ... xn` 成立
+
+例如对归纳定义的自然数和多态列表
+```
+Check nat_ind.
+(* ===>
+   nat_ind : forall P : nat -> Prop,
+      P 0 ->
+      (forall n : nat, P n -> P (S n)) ->
+      forall n : nat, P n  *)
+
+Inductive list (X:Type) : Type :=
+    | nil : list X
+    | cons : X -> list X -> list X.
+
+Check list_ind.
+(* list_ind: forall (X : Type) (P : list X -> Prop),
+       P (nil X) ->
+       (forall (x : X) (l : list X), P l -> P (cons X x l)) ->
+       forall l : list X, P  *)
+```
+
+There's nothing magic about this induction lemma: it's just another Coq lemma that requires a proof. Coq generates the proof automatically too...
+
+```
+Definition nat_id := 
+    fun (P : nat -> Prop)
+        (* Suppose we have evidence f that P holds on 0 *)
+        (f : P 0)
+        (* and evidence f0 that ∀ n:nat, P n -> P (S n) *)
+        (f0 : forall n : nat, P n -> P (S n)) => 
+        (* Then we can prove that P holds of an arbitrary nat n via a recursive function F  *)
+        (* (here defined using the expression form Fix rather than by a top-level Fixpoint declaration) *)
+            fix F (n : nat) : P n := match n with
+                | 0 => f
+                | S n0 => f0 n0 (F n0)
+            end.
+```
+
+We can adapt this approach to proving nat_ind to help prove non-standard induction principles too. 例如证明 `Lemma evenb_ev : ∀ n: nat, evenb n = true -> ev n.` 时，偶数是两个一跳的，对 `n` 进行归纳对于 `evenb` 并没有多大作用。Attempts to prove this by standard induction on n fail in the case for S (S n), because the induction hypothesis only tells us something about S n, which is useless.
+
+But we can make a much better proof by defining and proving a non-standard induction principle that goes "by twos":
+```
+Definition nat_ind2 : forall (P : nat -> Prop),
+    P 0 ->
+    P 1 ->
+    (forall n : nat, P n -> P (S(S n))) ->
+    forall n : nat , P n := fun P P0 P1 PSS =>
+        fix f (n:nat) := match n with
+            | 0 => P0
+            | 1 => P1
+            | S (S n') => PSS n' (f n')
+        end.
+
+Fixpoint evenb (n:nat) : bool := match n with
+    | O        => true
+    | S O      => false
+    | S (S n') => evenb n'
+end.
+
+Inductive ev : nat -> Prop :=
+    | ev_0 : ev 0
+    | ev_SS (n : nat) (H : ev n) : ev (S (S n)).
+
+
+Lemma evenb_ev : forall n, evenb n = true -> ev n.
+Proof.
+    intros. induction n as [ | |n'] using nat_ind2.
+        - apply ev_0.
+        - simpl in H. inversion H.
+        - simpl in H. apply ev_SS. apply IHn'. apply H.
+Qed.
+```
+
+Coq 也为归纳定义的'命题'生成归纳法则，例如我们要对具有性质 `even` 的自然数归纳证明证明 `P` 
+```
+Inductive even : nat -> Prop :=
+    | ev_0 : even 0
+    | ev_SS (n : nat) : even n -> even (S (S n)).
+
+Check even_ind.
+(* even_ind: forall P : nat -> Prop,
+       P 0 ->
+       (forall n : nat, even n -> P n -> P (S (S n))) ->
+       forall n : nat, even n -> P  *)
+```

@@ -551,7 +551,10 @@ The introduction/elimination terminology arises from a connection between type t
 The idea is that, in constructive logics, a proof of a proposition $P$ consists of concrete **evidence** for P.
 - For example, a proof of a proposition $P \supset Q$ can be viewed as a  mechanical procedure that, given a proof of $P$, constructs a proof of $Q$ - or, if you like, a proof of $Q$ **abstracted** on a proof of $P$
 
-Most compilers for full-scale programming languges actually avoid carrying annotations at ru time: thery are used during typechecking
+:br 
+:br 
+
+Most compilers for full-scale programming languges actually avoid carrying annotations at rutime: thery are used during typechecking
 
 **Definition**: The **erasure** of a simply typed term $t$ is defined as follows
 $$

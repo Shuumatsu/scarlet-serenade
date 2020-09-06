@@ -1,5 +1,5 @@
 # hakyll cache files
-_cache/
+_cache*
 
 .stack-work/
 *~

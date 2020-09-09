@@ -528,6 +528,7 @@ let app (TmApp (TmAbs (_, body), t2)) =
 
 **Progress** theorem: A well-typed term is not stuck (either it is a value or it can take a step according to the evaluation rules)
 **Preservation** theorem: If a well-typed term takes a step of evaluation, then the resulting term is also well typed.
+- If $e: \tau$ and $e \longmapsto e'$, then $e': \tau$.
 
 **Definition**: Languages in which type annotations in terms are used to guide the typechecker are called **explicitly typed**.
 **Definition**: Languages in which we ask the typechecker to infer or reconstruct his information are called **implicitly typed**.

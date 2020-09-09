@@ -1,0 +1,37 @@
+The static phase consists of parsing and type checking to ensure that the program is well-formed;
+- The static phase is specified by a **statics** comprising a set of rules for deriving **typing judgements** stating that an expression is well-formed of a certain type.
+
+:br
+
+The dynamic phase consists of execution of well-formed programs.
+- The **dynamics** of a language describes how programs are executed.
+
+
+:h3 Way to define the dynamics of a language:
+
+1. **structural dynamics**, which defines a **transition system** that inductively specifies the step-by-step process of executing a program.
+
+A transition system is specified by the following four forms of judgment:
+- 1. $s \text{ state}$, asserting that $s$ is a **state** of the transition system.
+- 2. $s \text{ final}$, where $s \text{ state}$, asserting that s is a **final state**.
+- 3. $s \text{ initial}$, where $s \text{ state}$, asserting that s is an **initial state**.
+- 4. $s \longmapsto s'$, where $s \text{ state}$ and $s' \text{ state}$, asserting that state $s$ may transition to state $s'$.
+
+A state from which no transition is possible is **stuck**.
+- (whereas all final states are stuck; not all stuck states are final
+
+**Definition**: A transition system is **deterministica** iff for every state $s$ there exists at most one state $s$ such that $s \longmapsto s'$; otherwise, it is **non-deterministic**
+
+**Definition**: A **transition sequence** is a sequence of states $s_0, \ldots, s_n$ such that $s_0$ is initial state, and $s_{i} \longmapsto s_{i+1}$ for every $0 \leq i \leq n$.
+
+**Definition**:  A transition sequence is **maximal** iff there is no $s$ such that $s_{n} \longmapsto s$, and it is **complete** iff $s_n$ is final state.
+- The judgment $s \downarrow$ means that there is a complete transition sequence starting from $s$ 
+
+:br
+
+
+
+- 2. **contextual dynamics**
+- 3. An equational dynamics presents the dynamics of a language by a collection of rules defining when one program is definitionally equivalent to another.
+
+

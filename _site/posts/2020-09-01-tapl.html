@@ -443,6 +443,7 @@ let app (TmApp (TmAbs (_, body), t2)) =
 <h3>Safety = Progress + Preservation</h3>
 <p indent="0"><b>Progress</b> theorem: A well-typed term is not stuck (either it is a value or it can take a step according to the evaluation rules)</p>
 <p indent="0"><b>Preservation</b> theorem: If a well-typed term takes a step of evaluation, then the resulting term is also well typed.</p>
+<p indent="1">If  <mathjax-panel>e: \tau</mathjax-panel> and  <mathjax-panel>e \longmapsto e'</mathjax-panel> , then  <mathjax-panel>e': \tau</mathjax-panel> .</p>
 <p indent="0"><b>Definition</b> : Languages in which type annotations in terms are used to guide the typechecker are called  <b>explicitly typed</b> .</p>
 <p indent="0"><b>Definition</b> : Languages in which we ask the typechecker to infer or reconstruct his information are called  <b>implicitly typed</b> .</p>
 <p indent="0"><b>Definition</b> : A  <b>typing context</b> (also called a  <b>type enviroment</b> )  <mathjax-panel>\Gamma</mathjax-panel> is a sequence of variables and their types.</p>

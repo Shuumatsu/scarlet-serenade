@@ -53,7 +53,9 @@
     <h1>2020-09-11-elf</h1>
     <article>
         <!-- <section class="header"></section> -->
-        <section><p indent="0">ELF 可用来记录 object file、executable file、share object、与 core dump 等格式。为了支援连结与执行等两种时期的不同用途，ELF 格式可以分为两种不同观点，</p>
+        <section><bq><a href="https://github.com/torvalds/linux/blob/master/include/uapi/linux/elf.h">https://github.com/torvalds/linux/blob/master/include/uapi/linux/elf.h</a></bq>
+<img style="width: 100%" src="https://upload.wikimedia.org/wikipedia/commons/e/e4/ELF_Executable_and_Linkable_Format_diagram_by_Ange_Albertini.png" />
+<p indent="0">ELF 可用来记录 object file、executable file、share object、与 core dump 等格式。为了支援连结与执行等两种时期的不同用途，ELF 格式可以分为两种不同观点，</p>
 <p indent="1">- 第一种是  <b>Linking View</b> 。在连结时期，是以分区 (Section) 为主的结构</p>
 <p indent="1">- 第二种是  <b>(Execution View)</b> 。在执行时期，是以分段 (Segment) 为主的结构</p>
 <code-snippet indent="0" block="true">Linking View:                           Execution View
@@ -61,6 +63,7 @@
 | ELF header                      |     | ELF header                      |
 -----------------------------------     -----------------------------------
 | Program Header Table (Optional) |     | Program Header Table            |
+|     (elf64_phdr[]               |     |     (elf64_phdr[]               |
 -----------------------------------     -----------------------------------
 | Section 1                       |     |                                 |
 -----------------------------------     | Segment 1                       |
@@ -74,11 +77,52 @@
 -----------------------------------     | ...                             |
 | ...                             |     |                                 |
 -----------------------------------     -----------------------------------
-| Section Header Table            |     | Section Header Table(Optional)  |
+| Section Header Table            |     | Section Header Table (Optional) |
+|     (elf64_shdr[]               |     |     (elf64_shdr[]               |
 -----------------------------------     -----------------------------------
 </code-snippet>
-<p indent="0">Program Header Table 记载了分段资讯，因此也可称为 Segment Header Table。Section Header Table 记载了分区资讯，是连结时期的主要结构。</p>
-<code-snippet indent="0" block="true">
+<code-snippet indent="0" block="true">typedef struct elf64_hdr {
+    unsigned char e_ident[EI_NIDENT]; // ELF &quot;magic number&quot; 
+    Elf64_Half e_type;                // Object file type
+    Elf64_Half e_machine;             // Architecture
+    Elf64_Word e_version;             // Object file version
+    Elf64_Addr e_entry;               // This is the virtual memory address of the entry point from where the process starts executing.
+    Elf64_Off e_phoff;                // Program header table file offset 
+    Elf64_Off e_shoff;                // Section header table file offset 
+    Elf64_Word e_flags;               // Processor-specific flags
+    Elf64_Half e_ehsize;              // ELF header size in bytes
+    Elf64_Half e_phentsize;           // Program header table entry size
+    Elf64_Half e_phnum;               // Program header table entry count
+    Elf64_Half e_shentsize;           // Section header table entry size
+    Elf64_Half e_shnum;               // Section header table entry count
+    Elf64_Half e_shstrndx;            // Section header string table index
+} Elf64_Ehdr;
+</code-snippet>
+<p indent="0">Section Header Table 记录了各分区的基本资讯，包含分区起始位址等，因此可以透过分区表头读取各分区</p>
+<code-snippet indent="0" block="true">typedef struct elf64_shdr {
+    Elf64_Word sh_name;        /* Section name, index in string tbl */
+    Elf64_Word sh_type;        /* Type of section */
+    Elf64_Xword sh_flags;      /* Miscellaneous section attributes */
+    Elf64_Addr sh_addr;        /* Section virtual addr at execution */
+    Elf64_Off sh_offset;       /* Section file offset */
+    Elf64_Xword sh_size;       /* Size of section in bytes */
+    Elf64_Word sh_link;        /* Index of another section */
+    Elf64_Word sh_info;        /* Additional section information */
+    Elf64_Xword sh_addralign;  /* Section alignment */
+    Elf64_Xword sh_entsize;    /* Entry size if section holds table */
+} Elf64_Shdr;
+</code-snippet>
+<p indent="0">Program Header Table 记载了分段资讯，因此也可称为 Segment Header Table。The program header table tells the system how to create a process image.</p>
+<code-snippet indent="0" block="true">typedef struct elf64_phdr {
+    Elf64_Word p_type;          /* Identifies the type of the segment. */
+    Elf64_Word p_flags;
+    Elf64_Off p_offset;         /* Offset of the segment in the file image. */
+    Elf64_Addr p_vaddr;         /* Segment virtual address */
+    Elf64_Addr p_paddr;         /* On systems where physical address is relevant, reserved for segment's physical address. */
+    Elf64_Xword p_filesz;       /* Segment size in file */
+    Elf64_Xword p_memsz;        /* Segment size in memory /
+    Elf64_Xword p_align;        /* Segment alignment, file &amp; memory */
+} Elf64_Phdr;
 </code-snippet></section>
     </article>
 </main>

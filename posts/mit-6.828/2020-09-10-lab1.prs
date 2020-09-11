@@ -1,0 +1,128 @@
+:h3 Bootstrap
+
+:h4 qemu
+
+use a patched version of qemu (https://github.com/mit-pdos/6.828-qemu.git
+
+but if you are using manjaro or encountered errors on `ld`, use my patched version
+- git@github.com:Shuumatsu/6.828-qemu.git
+
+```
+sudo pacman -S pkg-config 
+yay -S dtc
+git clone git@github.com:Shuumatsu/6.828-qemu.git
+cd 6.828-qemu
+./configure --python=/usr/bin/python2 --disable-kvm --disable-werror --prefix=/home/curry/workspace/mit-6.828/bin
+make && make install
+```
+
+```
+yay -S dtc
+sudo pacman -S pkg-config qemu-headless qemu-headless-arch-extra
+```
+
+:h4 Simulating the x86
+
+```
+git clone https://pdos.csail.mit.edu/6.828/2018/jos.git lab
+cd lab
+```
+
+update conf/env.mk file: QEMU=/usr/bin/qemu-system-i386 
+
+```
+make
+make qemu-nox
+```
+
+This executes QEMU with the options required to set the hard disk and direct serial port output to the terminal.
+
+
+:h3 The PC's Physical Address Space
+We will now dive into a bit more detail about how a PC starts up. A PC's physical address space is hard-wired to have the following general layout:
+```
++------------------+  <- 0xFFFFFFFF (4GB)
+|      32-bit      |
+|  memory mapped   |
+|     devices      |
+|                  |
+/\/\/\/\/\/\/\/\/\/\
+
+/\/\/\/\/\/\/\/\/\/\
+|                  |
+|      Unused      |
+|                  |
++------------------+  <- depends on amount of RAM
+|                  |
+|                  |
+| Extended Memory  |
+|                  |
+|                  |
++------------------+  <- 0x00100000 (1MB)
+|     BIOS ROM     |
++------------------+  <- 0x000F0000 (960KB)
+|  16-bit devices, |
+|  expansion ROMs  |
++------------------+  <- 0x000C0000 (768KB)
+|   VGA Display    |
++------------------+  <- 0x000A0000 (640KB)
+|                  |
+|    Low Memory    |
+|                  |
++------------------+  <- 0x00000000
+```
+第一代 PC 处理器是 16 位字长的 Intel 8088 处理器，这类处理器只能访问 1MB 的地址空间，即 0x00000000 ~ 0x000FFFFF。但是这 1MB 也不是用户都能利用到的，
+- 低 640KB (0x00000000 ~ 0x000A0000) 的地址空间是用户程序可以使用的。
+- 剩下的 384KB 的高地址空间则被保留用作其他的目的，比如 (0x000A0000~0x000C0000) 被用作屏幕显示内容缓冲区，其他的则被非易失性存储器 (ROM) 所使用，里面会存放一些固件，其中最重要的一部分就是 BIOS，占据了 0x000F0000 ~ 0x00100000 的地址空间。BIOS 负责进行一些基本的系统初始化任务，比如开启显卡，检测该系统的内存大小等等工作。在初始化完成后，BIOS 就会从某个合适的地方加载操作系统。
+
+Current PC architects nevertheless preserved the original layout for the low 1MB of physical address space in order to ensure backward compatibility with existing software. 
+- Modern PCs therefore have a "hole" in physical memory from 0x000A0000 to 0x00100000, dividing RAM into "low" or "conventional memory" (the first 640KB) and "extended memory" (everything else). 
+- In addition, some space at the very top of the PC's 32-bit physical address space, above all physical RAM, is now commonly reserved by the BIOS for use by 32-bit PCI devices.
+
+(Recent x86 processors can support more than 4GB of physical RAM, so RAM can extend further above 0xFFFFFFFF. In this case the BIOS must arrange to leave a second hole in the system's RAM at the top of the 32-bit addressable region, to leave room for these 32-bit devices to be mapped.
+
+
+:h3 The ROM BIOS
+
+:h4 Real Mode 
+In real mode, memory is limited to 1MB (2^20 bytes). Valid address range from 0x00000 to 0xFFFFF. 
+These address require a 20-bit number which will not fit into any of the 8086's 16-bit registers. The solution is use two 16-bit values to determine an address.
+- The first 16-bit value is called the **selector**. Selector values must be stored in the segment registers.
+- The second 16-bit value is called the **offset**. 
+The physical address referenced by a 32-bit selector:offset pair is computed by formula: `(selector << 4) + offset`
+
+Given that cs means "code segment" and that ip means "instruction pointer" (this is not a general purpose register!) the combination cs:ip represents the location where the CPU is currently fetching instructions to execute.
+
+:br
+
+The disadvantages are:
+- - Each byte in memory does not have a unique segmented address. The physical address 0x04808 can be referenced by 0x047C:0x0048, 0x047D:0x0038, 0x047E:0x0028 or 0x047B:0x0058. 
+- -  The program must be split up into sections (called segments) less than 64K in size. When execution moves from one segment to another, the value of CS must be changed.
+
+:h4 16-bit Protected Mode
+
+In protected mode, a selector value is an **index** into a **descriptor table**. Protected mode uses a technique called virtual memory. In protected mode, each segment is assigned an entry in a descriptor table.
+
+:h5 32-bit Protected Mode
+
+There are two major differences between 386 32-bit and 286 16-bit protected modes:
+- - Offsets are expanded to be 32-bits. This allows an offset to range up
+to 4 billion. Thus, segments can have sizes up to 4 gigabytes.
+- - Segments can be divided into smaller 4K-sized units called pages. The virtual memory system works with pages now instead of segments
+
+这里值得一提的是，对于支持 protected mode 的 cpu, 启动时为了保持向后兼容，仍然会以 real mode 启动，之后再切换到 protected mode.
+
+:h3 The Boot Loader
+
+Floppy and hard disks for PCs are divided into 512 byte regions called **sectors**. A sector is the disk's minimum transfer granularity: each read or write operation must be one or more sectors in size and aligned on a sector boundary.
+
+If the disk is bootable, the first sector is called the boot sector, since this is where the boot loader code resides.
+
+When you compile and link a C program such as the JOS kernel, the compiler transforms each C source ('.c') file into an object ('.o') file containing assembly language instructions encoded in the binary format expected by the hardware. The linker then combines all of the compiled object files into a single binary image such as obj/kern/kernel, which in this case is a binary in the ELF format, which stands for **Executable and Linkable Format**.
+
+The link address of a section is the memory address from which the section expects to execute. The linker encodes the link address in the binary in various ways, such as when the code needs the address of a global variable, with the result that a binary usually won't work if it is executing from an address that it is not linked for. 
+
+
+https://111qqz.com/2019/01/mit-6-828-lab-1/
+https://zhuanlan.zhihu.com/p/166413604
+https://pdos.csail.mit.edu/6.828/2018/readings/pcasm-book.pdf

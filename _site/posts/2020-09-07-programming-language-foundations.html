@@ -96,6 +96,10 @@ Notation &quot;P &lt;&lt;-&gt;&gt; Q&quot; := (assert_implies P Q /\ assert_impl
 Notation &quot;{{ P }} c {{ Q }}&quot; := (hoare_triple P c Q) (at level 90, c at next level) : hoare_spec_scope.
 </code-snippet>
 <p indent="0">For example,  <mathjax-panel>\{X = 0\} \; X := X+1 \; \{X = 1\}</mathjax-panel> is a valid Hoare triple, stating that command X := X + 1 would transform a state in which X = 0 to a state in which X = 1.</p>
+<br />
+<p indent="0"><b>Definition</b> :  <mathjax-panel>P</mathjax-panel> is a  <b>weakest precondition</b> of command  <mathjax-panel>c</mathjax-panel> for postcondition  <mathjax-panel>Q</mathjax-panel> if:</p>
+<p indent="1">-  <mathjax-panel>P</mathjax-panel> is a precondition, that is,  <mathjax-panel>\{P\} \quad c \quad \{Q\}</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>P</mathjax-panel> is at least as weak as all other preconditions, that is, if  <mathjax-panel>\{P'\} \quad c \quad \{Q\}</mathjax-panel> then  <mathjax-panel>P' \rightarrow P</mathjax-panel> .</p>
 <h4>Hoare logic Proof Rules</h4>
 <p indent="0">The goal of Hoare logic is to provide a  <b>compositional</b> method for proving the validity of specific Hoare triples.</p>
 <h5>Assignment</h5>
@@ -283,6 +287,53 @@ Proof.
         split; assumption. 
 Qed.
 </code-snippet>
+<h6>example</h6>
+<code-snippet indent="0" block="true">{{ X = m /\ Y = n }}
+while ~(X = 0) do
+    Y := Y - 1;
+    X := X - 1
+end
+{{ X = m /\ Y = n }}
+</code-snippet>
+<p indent="0">Once the outermost precondition and postcondition are chosen, the only creative part in verifying programs using Hoare Logic is finding the right loop invariants. </p>
+<p indent="0">To verify this program, we need to find an invariant Inv for the loop. As a first step we can leave Inv as an unknown and build a skeleton for the proof</p>
+<p indent="1">(working  <b>from the end of the program to the beginning</b> , as usual, and without any thinking at all yet).</p>
+<code-snippet indent="0" block="true">{{ X = m /\ Y = n }} -&gt;&gt; {{ Inv }} (a)
+while ~(X = 0) do
+{{ Inv /\ X != 0 }} -&gt;&gt; {{ Inv [X |-&gt; X-1] [Y |-&gt; Y-1] }} (b)
+    Y := Y - 1;
+{{ Inv [X |-&gt; X-1] }}
+    X := X - 1
+{{ Inv }}
+end
+{{ Inv /\ ~(X != 0) }} -&gt;&gt; {{ Y = n - m }} (c)
+</code-snippet>
+<p indent="0">我们需要找到一个  <code-snippet>Inv</code-snippet> 同时满足 (a)、(b)、(c)。One way to find an invariant that simultaneously satisfies these three conditions is by using an iterative process: </p>
+<p indent="1">start with a "candidate" invariant (e.g., a guess or a heuristic choice) and check the three conditions above; if any of the checks fails, try to use the information that we get from the failure to produce another.</p>
+<p indent="0">Guess  <code-snippet>Inv = (Y = n - m)</code-snippet> , </p>
+<code-snippet indent="0" block="true">{{ X = m /\ Y = n }} -&gt;&gt; {{ Y = n - m }} (a)
+while ~(X = 0) do
+{{ Y = n - m /\ X != 0 }} -&gt;&gt; {{ Y - 1 = n - m }} (b)
+    Y := Y - 1;
+{{ Y = n - m }}
+    X := X - 1
+{{ Y = n - m }}
+end
+{{ Y = n - m /\ ~(X != 0) }} -&gt;&gt; {{ Y = n - m }} (c)
+</code-snippet>
+<p indent="0">condition (c) is trivially satisfied, conditions (a) and (b) are wrong: the variable  <code-snippet>Y</code-snippet> changes during the loop, while  <code-snippet>m</code-snippet> and  <code-snippet>n</code-snippet> are constant, so the assertion we chose didn't have much chance of being an invariant!</p>
+<p indent="0">但是观察程序可以发现， <code-snippet>X</code-snippet> 和  <code-snippet>Y</code-snippet> 以相同的速率减小，我们可以利用 (c) 中  <code-snippet>~(X != 0)</code-snippet> 的条件将  <code-snippet>Inv</code-snippet> 改为  <code-snippet>Y - X = n - m</code-snippet></p>
+<code-snippet indent="0" block="true">{{ X = m /\ Y = n }} -&gt;&gt; {{ Y - X = n - m }} (a)
+while ~(X = 0) do
+{{ Y - X = n - m /\ X != 0 }} -&gt;&gt; {{ (Y - 1) - (X - 1) = n - m }} (b)
+    Y := Y - 1;
+{{ Y - (X - 1) = n - m }}
+    X := X - 1
+{{ Y - X = n - m }}
+end
+{{ Y - X = n - m /\ ~(X != 0) }} -&gt;&gt; {{ Y = n - m }} (c)
+</code-snippet>
+<p indent="0">Success! Conditions (a), (b) and (c) all hold now.</p>
 <br />
 <p indent="0">Property (Strong Progress): If t is a term, then either t is a value or else there exists a term t' such that t --> t'.</p>
 <p indent="1">tell us something interesting about values: they are exactly the terms that cannot make progress (normal forms) in this sense.</p></section>

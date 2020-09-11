@@ -474,7 +474,19 @@ let app (TmApp (TmAbs (_, body), t2)) =
 <p indent="0"><b>Curry-Style</b> : We first define the terms, then define a semantics showing how they behave, then give a type system that rejects some terms whose behaviors we don't like. Semantics is prior to typing.</p>
 <p indent="0"><b>Church-Style</b> : We first define terms, then identify the well-typed terms, then give semantics just to these. Typing is prior to semantics.</p>
 <p indent="1">In deed, strictly speaking, what we actually evaluate in Church-style systems is typing derivations, not terms.</p>
-<p indent="0">implicitly typed presentations of lambda-calculi are often given in the Curry style, while Church-style presentations are common only for explicitly typed systems.</p></section>
+<p indent="0">implicitly typed presentations of lambda-calculi are often given in the Curry style, while Church-style presentations are common only for explicitly typed systems.</p>
+<h3>Subtyping</h3>
+<p indent="0"><b>Definition</b> : We say that  <mathjax-panel>S</mathjax-panel> is a  <b>subtype</b> of  <mathjax-panel>T</mathjax-panel> , written  <mathjax-panel>S <: T</mathjax-panel> , to mean that any term of type  <mathjax-panel>S</mathjax-panel> can safely be used in a context where a term of type  <mathjax-panel>T</mathjax-panel> is expected.</p>
+<p indent="1">This view of subtyping is often called the  <b>principle of safe substitution</b> .</p>
+<p indent="0">This leads to a new typing rule - the so-called rule of  <b>subsumption</b></p>
+<mathjax-panel indent="0" block="true">\frac{
+  \Gamma \vdash t : T \quad S &lt;: T
+}{
+  \Gamma \vdash t : T
+}
+</mathjax-panel>
+<h4>The subtype relation </h4>
+<p indent="0">The subtype relation is  <b>reflexive</b> and  <b>transitive</b> .</p></section>
     </article>
 </main>
 

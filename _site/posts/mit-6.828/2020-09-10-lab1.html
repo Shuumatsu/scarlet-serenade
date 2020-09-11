@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-09-10-lab1</title>
+        <link rel="stylesheet" href="../../web/static/main.css" />
+        <script src="../../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../../">Home</a>
+                <a href="../../about.html">About</a>
+                <a href="../../contact.html">Contact</a>
+                <a href="../../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-09-10-lab1</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><h3>Bootstrap</h3>
+<h4>qemu</h4>
+<p indent="0">use a patched version of qemu (https://github.com/mit-pdos/6.828-qemu.git</p>
+<p indent="0">but if you are using manjaro or encountered errors on  <code-snippet>ld</code-snippet> , use my patched version</p>
+<p indent="1">git@github.com:Shuumatsu/6.828-qemu.git</p>
+<code-snippet indent="0" block="true">sudo pacman -S pkg-config 
+yay -S dtc
+git clone git@github.com:Shuumatsu/6.828-qemu.git
+cd 6.828-qemu
+./configure --python=/usr/bin/python2 --disable-kvm --disable-werror --prefix=/home/curry/workspace/mit-6.828/bin
+make &amp;&amp; make install
+</code-snippet>
+<code-snippet indent="0" block="true">yay -S dtc
+sudo pacman -S pkg-config qemu-headless qemu-headless-arch-extra
+</code-snippet>
+<h4>Simulating the x86</h4>
+<code-snippet indent="0" block="true">git clone https://pdos.csail.mit.edu/6.828/2018/jos.git lab
+cd lab
+</code-snippet>
+<p indent="0">update conf/env.mk file: QEMU=/usr/bin/qemu-system-i386 </p>
+<code-snippet indent="0" block="true">make
+make qemu-nox
+</code-snippet>
+<p indent="0">This executes QEMU with the options required to set the hard disk and direct serial port output to the terminal.</p>
+<h3>The PC's Physical Address Space</h3>
+<p indent="0">We will now dive into a bit more detail about how a PC starts up. A PC's physical address space is hard-wired to have the following general layout:</p>
+<code-snippet indent="0" block="true">+------------------+  &lt;- 0xFFFFFFFF (4GB)
+|      32-bit      |
+|  memory mapped   |
+|     devices      |
+|                  |
+/\/\/\/\/\/\/\/\/\/\
+
+/\/\/\/\/\/\/\/\/\/\
+|                  |
+|      Unused      |
+|                  |
++------------------+  &lt;- depends on amount of RAM
+|                  |
+|                  |
+| Extended Memory  |
+|                  |
+|                  |
++------------------+  &lt;- 0x00100000 (1MB)
+|     BIOS ROM     |
++------------------+  &lt;- 0x000F0000 (960KB)
+|  16-bit devices, |
+|  expansion ROMs  |
++------------------+  &lt;- 0x000C0000 (768KB)
+|   VGA Display    |
++------------------+  &lt;- 0x000A0000 (640KB)
+|                  |
+|    Low Memory    |
+|                  |
++------------------+  &lt;- 0x00000000
+</code-snippet>
+<p indent="0">第一代 PC 处理器是 16 位字长的 Intel 8088 处理器，这类处理器只能访问 1MB 的地址空间，即 0x00000000 ~ 0x000FFFFF。但是这 1MB 也不是用户都能利用到的，</p>
+<p indent="1">低 640KB (0x00000000 ~ 0x000A0000) 的地址空间是用户程序可以使用的。</p>
+<p indent="1">剩下的 384KB 的高地址空间则被保留用作其他的目的，比如 (0x000A0000~0x000C0000) 被用作屏幕显示内容缓冲区，其他的则被非易失性存储器 (ROM) 所使用，里面会存放一些固件，其中最重要的一部分就是 BIOS，占据了 0x000F0000 ~ 0x00100000 的地址空间。BIOS 负责进行一些基本的系统初始化任务，比如开启显卡，检测该系统的内存大小等等工作。在初始化完成后，BIOS 就会从某个合适的地方加载操作系统。</p>
+<p indent="0">Current PC architects nevertheless preserved the original layout for the low 1MB of physical address space in order to ensure backward compatibility with existing software. </p>
+<p indent="1">Modern PCs therefore have a "hole" in physical memory from 0x000A0000 to 0x00100000, dividing RAM into "low" or "conventional memory" (the first 640KB) and "extended memory" (everything else). </p>
+<p indent="1">In addition, some space at the very top of the PC's 32-bit physical address space, above all physical RAM, is now commonly reserved by the BIOS for use by 32-bit PCI devices.</p>
+<p indent="0">(Recent x86 processors can support more than 4GB of physical RAM, so RAM can extend further above 0xFFFFFFFF. In this case the BIOS must arrange to leave a second hole in the system's RAM at the top of the 32-bit addressable region, to leave room for these 32-bit devices to be mapped.</p>
+<h3>The ROM BIOS</h3>
+<h4>Real Mode </h4>
+<p indent="0">In real mode, memory is limited to 1MB (2^20 bytes). Valid address range from 0x00000 to 0xFFFFF. </p>
+<p indent="0">These address require a 20-bit number which will not fit into any of the 8086's 16-bit registers. The solution is use two 16-bit values to determine an address.</p>
+<p indent="1">The first 16-bit value is called the  <b>selector</b> . Selector values must be stored in the segment registers.</p>
+<p indent="1">The second 16-bit value is called the  <b>offset</b> . </p>
+<p indent="0">The physical address referenced by a 32-bit selector:offset pair is computed by formula:  <code-snippet>(selector << 4) + offset</code-snippet></p>
+<p indent="0">Given that cs means "code segment" and that ip means "instruction pointer" (this is not a general purpose register!) the combination cs:ip represents the location where the CPU is currently fetching instructions to execute.</p>
+<br />
+<p indent="0">The disadvantages are:</p>
+<p indent="1">- Each byte in memory does not have a unique segmented address. The physical address 0x04808 can be referenced by 0x047C:0x0048, 0x047D:0x0038, 0x047E:0x0028 or 0x047B:0x0058. </p>
+<p indent="1">-  The program must be split up into sections (called segments) less than 64K in size. When execution moves from one segment to another, the value of CS must be changed.</p>
+<h4>16-bit Protected Mode</h4>
+<p indent="0">In protected mode, a selector value is an  <b>index</b> into a  <b>descriptor table</b> . Protected mode uses a technique called virtual memory. In protected mode, each segment is assigned an entry in a descriptor table.</p>
+<h5>32-bit Protected Mode</h5>
+<p indent="0">There are two major differences between 386 32-bit and 286 16-bit protected modes:</p>
+<p indent="1">- Offsets are expanded to be 32-bits. This allows an offset to range up</p>
+<p indent="0">to 4 billion. Thus, segments can have sizes up to 4 gigabytes.</p>
+<p indent="1">- Segments can be divided into smaller 4K-sized units called pages. The virtual memory system works with pages now instead of segments</p>
+<p indent="0">这里值得一提的是，对于支持 protected mode 的 cpu, 启动时为了保持向后兼容，仍然会以 real mode 启动，之后再切换到 protected mode.</p>
+<h3>The Boot Loader</h3>
+<p indent="0">Floppy and hard disks for PCs are divided into 512 byte regions called  <b>sectors</b> . A sector is the disk's minimum transfer granularity: each read or write operation must be one or more sectors in size and aligned on a sector boundary.</p>
+<p indent="0">If the disk is bootable, the first sector is called the boot sector, since this is where the boot loader code resides.</p>
+<p indent="0">When you compile and link a C program such as the JOS kernel, the compiler transforms each C source ('.c') file into an object ('.o') file containing assembly language instructions encoded in the binary format expected by the hardware. The linker then combines all of the compiled object files into a single binary image such as obj/kern/kernel, which in this case is a binary in the ELF format, which stands for  <b>Executable and Linkable Format</b> .</p>
+<p indent="0">The link address of a section is the memory address from which the section expects to execute. The linker encodes the link address in the binary in various ways, such as when the code needs the address of a global variable, with the result that a binary usually won't work if it is executing from an address that it is not linked for. </p>
+<p indent="0">https://111qqz.com/2019/01/mit-6-828-lab-1/</p>
+<p indent="0">https://zhuanlan.zhihu.com/p/166413604</p>
+<p indent="0">https://pdos.csail.mit.edu/6.828/2018/readings/pcasm-book.pdf</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

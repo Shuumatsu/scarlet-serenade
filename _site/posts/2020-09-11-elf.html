@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-09-11-elf</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-09-11-elf</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">ELF 可用来记录 object file、executable file、share object、与 core dump 等格式。为了支援连结与执行等两种时期的不同用途，ELF 格式可以分为两种不同观点，</p>
+<p indent="1">- 第一种是  <b>Linking View</b> 。在连结时期，是以分区 (Section) 为主的结构</p>
+<p indent="1">- 第二种是  <b>(Execution View)</b> 。在执行时期，是以分段 (Segment) 为主的结构</p>
+<code-snippet indent="0" block="true">Linking View:                           Execution View
+-----------------------------------     -----------------------------------
+| ELF header                      |     | ELF header                      |
+-----------------------------------     -----------------------------------
+| Program Header Table (Optional) |     | Program Header Table            |
+-----------------------------------     -----------------------------------
+| Section 1                       |     |                                 |
+-----------------------------------     | Segment 1                       |
+| Section 2                       |     |                                 |
+-----------------------------------     -----------------------------------
+| ...                             |     |                                 |
+-----------------------------------     | Segment 2                       |
+| ...                             |     |                                 |
+-----------------------------------     -----------------------------------
+| ...                             |     |                                 |
+-----------------------------------     | ...                             |
+| ...                             |     |                                 |
+-----------------------------------     -----------------------------------
+| Section Header Table            |     | Section Header Table(Optional)  |
+-----------------------------------     -----------------------------------
+</code-snippet>
+<p indent="0">Program Header Table 记载了分段资讯，因此也可称为 Segment Header Table。Section Header Table 记载了分区资讯，是连结时期的主要结构。</p>
+<code-snippet indent="0" block="true">
+</code-snippet></section>
+    </article>
+</main>
+
+    </body>
+</html>

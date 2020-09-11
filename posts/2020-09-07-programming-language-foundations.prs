@@ -58,6 +58,12 @@ Notation "{{ P }} c {{ Q }}" := (hoare_triple P c Q) (at level 90, c at next lev
 
 For example, $\{X = 0\} \; X := X+1 \; \{X = 1\}$ is a valid Hoare triple, stating that command X := X + 1 would transform a state in which X = 0 to a state in which X = 1.
 
+:br
+
+**Definition**: $P$ is a **weakest precondition** of command $c$ for postcondition $Q$ if:
+- - $P$ is a precondition, that is, $\{P\} \quad c \quad \{Q\}$
+- - $P$ is at least as weak as all other preconditions, that is, if $\{P'\} \quad c \quad \{Q\}$ then $P' \rightarrow P$.
+
 :h4 Hoare logic Proof Rules
 
 The goal of Hoare logic is to provide a **compositional** method for proving the validity of specific Hoare triples.
@@ -295,6 +301,65 @@ Proof.
         split; assumption. 
 Qed.
 ```
+
+
+:h6 example
+
+```
+{{ X = m /\ Y = n }}
+while ~(X = 0) do
+    Y := Y - 1;
+    X := X - 1
+end
+{{ X = m /\ Y = n }}
+```
+
+Once the outermost precondition and postcondition are chosen, the only creative part in verifying programs using Hoare Logic is finding the right loop invariants. 
+
+To verify this program, we need to find an invariant Inv for the loop. As a first step we can leave Inv as an unknown and build a skeleton for the proof
+- (working **from the end of the program to the beginning**, as usual, and without any thinking at all yet).
+```
+{{ X = m /\ Y = n }} ->> {{ Inv }} (a)
+while ~(X = 0) do
+{{ Inv /\ X != 0 }} ->> {{ Inv [X |-> X-1] [Y |-> Y-1] }} (b)
+    Y := Y - 1;
+{{ Inv [X |-> X-1] }}
+    X := X - 1
+{{ Inv }}
+end
+{{ Inv /\ ~(X != 0) }} ->> {{ Y = n - m }} (c)
+```
+我们需要找到一个 `Inv` 同时满足 (a)、(b)、(c)。One way to find an invariant that simultaneously satisfies these three conditions is by using an iterative process: 
+- start with a "candidate" invariant (e.g., a guess or a heuristic choice) and check the three conditions above; if any of the checks fails, try to use the information that we get from the failure to produce another.
+
+Guess `Inv = (Y = n - m)`, 
+```
+{{ X = m /\ Y = n }} ->> {{ Y = n - m }} (a)
+while ~(X = 0) do
+{{ Y = n - m /\ X != 0 }} ->> {{ Y - 1 = n - m }} (b)
+    Y := Y - 1;
+{{ Y = n - m }}
+    X := X - 1
+{{ Y = n - m }}
+end
+{{ Y = n - m /\ ~(X != 0) }} ->> {{ Y = n - m }} (c)
+```
+condition (c) is trivially satisfied, conditions (a) and (b) are wrong: the variable `Y` changes during the loop, while `m` and `n` are constant, so the assertion we chose didn't have much chance of being an invariant!
+但是观察程序可以发现，`X` 和 `Y`以相同的速率减小，我们可以利用 (c) 中 `~(X != 0)` 的条件将 `Inv` 改为 `Y - X = n - m` 
+```
+{{ X = m /\ Y = n }} ->> {{ Y - X = n - m }} (a)
+while ~(X = 0) do
+{{ Y - X = n - m /\ X != 0 }} ->> {{ (Y - 1) - (X - 1) = n - m }} (b)
+    Y := Y - 1;
+{{ Y - (X - 1) = n - m }}
+    X := X - 1
+{{ Y - X = n - m }}
+end
+{{ Y - X = n - m /\ ~(X != 0) }} ->> {{ Y = n - m }} (c)
+```
+Success! Conditions (a), (b) and (c) all hold now.
+
+
 
 :br
 

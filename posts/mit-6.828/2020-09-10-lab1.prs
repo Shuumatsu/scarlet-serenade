@@ -84,33 +84,6 @@ Current PC architects nevertheless preserved the original layout for the low 1MB
 
 :h3 The ROM BIOS
 
-:h4 Real Mode 
-In real mode, memory is limited to 1MB (2^20 bytes). Valid address range from 0x00000 to 0xFFFFF. 
-These address require a 20-bit number which will not fit into any of the 8086's 16-bit registers. The solution is use two 16-bit values to determine an address.
-- The first 16-bit value is called the **selector**. Selector values must be stored in the segment registers.
-- The second 16-bit value is called the **offset**. 
-The physical address referenced by a 32-bit selector:offset pair is computed by formula: `(selector << 4) + offset`
-
-Given that cs means "code segment" and that ip means "instruction pointer" (this is not a general purpose register!) the combination cs:ip represents the location where the CPU is currently fetching instructions to execute.
-
-:br
-
-The disadvantages are:
-- - Each byte in memory does not have a unique segmented address. The physical address 0x04808 can be referenced by 0x047C:0x0048, 0x047D:0x0038, 0x047E:0x0028 or 0x047B:0x0058. 
-- -  The program must be split up into sections (called segments) less than 64K in size. When execution moves from one segment to another, the value of CS must be changed.
-
-:h4 16-bit Protected Mode
-
-In protected mode, a selector value is an **index** into a **descriptor table**. Protected mode uses a technique called virtual memory. In protected mode, each segment is assigned an entry in a descriptor table.
-
-:h5 32-bit Protected Mode
-
-There are two major differences between 386 32-bit and 286 16-bit protected modes:
-- - Offsets are expanded to be 32-bits. This allows an offset to range up
-to 4 billion. Thus, segments can have sizes up to 4 gigabytes.
-- - Segments can be divided into smaller 4K-sized units called pages. The virtual memory system works with pages now instead of segments
-
-这里值得一提的是，对于支持 protected mode 的 cpu, 启动时为了保持向后兼容，仍然会以 real mode 启动，之后再切换到 protected mode.
 
 :h3 The Boot Loader
 
@@ -121,6 +94,24 @@ If the disk is bootable, the first sector is called the boot sector, since this 
 When you compile and link a C program such as the JOS kernel, the compiler transforms each C source ('.c') file into an object ('.o') file containing assembly language instructions encoded in the binary format expected by the hardware. The linker then combines all of the compiled object files into a single binary image such as obj/kern/kernel, which in this case is a binary in the ELF format, which stands for **Executable and Linkable Format**.
 
 The link address of a section is the memory address from which the section expects to execute. The linker encodes the link address in the binary in various ways, such as when the code needs the address of a global variable, with the result that a binary usually won't work if it is executing from an address that it is not linked for. 
+
+The boot loader consists of one assembly language source file, boot/boot.S, and one C source file, boot/main.c.
+In boot/boot.S, 
+- 1. the boot loader switches the processor from real mode to 32-bit protected mode, because it is only in this mode that software can access all the memory above 1MB in the processor's physical address space.
+- 2. the boot loader reads the kernel from the hard disk by directly accessing the IDE disk device registers via the x86's special I/O instructions.
+-- (don't need to know the details
+- 3. call `bootmain` (implemented in boot/main.c)
+
+In boot/main.c
+The BIOS loads the boot sector into memory starting at address 0x7c00, so this is the boot sector's load address. 
+This is also where the boot sector executes from, so this is also its link address.
+
+:h3 The Kernel
+
+
+Operating system kernels often like to be linked and run at very high virtual address, such as 0xf0100000, in order to leave the lower part of the processor's virtual address space for user programs to use. The reason for this arrangement will become clearer in the next lab.
+
+:br 
 
 
 https://111qqz.com/2019/01/mit-6-828-lab-1/

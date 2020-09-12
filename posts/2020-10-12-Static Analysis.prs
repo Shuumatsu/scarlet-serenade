@@ -1,0 +1,44 @@
+大多数情况下，optimization application 都需要一个 conservative approximations. 如果我们拿到了错误的信息，那么我们的优化就可能是 unsound，并且会影响到程序本来的语义。
+
+一个 canonical choice 是为每个名为 $id$ 的变量 introduce a target $&id$ 
+为每个 allocation site introduce a target $malloc_i$ 其中 i 是一个唯一的 index
+
+points to analysis 发生在 syntax tree 上，因为发生在 control flow analysis 之前或同时进行。
+points to analysis 的结果是一个函数 $pt(pointer)$ 返回 set of possible pointer targets。 如果我们想知道两个指针 $p$ & $q$ 是否可能是  aliases，那么一个安全的做法就是比较其交集 $p t(p) \cap p t(q)$
+
+:h4 Andersen’s Algorithm
+
+对每个 variable named $id$，用集合 $\llbracket id \rrbracket$ 表示所有可能的 pointer targets
+
+分析假设程序已经倍 normalized，也就是说 pointer manipulation 仅限于以下几种
+:div(indent="1")
+    1) $id = malloc$，生成 constraints: $\{\mathrm{malloc_i}\} \subseteq \llbracket id \rrbracket$
+    2) $id_1 = &id_2$，生成 constraints: $\left\{\& i d_{2}\right\} \subseteq \llbracket i d_{1} \rrbracket$
+    3) $id_1 = id_2$，生成 constraints: $\llbracket i d_{2} \rrbracket \subseteq \llbracket i d_{1} \rrbracket$
+    4) $id_1 = *id_2$，生成 constraints: $\& i d \in \llbracket i d_{2} \rrbracket \Rightarrow \llbracket i d \rrbracket \subseteq \llbracket i d_{1} \rrbracket$
+    5) $*id_1 = id_2$，生成 constraints: $\& i d \in \llbracket i d_{1} \rrbracket \Rightarrow \llbracket i d_{2} \rrbracket \subseteq \llbracket i d \rrbracket$
+    6) $id = null$，生成 constraints: $\emptyset \subseteq \llbracket i d \rrbracket$ which 可以安全的被忽略
+
+最后我们得到 5 种 constraints，最后解这些约束就得到算法的结果
+
+:h4 Steensgaard’s Algorithm
+
+另一个更粗略度一点的算法，by viewing assignments as being bidirectional.
+
+TODO
+
+解这些约束就得到算法的结果，The resulting points-to function is defined as:
+$$ pt(p)=\{\& id \mid * p \sim id \} \cup \{ malloc_i \mid * p \sim malloc_i \}$$
+
+:h3 Interprocedural Points-To Analysis
+
+函数指针也可能有 indirect references，我们需要同时做 control flow analysis and the points-to analysis。例如：`(***x)(1,2,3);`
+
+我们可以对程序做一个简化，使得 function calls 总是形如 `id1 = (id2)(a1, ..., an);`。类似的 all return expressions are assumed to be just variables.
+
+
+
+到目前为止我们都只是把 heap 看作一个 amorphous 结构，几乎只关注了 stack based vars. 我们可以用 shape analysis 对堆进行更细致的分析。
+
+Shape graphs 是一个有向图，其每一个节点都是一个 pointer targets。Shape graphs 的 order 根据 inclusion of their sets of edges 定义。Thus, $\perp$ is the graph without edges and $\top$ is the completely connected graph.
+pointer targets 表示在执行期间可能创建的 memory cells，边表示两个 cell 间可能包含一个引用。

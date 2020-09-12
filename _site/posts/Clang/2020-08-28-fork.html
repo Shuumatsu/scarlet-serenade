@@ -74,9 +74,12 @@ int main() {
         printf(&quot;%d %d\n&quot;, pid, WEXITSTATUS(kirito));
 }
 </code-snippet>
-<p indent="0"><code-snippet>fork</code-snippet> 在父进程返回子进程的 id，在失败的时候返回 -1，在子进程返回 0</p>
-<p indent="0"><code-snippet>wait(&status)</code-snippet> 等待一个状态，并不指定是哪个子进程返回的状态，取第一个</p>
-<p indent="0">通常状态存储在  status 的低 16 位的高 8 位，用  <code-snippet>WEXITSTATUS</code-snippet> 取得状态</p></section>
+<p indent="0"><code-snippet>fork
+</code-snippet> 在父进程返回子进程的 id，在失败的时候返回 -1，在子进程返回 0</p>
+<p indent="0"><code-snippet>wait(&amp;status)
+</code-snippet> 等待一个状态，并不指定是哪个子进程返回的状态，取第一个</p>
+<p indent="0">通常状态存储在  status 的低 16 位的高 8 位，用  <code-snippet>WEXITSTATUS
+</code-snippet> 取得状态</p></section>
     </article>
 </main>
 

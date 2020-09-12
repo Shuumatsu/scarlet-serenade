@@ -1,0 +1,17 @@
+在 type theory 中 a **kind** is the type of a type constructor (can be nullary) or, less commonly, the type of a higher-order type operator.
+- (很多时候 kind 也被用来区分 data types (nullary constructor) 以及 type constructors
+
+:br
+
+examples:
+
+- `*`: pronounced "type" or "proper type", 是所有 data types 的 kind，被看作 **nullary type constructors**。
+-- e.g., `Int :: *`
+- `* -> *`: is the kind of a unary type constructor
+-- e.g., `[] :: * -> *`
+- `* -> * -> *`: is the kind of a binary type constructor (via currying),
+-- e.g., `(,) :: * -> * -> *`
+- `(* -> *) -> *`: is the kind of a higher-order type operator from unary type constructors to proper types.
+-- e.g. if `data Example f = C (f Int)` is defined then `Example :: (* -> *) -> *`
+
+

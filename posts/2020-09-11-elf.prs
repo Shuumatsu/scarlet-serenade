@@ -3,7 +3,7 @@
 
 :img(style="width: 100%", src="https://upload.wikimedia.org/wikipedia/commons/e/e4/ELF_Executable_and_Linkable_Format_diagram_by_Ange_Albertini.png")
 
-ELF 可用来记录 object file、executable file、share object、与 core dump 等格式。为了支援连结与执行等两种时期的不同用途，ELF 格式可以分为两种不同观点，
+Executable and Linking Format 可用来记录 object file、executable file、share object、与 core dump 等格式。为了支援连结与执行等两种时期的不同用途，ELF 格式可以分为两种不同观点，
 - - 第一种是 **Linking View**。在连结时期，是以分区 (Section) 为主的结构
 - - 第二种是 **(Execution View)**。在执行时期，是以分段 (Segment) 为主的结构
 ```
@@ -30,6 +30,9 @@ Linking View:                           Execution View
 |     (elf64_shdr[]               |     |     (elf64_shdr[]               |
 -----------------------------------     -----------------------------------
 ```
+虽然上图中 the program header table immediately after the ELF header, and the section header table following the sections，实际上 sections and segments have no specified order。
+
+:br
 
 
 ```
@@ -51,7 +54,10 @@ typedef struct elf64_hdr {
 } Elf64_Ehdr;
 ```
 
-Section Header Table 记录了各分区的基本资讯，包含分区起始位址等，因此可以透过分区表头读取各分区
+:h3 Sections
+
+Section Header Table 记录了各分区的基本资讯，包含分区起始位址等，因此可以透过分区表头读取各分区. Every section has an entry in the table; each entry gives information such as the section name,the section size, and so on.
+Sections hold the bulk of object file information for the linking view: instructions, data, symbol table, relocation information, and so on. 
 ```
 typedef struct elf64_shdr {
     Elf64_Word sh_name;        /* Section name, index in string tbl */
@@ -67,6 +73,50 @@ typedef struct elf64_shdr {
 } Elf64_Shdr;
 ```
 
+:h4 String Table Section
+
+String table sections hold null-terminated character sequences, commonly called strings. 
+An empty string table section is permitted, in this case its section header's sh_size member would contain zero.
+
+An non-empty string table section's first byte, which is index zero, is defined to hold a null character. Likewise, a string table's last byte is defined to hold a null character, ensuring null termination for all strings.
+
+One references a string as an index into the string table section. The following figures show a string table with 25 bytes and the strings associated with various indexes.
+
+```
+| Index |  0  | 1 | 2 | 3 |
+|---------------------------------------
+|       |  \0 |  a  b
+|Index | +0 | +1 | +2 | +3 | +4 | +5 | +6 | +7 | +8 | +9 |
+| 0    | \0 | n  | a  | m  | e  | .  | \0 | V  | a  | r  |
+| 10   | i  | a  | b  | l  | e  | \0 | a  | b  | l  | e  |
+| 20   | \0 | \0 | x  | x  | \0 | 
+```
+
+As the example shows, 
+- - a string table index may refer to any byte in the section.
+- - A string may appear more than once
+- - references to substrings may exist
+
+:h4 Symbol Table 
+
+An object file's symbol table holds information needed to locate and relocate a program's symbolic definitions and references.
+
+Index 0 both designates the first entry in the table and serves as the undefined symbol index. 
+
+```
+// symbol table entry:
+typedef struct elf64_sym {
+    Elf64_Word st_name;         /* Symbol name, holds an index into the in string tbl */
+    unsigned char st_info;      /* Type and binding attributes */
+    unsigned char st_other;     /* holds 0 and has no defined meaning */
+    Elf64_Half st_shndx;        /* Associated section index */
+    Elf64_Addr st_value;        /* Value of the symbol */
+    Elf64_Xword st_size;        /* Associated symbol size, holds 0 if the symbol has no size or an unknown size. */
+} Elf64_Sym;
+```
+
+:h3 Segments
+
 Program Header Table 记载了分段资讯，因此也可称为 Segment Header Table。The program header table tells the system how to create a process image.
 ```
 typedef struct elf64_phdr {
@@ -78,6 +128,6 @@ typedef struct elf64_phdr {
     Elf64_Xword p_filesz;       /* Segment size in file */
     Elf64_Xword p_memsz;        /* Segment size in memory /
     Elf64_Xword p_align;        /* Segment alignment, file & memory */
-} Elf64_Phdr;
+} Elf64_Phdr;54
 ```
 

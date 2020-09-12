@@ -106,10 +106,20 @@
 <h3>Next Permutation</h3>
 <p indent="0">给定任一非空正整数序列，生成这些数所能排列出的下一个较大序列。若给出的序列为最大序列，则生成最小序列。</p>
 <a href="https://leetcode.com/problems/next-permutation/#/description">https://leetcode.com/problems/next-permutation/#/description</a>
-<p indent="0">从最右方开始寻找，一直到左直到遇到第一个元素  <code-snippet>x</code-snippet> 它小于其右侧的元素。</p>
-<p indent="0">这说明  <code-snippet>x</code-snippet> 右侧的元素达到了其所能达到的最大值，则  <code-snippet>x</code-snippet> 所在位置应该更新位一个更大的值。</p>
-<p indent="0">在  <code-snippet>x</code-snippet> 右侧找到最小的大于  <code-snippet>x</code-snippet> 的元素  <code-snippet>y</code-snippet> 。交换  <code-snippet>x</code-snippet> 与  <code-snippet>y</code-snippet> 的位置，并将右侧的元素以递增排列（在这里其实就是  <code-snippet>reverse</code-snippet> 这部分</p>
-<p indent="0">如果没有这样的元素，说明原序列从右到左是一个递增序列，则返回从小到大排序的序列。（在这里其实就是  <code-snippet>reverse</code-snippet> 整个数组</p>
+<p indent="0">从最右方开始寻找，一直到左直到遇到第一个元素  <code-snippet>x
+</code-snippet> 它小于其右侧的元素。</p>
+<p indent="0">这说明  <code-snippet>x
+</code-snippet> 右侧的元素达到了其所能达到的最大值，则  <code-snippet>x
+</code-snippet> 所在位置应该更新位一个更大的值。</p>
+<p indent="0">在  <code-snippet>x
+</code-snippet> 右侧找到最小的大于  <code-snippet>x
+</code-snippet> 的元素  <code-snippet>y
+</code-snippet> 。交换  <code-snippet>x
+</code-snippet> 与  <code-snippet>y
+</code-snippet> 的位置，并将右侧的元素以递增排列（在这里其实就是  <code-snippet>reverse
+</code-snippet> 这部分</p>
+<p indent="0">如果没有这样的元素，说明原序列从右到左是一个递增序列，则返回从小到大排序的序列。（在这里其实就是  <code-snippet>reverse
+</code-snippet> 整个数组</p>
 <code-snippet indent="0" block="true">const reverse = (nums, i, j) =&gt; {
     while (i &lt; j) {
         ;[nums[i], nums[j]] = [nums[j], nums[i]]
@@ -149,13 +159,25 @@ const nextPermutation = nums =&gt; {
 }
 </code-snippet>
 <h3>Permutation Sequence</h3>
-<p indent="0">给定正整数  <code-snippet>n</code-snippet> 和  <code-snippet>k</code-snippet> ，要求返回在  <code-snippet>[1, 2, ..., n]</code-snippet> 所有的全排列中，第 k 大的字符串序列。</p>
+<p indent="0">给定正整数  <code-snippet>n
+</code-snippet> 和  <code-snippet>k
+</code-snippet> ，要求返回在  <code-snippet>[1, 2, ..., n]
+</code-snippet> 所有的全排列中，第 k 大的字符串序列。</p>
 <a href="https://leetcode.com/problems/permutation-sequence/#/description">https://leetcode.com/problems/permutation-sequence/#/description</a>
-<p indent="0">为方便，将  <code-snippet>k</code-snippet> 改作 0-based</p>
-<p indent="0">根据排列数公式，我们可以知道对于每个  <code-snippet>n</code-snippet> 总共有多少种排列  <code-snippet>A(n)</code-snippet> ，并且有  <code-snippet>A(n) = n * A(n - 1)</code-snippet> 。那么根据模  <code-snippet>A(n - 1)</code-snippet> 的值可以知道当前位于  <code-snippet>n</code-snippet> 的第几个最高位对应的那些序列中</p>
+<p indent="0">为方便，将  <code-snippet>k
+</code-snippet> 改作 0-based</p>
+<p indent="0">根据排列数公式，我们可以知道对于每个  <code-snippet>n
+</code-snippet> 总共有多少种排列  <code-snippet>A(n)
+</code-snippet> ，并且有  <code-snippet>A(n) = n * A(n - 1)
+</code-snippet> 。那么根据模  <code-snippet>A(n - 1)
+</code-snippet> 的值可以知道当前位于  <code-snippet>n
+</code-snippet> 的第几个最高位对应的那些序列中</p>
 <p indent="0">采取递归的算法，从最高位到最低位考虑每一位。维护一个有序数组记录待定元素。</p>
-<p indent="1">用  <code-snippet>Math.floor(k / A[arr.length - 1])</code-snippet> 得到当前应选的元素在待定元素数组的下标 </p>
-<p indent="1">用  <code-snippet>k % A[arr.length - 1]</code-snippet> 得到下一轮递归的  <code-snippet>k</code-snippet></p>
+<p indent="1">用  <code-snippet>Math.floor(k / A[arr.length - 1])
+</code-snippet> 得到当前应选的元素在待定元素数组的下标 </p>
+<p indent="1">用  <code-snippet>k % A[arr.length - 1]
+</code-snippet> 得到下一轮递归的  <code-snippet>k
+</code-snippet></p>
 <code-snippet indent="0" block="true">/**
  * @param {number} n
  * @param {number} k

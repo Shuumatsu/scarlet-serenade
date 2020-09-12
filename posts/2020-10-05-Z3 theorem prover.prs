@@ -1,0 +1,41 @@
+**definition**: an **uninterpreted function** or **function symbol** is one that has no other property than its name and n-ary form.
+
+
+**definition**: Z3 uses the notion of **congruence closure** to check the satisfiability of equalities.
+Let $\mathcal{T}$ be a set of terms and $\mathcal{E}$ set of equalities over $\mathcal{T}$. A congruence closure over $\mathcal{T}$ modulo $\mathcal{E}$ is the finest partition $cc$ of $\mathcal{T}$, such that:
+- \- if $(s=t) \in \mathcal{E}$ then $s, t$ are in the same partition in $cc$.
+- \- if $s_i, t_i$ are in the same partition of $cc$ for each $i = 1, \ldots, k$ then $s:=f\left(s_{1}, \ldots, s_{k}\right), t:=f\left(t_{1}, \ldots, t_{k}\right) \in \mathcal{T}$ are in the same partition under $cc$
+
+
+Decision procedures for quantifier-free EUF formulas are usually based on **union-find** to maintain equivalence classes of terms that are equated.
+
+
+
+e.g., 给定 constraints $a = b; \ b = c; \ d = e; \ b = s; \ d = t; \ a \neq t$
+Z3 会根据等式关系生成 $[a, b, c, s]$ 与 $[d, e, t]$ 两个 equivalence classes，不等式 $a \neq t$ 不会产生矛盾，所以给定的 constraints 是可满足的
+
+e.g., 给定 constraints: $a=b, b=c, d=e, b=s, d=t, f(a, g(d)) \neq f(g(e), b)$. 首先引入几个常量 $v_1 := g(e); v_2 := g(d); v_3 := f(a, v_2); v4 := f(v_1, b)$  and we can associate a distinct value with each equivalence class.
+$\diamond_{0}: [a, b, c, s]$ & $\diamond_{1}: [d, e, t]$ & $\diamond_{0}: [v_1, v_2]$ & & $\diamond_{3}: [v_3]$ & $\diamond_{4}: [v_4]$
+
+When presenting the formula to Z3, it produces a model, that may look as follows:
+```
+[s = S!val!0, b = S!val!0, a = S!val!0,
+ c = S!val!0, d = S!val!1, e = S!val!1, t = S!val!1,
+ f = [(S!val!2, S!val!0) -> S!val!4, else -> S!val!3],
+ g = [else -> S!val!2]]
+```
+在这个模型中，像 `S!val!0` 这样的是 fresh constant that are distinct from each other. 
+`f` maps the arguments `(S!val!2, S!val!0)` to `S!val!4`. All other arguments are mapped by the else clause to `S!val!3`. 
+The interpretation of S is a finite set `{S!val!0, S!val!1, S!val!2, S!val!3, S!val!4}`.
+
+Array 在某种意味上可以看作一个函数，Z3 decides arrays by reduction to EUF. The theory of arrays is extensional. That is, two arrays are equal if they behave the same on all selected indices.
+
+Z3 mostly uses a **bit-blasting** approach to deciding bit-vectors. By bit-blasting we refer to 将每个位都视为命题变量。以位向量加法为例，表达式 $out := v + w$ 通过编码为一个 ripple-carry adder 来得到变量间的约束关系。
+
+Floating points are bit-vectors with an interpretation specified by the IEEE floating point standard.
+
+The theory of first-order algebraic data-types captures the theory of finite trees. It is characterized by the properties that:
+- \- All trees are finite (occurs check).
+- \- All trees are generated from the constructors (no junk).
+- \- Two trees are equal if and only if they are constructed exactly the same way (no confusion).
+

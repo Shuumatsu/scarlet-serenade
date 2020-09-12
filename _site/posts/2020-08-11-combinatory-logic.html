@@ -54,14 +54,32 @@
     <article>
         <!-- <section class="header"></section> -->
         <section><h1>combinatory logic</h1>
-<p indent="0">1. 所有的变量，常量，以及组合子  <mathjax-panel>I</mathjax-panel> ,  <mathjax-panel>K</mathjax-panel> ,  <mathjax-panel>S</mathjax-panel> 都是合法的  <mathjax-panel>CL</mathjax-panel> 项</p>
-<p indent="0">2. 如果  <mathjax-panel>X</mathjax-panel> 和  <mathjax-panel>Y</mathjax-panel> 是合法的  <mathjax-panel>CL</mathjax-panel> 项，那么  <mathjax-panel>XY</mathjax-panel> 也是</p>
-<p indent="0">例如，以下字符串都是合法的  <mathjax-panel>CL</mathjax-panel> 项  <mathjax-panel>((S(K S)) K)</mathjax-panel> ,  <mathjax-panel>\left(\left(S\left(K\right)\right)((S K) K)\right)</mathjax-panel></p>
+<p indent="0">1. 所有的变量，常量，以及组合子  <mathjax-panel>I
+</mathjax-panel> ,  <mathjax-panel>K
+</mathjax-panel> ,  <mathjax-panel>S
+</mathjax-panel> 都是合法的  <mathjax-panel>CL
+</mathjax-panel> 项</p>
+<p indent="0">2. 如果  <mathjax-panel>X
+</mathjax-panel> 和  <mathjax-panel>Y
+</mathjax-panel> 是合法的  <mathjax-panel>CL
+</mathjax-panel> 项，那么  <mathjax-panel>XY
+</mathjax-panel> 也是</p>
+<p indent="0">例如，以下字符串都是合法的  <mathjax-panel>CL
+</mathjax-panel> 项  <mathjax-panel>((S(K S)) K)
+</mathjax-panel> ,  <mathjax-panel>\left(\left(S\left(K\right)\right)((S K) K)\right)
+</mathjax-panel></p>
 <h3>Weak reduction</h3>
-<p indent="0"><mathjax-panel>IX</mathjax-panel> 可以变换为  <mathjax-panel>X</mathjax-panel></p>
-<p indent="0"><mathjax-panel>KXY</mathjax-panel> 可以变换为  <mathjax-panel>X</mathjax-panel></p>
-<p indent="0"><mathjax-panel>SXYZ</mathjax-panel> 可以变换为  <mathjax-panel>(XZ)(YZ)</mathjax-panel></p>
-<p indent="0">例如计算  <mathjax-panel>S(K S) K X Y Z</mathjax-panel></p>
+<p indent="0"><mathjax-panel>IX
+</mathjax-panel> 可以变换为  <mathjax-panel>X
+</mathjax-panel></p>
+<p indent="0"><mathjax-panel>KXY
+</mathjax-panel> 可以变换为  <mathjax-panel>X
+</mathjax-panel></p>
+<p indent="0"><mathjax-panel>SXYZ
+</mathjax-panel> 可以变换为  <mathjax-panel>(XZ)(YZ)
+</mathjax-panel></p>
+<p indent="0">例如计算  <mathjax-panel>S(K S) K X Y Z
+</mathjax-panel></p>
 <mathjax-panel indent="0" block="true">\begin{aligned}
 S(K S) K X Y Z &amp;= (K S K) (K X) Y Z \\
                &amp;= S (K X) Y Z \\
@@ -69,16 +87,45 @@ S(K S) K X Y Z &amp;= (K S K) (K X) Y Z \\
                &amp;= X (Y Z)
 \end{aligned}
 </mathjax-panel>
-<p indent="0">与  <mathjax-panel>\lambda</mathjax-panel> 项的  <mathjax-panel>\beta</mathjax-panel> 范式一样，我们将不能再继续进行 weak reduction 的  <mathjax-panel>CL</mathjax-panel> 项称为 weak 范式(weak normal form)</p>
-<h3><mathjax-panel>CL</mathjax-panel> 的计算能力与  <mathjax-panel>\lambda</mathjax-panel> 演算相当</h3>
-<p indent="0">以上我们看到  <mathjax-panel>CL</mathjax-panel> 项，似乎只能进行项的应用 (application) 操作，对应于  <mathjax-panel>\lambda</mathjax-panel> 项的用法为  <mathjax-panel>(MN)</mathjax-panel> ，然而  <mathjax-panel>CL</mathjax-panel> 的计算能力与  <mathjax-panel>\lambda</mathjax-panel> 演算相当。 <mathjax-panel>\lambda</mathjax-panel> 中的 abstraction 可以通过 组合子  <mathjax-panel>I</mathjax-panel> ,  <mathjax-panel>K</mathjax-panel> ,  <mathjax-panel>S</mathjax-panel> 表示</p>
-<p indent="0">考虑  <mathjax-panel>\lambda</mathjax-panel> 演算的 abstraction，具体有几种情况</p>
-<p indent="1"><mathjax-panel>\lambda x . x</mathjax-panel> 则等价于  <mathjax-panel>I</mathjax-panel></p>
-<p indent="1"><mathjax-panel>\lambda x . M</mathjax-panel> 如果  <mathjax-panel>M</mathjax-panel> 中不含  <mathjax-panel>x</mathjax-panel> ，则等价于  <mathjax-panel>K M</mathjax-panel></p>
-<p indent="1"><mathjax-panel>\lambda x . U x</mathjax-panel> 则等价于 U (就是 eta-conversion)</p>
-<p indent="1">在上述三种情况外，一定形如  <mathjax-panel>\lambda x . U V</mathjax-panel> ，则等价于  <mathjax-panel>S (\lambda . U) (\lambda . V)</mathjax-panel></p>
-<p indent="2">在  <mathjax-panel>\lambda</mathjax-panel> 演算中，当我们做 application 的时候，我们对 function body 做 substitution 也就是 beta-reduction；也就是说如果我们的项将对某个变量  <mathjax-panel>x</mathjax-panel> 做 substitution，我们可以将其写成 function application 的形式。所以在这里  <mathjax-panel>U</mathjax-panel> 被改写为了  <mathjax-panel>(\lambda . U)</mathjax-panel></p>
-<p indent="0">例如  <mathjax-panel>[x] . x y=S([x] . x)([x] . y)=S I(K y)</mathjax-panel></p></section>
+<p indent="0">与  <mathjax-panel>\lambda
+</mathjax-panel> 项的  <mathjax-panel>\beta
+</mathjax-panel> 范式一样，我们将不能再继续进行 weak reduction 的  <mathjax-panel>CL
+</mathjax-panel> 项称为 weak 范式(weak normal form)</p>
+<h3><mathjax-panel>CL
+</mathjax-panel> 的计算能力与  <mathjax-panel>\lambda
+</mathjax-panel> 演算相当</h3>
+<p indent="0">以上我们看到  <mathjax-panel>CL
+</mathjax-panel> 项，似乎只能进行项的应用 (application) 操作，对应于  <mathjax-panel>\lambda
+</mathjax-panel> 项的用法为  <mathjax-panel>(MN)
+</mathjax-panel> ，然而  <mathjax-panel>CL
+</mathjax-panel> 的计算能力与  <mathjax-panel>\lambda
+</mathjax-panel> 演算相当。 <mathjax-panel>\lambda
+</mathjax-panel> 中的 abstraction 可以通过 组合子  <mathjax-panel>I
+</mathjax-panel> ,  <mathjax-panel>K
+</mathjax-panel> ,  <mathjax-panel>S
+</mathjax-panel> 表示</p>
+<p indent="0">考虑  <mathjax-panel>\lambda
+</mathjax-panel> 演算的 abstraction，具体有几种情况</p>
+<p indent="1"><mathjax-panel>\lambda x . x
+</mathjax-panel> 则等价于  <mathjax-panel>I
+</mathjax-panel></p>
+<p indent="1"><mathjax-panel>\lambda x . M
+</mathjax-panel> 如果  <mathjax-panel>M
+</mathjax-panel> 中不含  <mathjax-panel>x
+</mathjax-panel> ，则等价于  <mathjax-panel>K M
+</mathjax-panel></p>
+<p indent="1"><mathjax-panel>\lambda x . U x
+</mathjax-panel> 则等价于 U (就是 eta-conversion)</p>
+<p indent="1">在上述三种情况外，一定形如  <mathjax-panel>\lambda x . U V
+</mathjax-panel> ，则等价于  <mathjax-panel>S (\lambda . U) (\lambda . V)
+</mathjax-panel></p>
+<p indent="2">在  <mathjax-panel>\lambda
+</mathjax-panel> 演算中，当我们做 application 的时候，我们对 function body 做 substitution 也就是 beta-reduction；也就是说如果我们的项将对某个变量  <mathjax-panel>x
+</mathjax-panel> 做 substitution，我们可以将其写成 function application 的形式。所以在这里  <mathjax-panel>U
+</mathjax-panel> 被改写为了  <mathjax-panel>(\lambda . U)
+</mathjax-panel></p>
+<p indent="0">例如  <mathjax-panel>[x] . x y=S([x] . x)([x] . y)=S I(K y)
+</mathjax-panel></p></section>
     </article>
 </main>
 

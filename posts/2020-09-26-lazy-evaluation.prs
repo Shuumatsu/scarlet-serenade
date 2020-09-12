@@ -1,0 +1,105 @@
+通过 list map 理解 lazy evaluation:
+```
+xs = [1,2,3,4,5,6,7,8]
+map f $ map f xs
+```
+上面的代码对每个元素执行了两次 `f` 而只需要遍历一次
+
+:br
+\---
+:br
+
+以 OCaml 为例，OCaml 是默认严格求值的语言所以不能像 Haskell 中那样定义一个无限列表（在这里我们假装 OCaml 没有 lazy 关键字）
+
+:br
+
+惰性求值本质上就是一个 `thunk`，所以我们定一个 `thunk` 类型：
+
+```
+type 'a thunk = Evaluated of 'a | Unevaluated of (unit -> 'a)
+
+type 'a thunk_ref = 'a thunk ref
+
+(* 从 Unevaluated 到 Evaluated *)
+let force thunk_ref =
+  match !thunk_ref with
+  | Evaluated x ->
+      x
+  | Unevaluated f ->
+      let ret = f () in
+      thunk_ref := Evaluated ret ;
+      ret
+
+let thunk_from f = ref (Unevaluated f)
+(* 这部分可以参考 http://typeocaml.com/2014/11/13/magic-of-thunk-lazy/ *)
+```
+
+定义一个 stream 类型，对应 Haskell 中的列表：
+
+```
+type 'a stream = 'a _stream thunk_ref
+
+and 'a _stream = Cons of 'a thunk_ref * 'a stream | Empty
+```
+
+整个 stream 是惰性的，并且它的每一个元素也是惰性的。
+
+:br 
+
+惰性求值的情况下，每次 `map` 不需要等上一次 `map` 的遍历结束，而是总共只需要一次遍历。
+
+:br 
+
+首先我们定义 `head` 和 `tail` ：（实现 `map` 需要
+
+```
+let head (stream : 'a stream) : 'a thunk_ref thunk_ref =
+  thunk_from (fun () -> match force stream with Cons (h, _) -> h)
+
+let tail (stream : 'a stream) : 'a stream thunk_ref =
+  thunk_from (fun () -> match force stream with Cons (_, t) -> t)
+```
+然后是 map：
+```
+let rec map (f : 'a -> 'b) (stream : 'a stream) =
+  thunk_from (fun () ->
+      match force stream with
+      | Cons _ ->
+          let h = force (head stream) and t = force (tail stream) in
+          Cons (thunk_from (fun () -> f (force h)), map f t)
+      | _ ->
+          Empty)
+```
+
+（注意我们的 `head`, `tail` 以及 `map` 方法都是由 `thunk_from` 开头，代表他们是惰性的
+
+:br
+
+现在我们已经做完所有的准备工作，可以验证为什么只需要一次遍历了：
+
+```
+let rec make () =
+  thunk_from (fun () -> Cons (thunk_from (fun () -> ()), make ()))
+
+let example = make ()
+
+let f () = print_endline "f"
+
+let g () = print_endline "g"
+
+let r = example |> map f |> map g
+
+let rec take_to_list (n : int) (stream : 'a stream) =
+  match force stream with
+  | Cons _ when n > 0 ->
+      let h = force (head stream) and t = force (tail stream) in
+      force h :: take_to_list (n - 1) t
+  | _ ->
+      []
+
+;;
+take_to_list 2 r
+(* 运行这个代码会得到输出 `fgfg` *)
+```
+
+`make` 返回一个无限长的 `stream`， 如果做不到一次遍历的话，那 `g` 将永远得不到调用，我们也无法通过 `take_to_list 2 r` 得到前两个元素。

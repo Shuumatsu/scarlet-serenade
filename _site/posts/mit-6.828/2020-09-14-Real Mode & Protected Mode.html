@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-09-14-Real Mode & Protected Mode</title>
+        <link rel="stylesheet" href="../../web/static/main.css" />
+        <script src="../../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../../">Home</a>
+                <a href="../../about.html">About</a>
+                <a href="../../contact.html">Contact</a>
+                <a href="../../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-09-14-Real Mode & Protected Mode</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">实模式与保护模式都是 CPU 的工作模式，实模式是早期 CPU 运行的工作模式，而保护模式则是现代 CPU 运行的模式。</p>
+<p indent="0">这里值得一提的是，对于支持 protected mode 的 cpu, 启动时为了保持向后兼容，仍然会以 real mode 启动，之后再切换到 protected mode.</p>
+<h3>Real Mode</h3>
+<p indent="0">实模式出现于早期 8088CPU 时期。当时由于 CPU 的性能有限，一共只有 20 位地址线（所以地址空间只有 1MB 即 0x00000000 ~ 0x000FFFFF。但是这 1MB 也不是用户都能利用到的），以及 8 个 16 位的通用寄存器，以及 4 个 16 位的段寄存器。</p>
+<p indent="0">These address require a 20-bit number which will not fit into any of the 8086's 16-bit registers. The solution is use two 16-bit values to determine an address.</p>
+<p indent="1">The first 16-bit value is called the  <b>selector</b> . Selector values must be stored in the segment registers.</p>
+<p indent="1">The second 16-bit value is called the  <b>offset</b> . </p>
+<p indent="0">The physical address referenced by a 32-bit selector:offset pair is computed by formula:  <code-snippet>(selector &lt;&lt; 4) + offset
+</code-snippet></p>
+<p indent="0">e.g., Given that cs means "code segment" and that ip means "instruction pointer" (this is not a general purpose register!) the combination cs:ip represents the location where the CPU is currently fetching instructions to execute.</p>
+<br />
+<p indent="0">The disadvantages are:</p>
+<p indent="1">- Each byte in memory does not have a unique segmented address. The physical address 0x04808 can be referenced by 0x047C:0x0048, 0x047D:0x0038, 0x047E:0x0028 or 0x047B:0x0058. </p>
+<p indent="1">-  The program must be split up into sections (called segments) less than 64K in size. When execution moves from one segment to another, the value of CS must be changed.</p>
+<h3>Protected Mode</h3>
+<p indent="0">先清楚以下几个概念：</p>
+<p indent="1">-  <b>Logical address</b> : the address as the CPU instruction set is using (those seen and used by the assembly programmer). </p>
+<p indent="1">-  <b>Virtual address</b> : logical address on a system with virtual memory. (whereas on a system with no virtual memory a logical address always maps to a physical address, i.e. to some "real" memory</p>
+<p indent="1">-  <b>Linear addresses</b> : calculated from logical addresses by segment translation. 如果该机器没有采用分页机制 (paging hardware) 的话，此时 linear address 就是最后的主存物理地址。</p>
+<p indent="1">-  <b>Physical address</b> : the address that is sent to the RAM (or ROM, or IO) for a read or write operation.</p>
+<br />
+<p indent="0">In protected mode, a selector value is an  <b>index</b> into a  <b>descriptor table</b> . Protected mode uses a technique called virtual memory. In protected mode, each segment is assigned an entry in a descriptor table. 先根据相应 entry 的 Flags 字段来判断是否可以访问这个段的内容，这样做是为了能够实现进程间地址的保护。如果能访问，则把 Base 字段的内容取出，直接与 offset 相加，就得到线性地址 (linear address) 了。之后就是要根据是否有分页机构来进行地址转换了。</p>
+<p indent="1">在计算机中存在两个表，GDT，LDT。它们两个其实是同类型的表，他们都是用来存放关于某个运行在内存中的程序的分段信息的。比如某个程序的代码段是从哪里开始，有多大；数据段又是从哪里开始，有多大。</p>
+<p indent="2">前者叫做全局段描述符表，GDT 表是全局可见的，也就是说每一个运行在内存中的程序都能看到这个表。所以操作系统内核程序的段信息就存在这里面。</p>
+<p indent="2">后者叫做本地段描述符表。LDT 表是每一个在内存中的程序都包含的，里面指明了每一个程序的段信息。</p>
+<p indent="1">每一个表项都包括三个字段:</p>
+<p indent="2">- Base: 代表这个段的基地址。</p>
+<p indent="2">- Limit: 代表这个段的大小。</p>
+<p indent="2">- Flags: 代表这个段的访问权限。</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

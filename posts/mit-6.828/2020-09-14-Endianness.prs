@@ -1,0 +1,18 @@
+The adjectives big-endian and little-endian refer to which bytes are most significant in multi-byte data types and describe the order in which a sequence of bytes is stored in a computer's memory.
+
+
+For example, consider the number 1025 stored in a 4-byte integer: `00000000 00000000 00000100 00000001`
+- - In a big-endian system, the most significant value in the sequence is stored at the lowest storage address (i.e., first). 
+-- ```
+address | 00       | 01       | 02       | 03 
+value   | 00000000 | 00000000 | 00000100 | 00000001
+```
+- - In a little-endian system, the least significant value in the sequence is stored first.
+-- ```
+address | 00       | 01       | 02       | 03 
+value   | 00000001 | 00000100 | 00000000 | 00000000
+```
+
+Most modern computers, use the little-endian system. Most of the networks, use the big-endian system.
+
+

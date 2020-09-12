@@ -1,0 +1,18 @@
+auto as a placeholder for locations where you would like inference to occur
+just as c++
+
+more todo:
+support the constraints between type level programming like:
+```
+type Box<T> = { value: T };
+
+type HasBoxedNumber = Box<number>;
+
+declare function foo<T extends Box<S>, S>(arg: T): S;
+
+declare const hbn: HasBoxedNumber;
+
+foo<HasBoxedNumber, infer>(hbn).toFixed();
+```
+or more advanced: dependent type 
+

@@ -53,19 +53,29 @@
     <h1>2020-01-01-hakyll-src</h1>
     <article>
         <!-- <section class="header"></section> -->
-        <section><p indent="0"><code-snippet>data CompilerRead</code-snippet> environment in which a compiler runs</p>
-<p indent="0"><code-snippet>data CompilerWrite</code-snippet> contains dependencies and cache hit counts</p>
+        <section><p indent="0"><code-snippet>data CompilerRead
+</code-snippet> environment in which a compiler runs</p>
+<p indent="0"><code-snippet>data CompilerWrite
+</code-snippet> contains dependencies and cache hit counts</p>
 <p indent="1">instance of Monoid: add deps & counts </p>
-<p indent="0"><code-snippet>data CompilerResult a</code-snippet></p>
-<p indent="1"><code-snippet>CompilerDone</code-snippet> contains result and  <code-snippet>CompilerWrite</code-snippet></p>
-<p indent="1"><code-snippet>CompilerSnapshot</code-snippet></p>
-<p indent="0"><code-snippet>newtype Compiler a</code-snippet> take an environment and returns an IO result</p>
+<p indent="0"><code-snippet>data CompilerResult a
+</code-snippet></p>
+<p indent="1"><code-snippet>CompilerDone
+</code-snippet> contains result and  <code-snippet>CompilerWrite
+</code-snippet></p>
+<p indent="1"><code-snippet>CompilerSnapshot
+</code-snippet></p>
+<p indent="0"><code-snippet>newtype Compiler a
+</code-snippet> take an environment and returns an IO result</p>
 <p indent="1">instance of Functor</p>
-<p indent="2">case  <code-snippet>CompilerDone</code-snippet> : map result</p>
+<p indent="2">case  <code-snippet>CompilerDone
+</code-snippet> : map result</p>
 <p indent="1">instance of Applicative</p>
-<p indent="2">case  <code-snippet>CompilerDone</code-snippet> : Applicative version of fmap</p>
+<p indent="2">case  <code-snippet>CompilerDone
+</code-snippet> : Applicative version of fmap</p>
 <p indent="1">instance of Monad </p>
-<p indent="2">case  <code-snippet>CompilerDone</code-snippet> : new result & mappend deps</p>
+<p indent="2">case  <code-snippet>CompilerDone
+</code-snippet> : new result & mappend deps</p>
 <p indent="1">instance of Alternative</p>
 <p indent="2">empty = error result</p>
 <p indent="2"><|> </p></section>

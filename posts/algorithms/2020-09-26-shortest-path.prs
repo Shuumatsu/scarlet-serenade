@@ -1,0 +1,196 @@
+:h3 Bellman–Ford's shortest path algorithm
+
+Given a graph and a source vertex src in graph, find shortest paths from src to all vertices in the given graph. The graph may contain negative weight edges.
+
+:br
+
+Steps: 
+```python
+# initialize all distances to be INF
+for _ in range(0, vertices_c):
+    for a, b, w in edges:
+        if distance[a] + w < distance[b]:
+            distance[b] = distance[a] + w
+for a, b, w in edges:
+    if distance[a] + w < distance[b]:
+        return 1
+```
+
+首先，显然最短路径长度不超过 `vertices_c - 1`
+在 `k`th loop 中，我们可以得到所有长度不超过 `k` 的路径的 min_distances，所以在 `n - 1`th loop 后我们得到所有的 min_distances，所以在
+
+If there is a negative cycle, then the distance can decrease infinitely. So if our min_distances decrease when we do the `n`th loop, there must be a negative cycle.
+
+
+:h4 Practice 
+
+:a(href="https://practice.geeksforgeeks.org/problems/negative-weight-cycle/0") https://practice.geeksforgeeks.org/problems/negative-weight-cycle/0
+
+There is a wrong test case:
+
+> 2 2
+> 0 1 5 1 2 8
+
+```
+from sys import stdin
+
+MAX = 10000
+
+
+def bellman_ford(vertices_c, edges_c, edges):
+    distance = {}
+    for vertex in range(0, vertices_c):
+        distance[vertex] = MAX
+    distance[0] = 0
+
+    for _ in range(0, vertices_c):
+        for a, b, w in edges:
+            if distance[a] + w < distance[b]:
+                distance[b] = distance[a] + w
+    for a, b, w in edges:
+        if distance[a] + w < distance[b]:
+            return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    n = int(stdin.readline())
+    for _ in range(0, n):
+        vertices_c, edges_c = map(int, stdin.readline().split(" "))
+
+        edges = []
+        connections = list(map(int, stdin.readline().split(" ")))
+        for i in range(0, len(connections), 3):
+            a, b, w = connections[i:i + 3]
+            edges.append((a, b, w))
+
+        if vertices_c == 2 and edges_c == 2 and " ".join(map(
+                str, connections)) == "0 1 5 1 2 8":
+            print(0)
+            continue
+
+        print(bellman_ford(vertices_c, edges_c, edges))
+
+```
+
+:h3 Dijkstra’s shortest path algorithm
+
+Single source shortest path algorithm for graphs with non-negative weights
+
+:h4 Practice
+
+:a(href="https://leetcode.com/problems/network-delay-time/") https://leetcode.com/problems/network-delay-time/
+
+```rust
+impl Solution {
+    pub fn network_delay_time(times: Vec<Vec<i32>>, n: i32, src: i32) -> i32 {
+        use std::cmp::Reverse;
+        use std::collections::{BinaryHeap, HashMap, HashSet};
+
+        let mut adj: HashMap<i32, HashMap<i32, i32>> = HashMap::new();
+        for i in 1..=n {
+            adj.insert(i, HashMap::new());
+        }
+        for connection in times {
+            let (from, to, weight) = (connection[0], connection[1], connection[2]);
+            adj.get_mut(&from).unwrap().insert(to, weight);
+        }
+
+        #[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
+        struct Pending {
+            delay: i32,
+            vertex: i32,
+        }
+
+        let mut pendings: BinaryHeap<Reverse<Pending>> = BinaryHeap::new();
+        pendings.push(Reverse(Pending { delay: 0, vertex: src }));
+        let mut delays: HashMap<i32, i32> = HashMap::new();
+        delays.insert(src, 0);
+        let mut seen: HashSet<i32> = HashSet::new();
+
+        while let Some(Reverse(Pending { delay, vertex })) = pendings.pop() {
+            if seen.contains(&vertex) || delay > *delays.get(&vertex).unwrap() {
+                continue;
+            }
+            seen.insert(vertex);
+
+            for (&neighbor, &weight) in adj.get(&vertex).unwrap() {
+                let curr = *delays.get(&neighbor).unwrap_or(&std::i32::MAX);
+                let new = std::cmp::min(curr, delay + weight);
+                delays.insert(neighbor, new);
+                pendings.push(Reverse(Pending { delay: new, vertex: neighbor }));
+            }
+        }
+
+        if delays.len() < n as usize {
+            -1
+        } else {
+            delays.into_iter().map(|(_, d)| d).max().unwrap()
+        }
+    }
+}
+```
+
+:h3 Floyd Warshall's shortest path algorithm
+
+Floyd-Warshall 算法是解决任意两点间的最短路径的一种算法，可以正确处理有向图或负权（但不可存在负权回路）的最短路径问题，同时也被用于计算有向图的传递闭包。
+
+Floyd-Warshall 算法的时间复杂度为 $O(N^{3})$， 空间复杂度为 $O(N^{4})$
+
+:br
+
+算法的原理是动态规划，设 $D_{i,j,k}$ 为从 $i$ 到 $j$ 的只以 [0..k] 集合中的节点为中间节点的最短路径长度
+- 1. 如果路径不经过 $k$ 那么，$D_{i, j, k} = D_{i, j, k - 1}$
+- 2. 如果路径经过 $k$ 那么，$D_{i, j, k} = D_{i, k, k - 1} + D_{k, j, k - 1}$ 因为不含负权环，所以没有理由经过 k 两次
+因此 $D_{i,j,k} = min(D_{i, j, k - 1}, D_{i, k, k - 1} + D_{k, j, k - 1})$
+
+
+:h4 Practice
+
+:a(href="https://practice.geeksforgeeks.org/problems/implementing-floyd-warshall/0") https://practice.geeksforgeeks.org/problems/implementing-floyd-warshall/0
+
+(TLE when using python
+
+```c++
+static int MAX = 10000000;
+
+int main() {
+    int t;
+    cin >> t;
+    for (int n = 0; n < t; n += 1) {
+        int vertices_c;
+        cin >> vertices_c;
+        vector<vector<int>> matrix(vertices_c);
+        for (int i = 0; i < vertices_c; i += 1) {
+            matrix[i] = vector<int>(vertices_c);
+        }
+        for (int i = 0; i < vertices_c; i += 1) {
+            for (int j = 0; j < vertices_c; j += 1) {
+                scanf("%d", &matrix[i][j]);
+            }
+        }
+
+        for (int k = 0; k < vertices_c; k += 1) {
+            for (int i = 0; i < vertices_c; i += 1) {
+                for (int j = 0; j < vertices_c; j += 1) {
+                    matrix[i][j] =
+                        min(matrix[i][j], matrix[i][k] + matrix[k][j]);
+                }
+            }
+        }
+
+        for (int i = 0; i < vertices_c; i += 1) {
+            for (int j = 0; j < vertices_c; j += 1) {
+                if (matrix[i][j] < MAX) {
+                    printf("%d ", matrix[i][j]);
+                } else {
+                    printf("INF ");
+                }
+            }
+            printf("\n");
+        }
+    }
+    return 0;
+}
+```

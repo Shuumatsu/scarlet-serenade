@@ -53,9 +53,12 @@
     <h1>2020-08-10-lambda</h1>
     <article>
         <!-- <section class="header"></section> -->
-        <section><p indent="0">bound var: a var that's associated with some  <mathjax-panel>\lambda</mathjax-panel></p>
-<p indent="0">free var: a var not associated with any  <mathjax-panel>\lambda</mathjax-panel></p>
-<p indent="1">直观上来说，如果 x is bound 则 x 在一个左边为 x 的  <mathjax-panel>\lambda</mathjax-panel> 的子树中</p>
+        <section><p indent="0">bound var: a var that's associated with some  <mathjax-panel>\lambda
+</mathjax-panel></p>
+<p indent="0">free var: a var not associated with any  <mathjax-panel>\lambda
+</mathjax-panel></p>
+<p indent="1">直观上来说，如果 x is bound 则 x 在一个左边为 x 的  <mathjax-panel>\lambda
+</mathjax-panel> 的子树中</p>
 <p indent="0">A closed term is one in which all identifiers are bound.</p>
 <br />
 <p indent="0">In the pure lambda calculus, any abstraction is a value. Remember, an abstraction λx. e is a function; in the pure lambda calculus, the only values are functions. </p>
@@ -72,14 +75,19 @@
 </code-snippet>
 <p indent="0">we call ((λx.λy.x)y)z and y are beta-equivalent</p>
 <p indent="0">Note that the term "beta-*reduction*" is perhaps misleading, since doing beta-reduction does not always produce a smaller lambda expression. In fact, a beta-reduction can:</p>
-<p indent="1">not change:  <code-snippet>(λx.xx)(λx.xx) → (λx.xx)(λx.xx)</code-snippet></p>
-<p indent="1">increase:  <code-snippet>(λx.xxx)(λx.xxx) → (λx.xxx)(λx.xxx)(λx.xxx) → (λx.xxx)(λx.xxx)(λx.xxx)(λx.xxx)</code-snippet></p>
-<p indent="1">decrease:  <code-snippet>(λx.xx)(λa.λb.bbb) → (λa.λb.bbb)(λa.λb.bbb) → λb.bbb</code-snippet></p>
+<p indent="1">not change:  <code-snippet>(λx.xx)(λx.xx) → (λx.xx)(λx.xx)
+</code-snippet></p>
+<p indent="1">increase:  <code-snippet>(λx.xxx)(λx.xxx) → (λx.xxx)(λx.xxx)(λx.xxx) → (λx.xxx)(λx.xxx)(λx.xxx)(λx.xxx)
+</code-snippet></p>
+<p indent="1">decrease:  <code-snippet>(λx.xx)(λa.λb.bbb) → (λa.λb.bbb)(λa.λb.bbb) → λb.bbb
+</code-snippet></p>
 <h3>normal form</h3>
 <p indent="0">We say that a lambda expression without redexes (applications of a function to an argument) is in  <b>normal form</b> , and that a lambda expression  <b>has</b> a normal form iff there is some sequence of beta-reductions and/or expansions that leads to a normal form.</p>
-<p indent="0"><code-snippet>(λx.λy.y)((λz.zz)(λz.zz))</code-snippet> . This lambda expression contains two redexes:</p>
+<p indent="0"><code-snippet>(λx.λy.y)((λz.zz)(λz.zz))
+</code-snippet> . This lambda expression contains two redexes:</p>
 <p indent="1">the whole expression</p>
-<p indent="1">the argument itself:  <code-snippet>((λz.zz)(λz.zz))</code-snippet></p>
+<p indent="1">the argument itself:  <code-snippet>((λz.zz)(λz.zz))
+</code-snippet></p>
 <p indent="0">如果我们先对 argument 做 beta reduction 则永远不会得到 norm form 但是如果先对第一个 redex 做则可以</p>
 <p indent="0"><b>leftmost-outermost</b> or  <b>normal-order-reduction (NOR)</b> 能够保证得到 norm form (如果存在的话)</p>
 <p indent="0">Definition: An outermost redex is a redex that is not contained inside another one. (Similarly, an innermost redex is one that has no redexes inside it.)</p>

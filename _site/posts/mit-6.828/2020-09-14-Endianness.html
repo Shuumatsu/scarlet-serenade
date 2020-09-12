@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-09-14-Endianness</title>
+        <link rel="stylesheet" href="../../web/static/main.css" />
+        <script src="../../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../../">Home</a>
+                <a href="../../about.html">About</a>
+                <a href="../../contact.html">Contact</a>
+                <a href="../../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-09-14-Endianness</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">The adjectives big-endian and little-endian refer to which bytes are most significant in multi-byte data types and describe the order in which a sequence of bytes is stored in a computer's memory.</p>
+<p indent="0">For example, consider the number 1025 stored in a 4-byte integer:  <code-snippet>00000000 00000000 00000100 00000001
+</code-snippet></p>
+<p indent="1">- In a big-endian system, the most significant value in the sequence is stored at the lowest storage address (i.e., first). </p>
+<code-snippet indent="2" block="true">address | 00       | 01       | 02       | 03 
+value   | 00000000 | 00000000 | 00000100 | 00000001
+</code-snippet>
+<p indent="1">- In a little-endian system, the least significant value in the sequence is stored first.</p>
+<code-snippet indent="2" block="true">address | 00       | 01       | 02       | 03 
+value   | 00000001 | 00000100 | 00000000 | 00000000
+</code-snippet>
+<p indent="0">Most modern computers, use the little-endian system. Most of the networks, use the big-endian system.</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

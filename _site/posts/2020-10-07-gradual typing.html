@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-10-07-gradual typing</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-10-07-gradual typing</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">the gradual type checker 通过一个用  <code-snippet>?
+</code-snippet> 表示的 unknow type (also called the dynamic type) 来处理 unannotated variables。</p>
+<p indent="0">the gradual type checker 在两个类型间允许 implicit conversion 如果他们  <b>consistent</b> with each other</p>
+<p indent="1">(用  <code-snippet>S ~ T
+</code-snippet> 来表示 S is consistent with T，用  <code-snippet>S !~ T
+</code-snippet> S is not consistent with T</p>
+<p indent="0">1. 对任意类型  <code-snippet>T
+</code-snippet> 有  <code-snippet>? ~ T
+</code-snippet> and  <code-snippet>T ~ ?
+</code-snippet> . 即允许  <code-snippet>?
+</code-snippet> 与任何类型的相互 conversions</p>
+<p indent="0">2. 对任意 basic type  <code-snippet>B
+</code-snippet> , such as int, 有  <code-snippet>B ~ B
+</code-snippet> .</p>
+<p indent="0">3. tuple type  <code-snippet>T1 * T2
+</code-snippet> is consistent with  <code-snippet>S1 * S2
+</code-snippet> if  <code-snippet>T1 ~ S1
+</code-snippet> and  <code-snippet>T2 ~ S2
+</code-snippet> . 这个规则被推广到任意大小的 tuple </p>
+<p indent="0">4. 函数类型  <code-snippet>fun (T1, ..., Tn) =&gt; R)
+</code-snippet> is consistent with  <code-snippet>fun (S1, ..., Sn) =&gt; U)
+</code-snippet> if  <code-snippet>T1 ~ S1, ..., Tn ~ Sn
+</code-snippet> and  <code-snippet>R ~ U
+</code-snippet> .</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

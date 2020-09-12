@@ -91,14 +91,16 @@ Check nil : forall X : Type, list X.
 Check cons : forall X : Type, X -&gt; list X -&gt; list X.
 </code-snippet>
 <p indent="0">要使用多态函数，我们需要为其参数再额外传入一个或更多类型。 例如，前面 repeat 函数体中的递归调用必须传递类型 X。幸运的是，Coq 允许我们避免这种冗余。在任何我们可以写类型参数的地方，我们都可 以将类型参数写为 "洞" _，可以看做是说 "请 Coq 自行找出这里应该填什么。更确切地说，当 Coq 遇到 _ 时，它会尝试  <b>统一 (unify)</b> 所有的局部变量信息， 包括函数应当应用到的类型，其它参数的类型，以及应用函数的上下文中期望的类型， 以此来确定 _ 处应当填入的具体类型。</p>
-<p indent="0">这听起来很像类型标注推断。实际上，这两种个过程依赖于同样的底层机制。我们可以这样写  <code-snippet>repeat' (X : _) (x : _) (count : _) : list X :=</code-snippet></p>
+<p indent="0">这听起来很像类型标注推断。实际上，这两种个过程依赖于同样的底层机制。我们可以这样写  <code-snippet>repeat' (X : _) (x : _) (count : _) : list X :=
+</code-snippet></p>
 <p indent="0">我们甚至可以通过告诉 Coq ' 总是' 推断给定函数的类型参数来在大多数情况下 直接避免写 _。</p>
 <p indent="0">Arguments 用于指令指定函数或构造子的名字并列出其参数名， 花括号中的任何参数都会被视作隐式参数。（如果定义中的某个参数没有名字， 那么它可以用通配模式 _ 来标记。这种情况常见于构造子中。）</p>
 <code-snippet indent="0" block="true">Arguments nil {X}.
 Arguments cons {X} _ _.
 Arguments repeat {X} x count.
 </code-snippet>
-<p indent="0">现在我们完全不用提供类型参数了:  <code-snippet>Definition list123'' := cons 1 (cons 2 (cons 3 nil)).</code-snippet></p>
+<p indent="0">现在我们完全不用提供类型参数了:  <code-snippet>Definition list123'' := cons 1 (cons 2 (cons 3 nil)).
+</code-snippet></p>
 <p indent="0">此外，我们还可以在定义函数时就声明隐式参数， 只需要将某个参数两边的圆括号换成花括号。例如：</p>
 <code-snippet indent="0" block="true">Fixpoint repeat''' {X : Type} (x : X) (count : nat) : list X :=
   match count with
@@ -106,7 +108,8 @@ Arguments repeat {X} x count.
   | S count' ⇒ cons x (repeat''' x count')
   end.
 </code-snippet>
-<p indent="0">（注意我们现在甚至不必在  <code-snippet>repeat'''</code-snippet> 的递归调用中提供类型参数了， 实际上提供了反而是无效的，因为 Coq 并不想要它。）</p>
+<p indent="0">（注意我们现在甚至不必在  <code-snippet>repeat'''
+</code-snippet> 的递归调用中提供类型参数了， 实际上提供了反而是无效的，因为 Coq 并不想要它。）</p>
 <p indent="0">此外，我们还可以在函数名前加上前缀 @ 来强制将隐式参数变成显式的：</p>
 <code-snippet indent="0" block="true">Check @nil : forall X : Type, list X.
 Definition mynil' := @nil nat.
@@ -132,7 +135,9 @@ Definition mynil' := @nil nat.
 <code-snippet indent="0" block="true">Check @eq : forall A : Type, A -&gt; A -&gt; Prop.
 </code-snippet>
 <p indent="0">（注意我们写的是 @eq 而非 eq：eq 的类型参数 A 是隐式声明的，因此我们需要关掉隐式参数的类型推断以便看到 eq 的完整类型。）</p>
-<p indent="0">Coq 将  <code-snippet>¬ P</code-snippet> 定义为  <code-snippet>P -> False</code-snippet> ，而 False 是在标准库中特别定义的矛盾性命题。</p>
+<p indent="0">Coq 将  <code-snippet>¬ P
+</code-snippet> 定义为  <code-snippet>P -&gt; False
+</code-snippet> ，而 False 是在标准库中特别定义的矛盾性命题。</p>
 <p indent="0">除 False 外，Coq 的标准库中还定义了 True，一个明显真的命题。 为了证明它，我们使用了预定义的常量 I : True：</p>
 <code-snippet indent="0" block="true">Lemma True_is_true : True.
 Proof. apply I. Qed.
@@ -217,25 +222,43 @@ Qed.
 | ev_0 : ev 0
 | ev_SS (n : nat) (H : ev n) : ev (S (S n)).
 </code-snippet>
-<p indent="0">在 Coq 中，我们可以认为  <code-snippet>ev</code-snippet> 定义了一个性质  <code-snippet>ev : nat -> Prop</code-snippet> ，其包括 "证据构造子"  <code-snippet>ev_0 : ev 0</code-snippet> 和  <code-snippet>ev_SS : forall n, ev n -> ev (S (S n))</code-snippet> 。这些 “证据构造子” 等同于已经证明过的定理。 具体来说，我们可以使用 Coq 中的  <code-snippet>apply</code-snippet> 策略和规则名称来证明某个数的  <code-snippet>ev</code-snippet> 性质</p>
+<p indent="0">在 Coq 中，我们可以认为  <code-snippet>ev
+</code-snippet> 定义了一个性质  <code-snippet>ev : nat -&gt; Prop
+</code-snippet> ，其包括 "证据构造子"  <code-snippet>ev_0 : ev 0
+</code-snippet> 和  <code-snippet>ev_SS : forall n, ev n -&gt; ev (S (S n))
+</code-snippet> 。这些 “证据构造子” 等同于已经证明过的定理。 具体来说，我们可以使用 Coq 中的  <code-snippet>apply
+</code-snippet> 策略和规则名称来证明某个数的  <code-snippet>ev
+</code-snippet> 性质</p>
 <code-snippet indent="0" block="true">Theorem ev_4 : ev 4.
 Proof. apply ev_SS. apply ev_SS. apply ev_0. Qed.
 </code-snippet>
-<p indent="0">在  <code-snippet>Inductive</code-snippet> 定义中，类型构造子冒号左侧的参数叫做形参（Parameter）， 而右侧的叫做索引（Index）或注解（Annotation）。</p>
-<p indent="0"><code-snippet>ev</code-snippet> 中的  <code-snippet>nat</code-snippet> 参数出现在冒号'右侧'，这允许在不同的构造子类型中使用不同的值：例如  <code-snippet>ev_0</code-snippet> 类型中的  <code-snippet>0</code-snippet> 以及  <code-snippet>ev_SS</code-snippet> 类型中的  <code-snippet>S (S n)</code-snippet> 。与此相应， 每个构造子的类型必须在冒号后显式指定</p>
-<p indent="0">对比  <code-snippet>list</code-snippet> 的定义</p>
+<p indent="0">在  <code-snippet>Inductive
+</code-snippet> 定义中，类型构造子冒号左侧的参数叫做形参（Parameter）， 而右侧的叫做索引（Index）或注解（Annotation）。</p>
+<p indent="0"><code-snippet>ev
+</code-snippet> 中的  <code-snippet>nat
+</code-snippet> 参数出现在冒号'右侧'，这允许在不同的构造子类型中使用不同的值：例如  <code-snippet>ev_0
+</code-snippet> 类型中的  <code-snippet>0
+</code-snippet> 以及  <code-snippet>ev_SS
+</code-snippet> 类型中的  <code-snippet>S (S n)
+</code-snippet> 。与此相应， 每个构造子的类型必须在冒号后显式指定</p>
+<p indent="0">对比  <code-snippet>list
+</code-snippet> 的定义</p>
 <code-snippet indent="0" block="true">Inductive list (X:Type) : Type :=
     | nil
     | cons (x : X) (l : list X).
 </code-snippet>
-<p indent="0">它以'全局的方式'在冒号'左侧' 引入了参数 X， 强迫 nil 和 cons 的结果为同一个类型（list X）。如果在定义  <code-snippet>ev</code-snippet> 时将  <code-snippet>nat</code-snippet> 置于冒号左侧，就会得到如下错误：</p>
+<p indent="0">它以'全局的方式'在冒号'左侧' 引入了参数 X， 强迫 nil 和 cons 的结果为同一个类型（list X）。如果在定义  <code-snippet>ev
+</code-snippet> 时将  <code-snippet>nat
+</code-snippet> 置于冒号左侧，就会得到如下错误：</p>
 <code-snippet indent="0" block="true">Fail Inductive wrong_ev (n : nat) : Prop :=
 | wrong_ev_0 : wrong_ev 0
 | wrong_ev_SS (H: wrong_ev n) : wrong_ev (S (S n)).
 (* ===&gt; Error: Last occurrence of &quot;wrong_ev&quot; must have &quot;n&quot;
         as 1st argument in &quot;wrong_ev 0&quot;. *)
 </code-snippet>
-<p indent="0"><code-snippet>wrong_ev_0</code-snippet> 与  <code-snippet>wrong_ev_SS</code-snippet> 的类型不一致，前者是 wrong_ev 0 而后者不是。</p>
+<p indent="0"><code-snippet>wrong_ev_0
+</code-snippet> 与  <code-snippet>wrong_ev_SS
+</code-snippet> 的类型不一致，前者是 wrong_ev 0 而后者不是。</p>
 <h4>Inversion on Evidence</h4>
 <p indent="0">对于这类证据使用' 归纳（induction）' 和' 分类讨论（case analysis）' 来进行论证是可行的。</p>
 <p indent="0">用 destruct 解构证据即可证明下述定理（这就是对证明进行反演）：</p>
@@ -259,7 +282,13 @@ Proof.
 Abort.
 </code-snippet>
 <p indent="0">直观来说，我们知道支撑前提的证据不会由 ev_0 组成，因为 0 和 S 是 nat 类型不同的构造子；由此 ev_SS 是唯一需要应对的情况（译注：ev_0 无条件成立）。 不幸的是，destruct 并没有如此智能，它仍然为我们生成两个子目标。</p>
-<p indent="0">这里  <code-snippet>destruct E</code-snippet> 之后， <code-snippet>ev (S (S n))</code-snippet> 中的  <code-snippet>S (S n)</code-snippet> 在假设中被"忘记"了，并为  <code-snippet>ev_0</code-snippet> 的情况生成了子目标，如果我们记住  <code-snippet>S (S n)</code-snippet> 的话就可以利用爆炸原理  <code-snippet>0 = S (S n)</code-snippet> 证得该子目标：</p>
+<p indent="0">这里  <code-snippet>destruct E
+</code-snippet> 之后， <code-snippet>ev (S (S n))
+</code-snippet> 中的  <code-snippet>S (S n)
+</code-snippet> 在假设中被"忘记"了，并为  <code-snippet>ev_0
+</code-snippet> 的情况生成了子目标，如果我们记住  <code-snippet>S (S n)
+</code-snippet> 的话就可以利用爆炸原理  <code-snippet>0 = S (S n)
+</code-snippet> 证得该子目标：</p>
 <code-snippet indent="0" block="true">Theorem evSS_ev_remember : ∀ n,
   ev (S (S n)) → ev n.
 Proof.
@@ -282,15 +311,27 @@ Proof. intros n H. apply ev_inversion in H. destruct H.
    rewrite Heq. apply Hev.
 Qed.
 </code-snippet>
-<p indent="0"><code-snippet>inversion</code-snippet> 的工作原理大致如下：</p>
-<p indent="1">- 接受一个前提  <code-snippet>H</code-snippet> ，该前提的类型  <code-snippet>P</code-snippet> 是通过归纳定义的，以及</p>
-<p indent="1">- 对于  <code-snippet>P</code-snippet> 的定义里的每一个构造子  <code-snippet>C</code-snippet> ，</p>
-<p indent="2">- 产生一个新的子目标，在该子目标中我们假设  <code-snippet>H</code-snippet> 是通过  <code-snippet>C</code-snippet> 构造的，</p>
-<p indent="2">- 作为额外的假设，在子目标的上下文中增加  <code-snippet>C</code-snippet> 的论据（前提），</p>
-<p indent="2">- 将  <code-snippet>C</code-snippet> 的结论（结果类型）与当前的目标相匹配，计算出为了能够应用  <code-snippet>C</code-snippet> 而必须成立的一些相等关系，将这些相等关系加入上下文中（以及，为了方便，在目标中替换它们），以及</p>
+<p indent="0"><code-snippet>inversion
+</code-snippet> 的工作原理大致如下：</p>
+<p indent="1">- 接受一个前提  <code-snippet>H
+</code-snippet> ，该前提的类型  <code-snippet>P
+</code-snippet> 是通过归纳定义的，以及</p>
+<p indent="1">- 对于  <code-snippet>P
+</code-snippet> 的定义里的每一个构造子  <code-snippet>C
+</code-snippet> ，</p>
+<p indent="2">- 产生一个新的子目标，在该子目标中我们假设  <code-snippet>H
+</code-snippet> 是通过  <code-snippet>C
+</code-snippet> 构造的，</p>
+<p indent="2">- 作为额外的假设，在子目标的上下文中增加  <code-snippet>C
+</code-snippet> 的论据（前提），</p>
+<p indent="2">- 将  <code-snippet>C
+</code-snippet> 的结论（结果类型）与当前的目标相匹配，计算出为了能够应用  <code-snippet>C
+</code-snippet> 而必须成立的一些相等关系，将这些相等关系加入上下文中（以及，为了方便，在目标中替换它们），以及</p>
 <p indent="2">- 如果这些相等关系无法满足（例如，它们涉及到 S n = O），那么立即解决这个子目标。</p>
 <h4>Induction on Evidence</h4>
-<p indent="0">我们可以用  <code-snippet>destruct</code-snippet> 进行分类讨论，同样我们也可以用  <code-snippet>induction</code-snippet> 进行归纳</p>
+<p indent="0">我们可以用  <code-snippet>destruct
+</code-snippet> 进行分类讨论，同样我们也可以用  <code-snippet>induction
+</code-snippet> 进行归纳</p>
 <h4>Inductive Relations</h4>
 <p indent="0">我们可以认为被一个数所参数化的命题（比如 ev）是一个' 性质'，也即， 它定义了 nat　的一个子集，其中的数可以被证明满足此命题。 以同样的方式，我们可认为有两个参数的命题是一个' 关系'，也即，它定义了一个 可满足此命题的序对集合。</p>
 <h4>remember tactics</h4>
@@ -306,18 +347,29 @@ Qed.
   | ev_0 : ev 0
   | ev_SS : forall n, ev n -&gt; ev (S (S n)).
 </code-snippet>
-<p indent="0"><code-snippet>ev</code-snippet> 定义中第二行的  <code-snippet>ev_0 : ev 0</code-snippet> 可以读作 “ev_0 是 ev 0 的证明” 也可以读作 “ev_0 的类型为 ev 0”。</p>
-<p indent="0"><code-snippet>Check ev_SS : forall n, ev n -> ev (S (S n)).</code-snippet> 可以将其读作 “ev_SS 构造子接受两个参数 —— 数字 n 以及命题 ev n 的证明 —— 并产生 ev (S (S n)) 的证明。”</p>
+<p indent="0"><code-snippet>ev
+</code-snippet> 定义中第二行的  <code-snippet>ev_0 : ev 0
+</code-snippet> 可以读作 “ev_0 是 ev 0 的证明” 也可以读作 “ev_0 的类型为 ev 0”。</p>
+<p indent="0"><code-snippet>Check ev_SS : forall n, ev n -&gt; ev (S (S n)).
+</code-snippet> 可以将其读作 “ev_SS 构造子接受两个参数 —— 数字 n 以及命题 ev n 的证明 —— 并产生 ev (S (S n)) 的证明。”</p>
 <p indent="0">既在类型层面表达 “具有……类型”，又在命题层面表示 “是……的证明”。 这种双关称为' 柯里 - 霍华德同构（Curry-Howard correspondence）'。 </p>
 <br />
-<p indent="0">有关  <code-snippet>ev</code-snippet> 的一个证明,  <code-snippet>Theorem ev_4 : ev 4. Proof. apply ev_SS. apply ev_SS. apply ev_0. Qed.</code-snippet> 产生了一个  <b>'证据对象' (proof object)</b></p>
-<p indent="0">实际上，我们也可以不借助脚本 '直接' 写出表达式作为证明。 <code-snippet>Check (ev_SS 2 (ev_SS 0 ev_0)) : ev 4.</code-snippet></p>
+<p indent="0">有关  <code-snippet>ev
+</code-snippet> 的一个证明,  <code-snippet>Theorem ev_4 : ev 4. Proof. apply ev_SS. apply ev_SS. apply ev_0. Qed.
+</code-snippet> 产生了一个  <b>'证据对象' (proof object)</b></p>
+<p indent="0">实际上，我们也可以不借助脚本 '直接' 写出表达式作为证明。 <code-snippet>Check (ev_SS 2 (ev_SS 0 ev_0)) : ev 4.
+</code-snippet></p>
 <br />
 <p indent="0">在 Coq 的计算世界里（即所有的数据结构和程序存在的地方），有两种值的 类型中拥有箭头：一种是' 构造子 (Constructor)'，它通过归纳地定义数据类型 引入，另一种是' 函数 (Function)'。</p>
 <p indent="0">类似地，在 Coq 的逻辑世界里（即我们运用证明的地方），有两种方式来给 与蕴含式需要的证据：构造子，通过归纳地定义命题引入，和函数</p>
-<p indent="1">考虑下列陈述： <code-snippet>Theorem ev_plus4 : forall n, ev n → ev (4 + n).</code-snippet> 我们在寻找一个 '类型 (Type)' 是  <code-snippet>forall n, ev n -> ev (4 + n)</code-snippet> 的表达式 —— 也 就是说，一个接受两个参数（一个数字和一个证据）并返回一个证据的 ' 函数 (Function)'</p>
+<p indent="1">考虑下列陈述： <code-snippet>Theorem ev_plus4 : forall n, ev n → ev (4 + n).
+</code-snippet> 我们在寻找一个 '类型 (Type)' 是  <code-snippet>forall n, ev n -&gt; ev (4 + n)
+</code-snippet> 的表达式 —— 也 就是说，一个接受两个参数（一个数字和一个证据）并返回一个证据的 ' 函数 (Function)'</p>
 <br />
-<p indent="0">到蕴含式（->）和量化（∀）都表示证据上的函数。事实上，他们 是同一个东西：当我们使用  <code-snippet>∀</code-snippet> 时没有依赖，就可以简写为当  <code-snippet>-></code-snippet> 。即，我们没有必要给与箭头左边的类型一个名字： <code-snippet>forall (x:nat), nat = forall (_: nat), nat = nat -> nat</code-snippet></p>
+<p indent="0">到蕴含式（->）和量化（∀）都表示证据上的函数。事实上，他们 是同一个东西：当我们使用  <code-snippet>∀
+</code-snippet> 时没有依赖，就可以简写为当  <code-snippet>-&gt;
+</code-snippet> 。即，我们没有必要给与箭头左边的类型一个名字： <code-snippet>forall (x:nat), nat = forall (_: nat), nat = nat -&gt; nat
+</code-snippet></p>
 <p indent="0">总的来说，"P -> Q"只是"forall (_:P), Q" 的语法糖。</p>
 <code-snippet indent="0" block="true">Definition conj_fact : forall P Q R, P /\ Q -&gt; Q /\ R -&gt; P /\ R := 
   fun P Q R (H1: P /\ Q) (H2: Q /\ R) =&gt; match H1 with 
@@ -366,7 +418,12 @@ Qed.
 <p indent="1">- 若 c 不接受参数，该情况为 </p>
 <p indent="2">P 对 c 成立</p>
 <p indent="1">- 若 c 接受参数 x1:a1 ... xn:an，该情况为：</p>
-<p indent="2">对于所有的  <code-snippet>x1:a1 ... xn:an</code-snippet> ，若  <code-snippet>P</code-snippet> 对每个类型为  <code-snippet>t</code-snippet> 的参数都成立，则  <code-snippet>P</code-snippet> 对于  <code-snippet>c x1 ... xn</code-snippet> 成立</p>
+<p indent="2">对于所有的  <code-snippet>x1:a1 ... xn:an
+</code-snippet> ，若  <code-snippet>P
+</code-snippet> 对每个类型为  <code-snippet>t
+</code-snippet> 的参数都成立，则  <code-snippet>P
+</code-snippet> 对于  <code-snippet>c x1 ... xn
+</code-snippet> 成立</p>
 <p indent="0">例如对归纳定义的自然数和多态列表</p>
 <code-snippet indent="0" block="true">Check nat_ind.
 (* ===&gt;
@@ -399,7 +456,10 @@ Check list_ind.
                 | S n0 =&gt; f0 n0 (F n0)
             end.
 </code-snippet>
-<p indent="0">We can adapt this approach to proving nat_ind to help prove non-standard induction principles too. 例如证明  <code-snippet>Lemma evenb_ev : ∀ n: nat, evenb n = true -> ev n.</code-snippet> 时，偶数是两个一跳的，对  <code-snippet>n</code-snippet> 进行归纳对于  <code-snippet>evenb</code-snippet> 并没有多大作用。Attempts to prove this by standard induction on n fail in the case for S (S n), because the induction hypothesis only tells us something about S n, which is useless.</p>
+<p indent="0">We can adapt this approach to proving nat_ind to help prove non-standard induction principles too. 例如证明  <code-snippet>Lemma evenb_ev : ∀ n: nat, evenb n = true -&gt; ev n.
+</code-snippet> 时，偶数是两个一跳的，对  <code-snippet>n
+</code-snippet> 进行归纳对于  <code-snippet>evenb
+</code-snippet> 并没有多大作用。Attempts to prove this by standard induction on n fail in the case for S (S n), because the induction hypothesis only tells us something about S n, which is useless.</p>
 <p indent="0">But we can make a much better proof by defining and proving a non-standard induction principle that goes "by twos":</p>
 <code-snippet indent="0" block="true">Definition nat_ind2 : forall (P : nat -&gt; Prop),
     P 0 -&gt;
@@ -431,7 +491,9 @@ Proof.
         - simpl in H. apply ev_SS. apply IHn'. apply H.
 Qed.
 </code-snippet>
-<p indent="0">Coq 也为归纳定义的'命题'生成归纳法则，例如我们要对具有性质  <code-snippet>even</code-snippet> 的自然数归纳证明证明  <code-snippet>P</code-snippet></p>
+<p indent="0">Coq 也为归纳定义的'命题'生成归纳法则，例如我们要对具有性质  <code-snippet>even
+</code-snippet> 的自然数归纳证明证明  <code-snippet>P
+</code-snippet></p>
 <code-snippet indent="0" block="true">Inductive even : nat -&gt; Prop :=
     | ev_0 : even 0
     | ev_SS (n : nat) : even n -&gt; even (S (S n)).

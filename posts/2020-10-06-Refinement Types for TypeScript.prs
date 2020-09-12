@@ -1,0 +1,19 @@
+Our design of RSC addresses three intertwined problems by carefully integrating and extending existing ideas from the literature. 
+- 1. RSC accounts for mutation by using ideas from IGJ [39] to track which fields may be mutated, and to allow refinements to depend on immutable fields, and by using SSA-form to recover path and flow-sensitivity that is essential for analyzing real world applications. 
+- 2. RSC accounts for dynamic typing by using a recently proposed technique called two-phase typing [36], where dynamic behaviors are specified via union and intersection types, and verified by reduction to refinement typing.
+- 3. Third, the above are carefully designed to permit refinement inference via the Liquid Types [26] framework to render refinement typing practical on real world programs. Concretely, we make the following contributions:
+
+Contributions:
+- \-  develop a core calculus that formalizes the interaction of mutability and refinements via declarative refinement type checking that we prove sound 
+- \- 
+- \-
+
+$\operatorname{type} idx<a> = \{ v : nat | v \lt len(a) \}$
+
+$(x: \text { nat }) \Rightarrow\{v: \text { nat } \mid x<v\}$ is a function type that describes functions that require a non-negative input, and ensure that the output exceeds the input.
+
+The signature of array reduce function, $<A, B>(a: A[], f:(B, A, idx<a>) \Rightarrow B, x: B) \Rightarrow B$, specifies that the callback f is only invoked on valid indices for the array a being reduced.
+
+
+
+Next, we show how refinement types let programmers **specify** and statically **verify** a variety of properties — array safety, reflection (value-based overloading), and down-casts — potential sources of runtime problems that cannot be prevented via existing techniques.

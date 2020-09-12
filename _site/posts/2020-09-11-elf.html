@@ -55,7 +55,7 @@
         <!-- <section class="header"></section> -->
         <section><bq><a href="https://github.com/torvalds/linux/blob/master/include/uapi/linux/elf.h">https://github.com/torvalds/linux/blob/master/include/uapi/linux/elf.h</a></bq>
 <img style="width: 100%" src="https://upload.wikimedia.org/wikipedia/commons/e/e4/ELF_Executable_and_Linkable_Format_diagram_by_Ange_Albertini.png" />
-<p indent="0">ELF 可用来记录 object file、executable file、share object、与 core dump 等格式。为了支援连结与执行等两种时期的不同用途，ELF 格式可以分为两种不同观点，</p>
+<p indent="0">Executable and Linking Format 可用来记录 object file、executable file、share object、与 core dump 等格式。为了支援连结与执行等两种时期的不同用途，ELF 格式可以分为两种不同观点，</p>
 <p indent="1">- 第一种是  <b>Linking View</b> 。在连结时期，是以分区 (Section) 为主的结构</p>
 <p indent="1">- 第二种是  <b>(Execution View)</b> 。在执行时期，是以分段 (Segment) 为主的结构</p>
 <code-snippet indent="0" block="true">Linking View:                           Execution View
@@ -81,6 +81,8 @@
 |     (elf64_shdr[]               |     |     (elf64_shdr[]               |
 -----------------------------------     -----------------------------------
 </code-snippet>
+<p indent="0">虽然上图中 the program header table immediately after the ELF header, and the section header table following the sections，实际上 sections and segments have no specified order。</p>
+<br />
 <code-snippet indent="0" block="true">typedef struct elf64_hdr {
     unsigned char e_ident[EI_NIDENT]; // ELF &quot;magic number&quot; 
     Elf64_Half e_type;                // Object file type
@@ -98,7 +100,9 @@
     Elf64_Half e_shstrndx;            // Section header string table index
 } Elf64_Ehdr;
 </code-snippet>
-<p indent="0">Section Header Table 记录了各分区的基本资讯，包含分区起始位址等，因此可以透过分区表头读取各分区</p>
+<h3>Sections</h3>
+<p indent="0">Section Header Table 记录了各分区的基本资讯，包含分区起始位址等，因此可以透过分区表头读取各分区. Every section has an entry in the table; each entry gives information such as the section name,the section size, and so on.</p>
+<p indent="0">Sections hold the bulk of object file information for the linking view: instructions, data, symbol table, relocation information, and so on. </p>
 <code-snippet indent="0" block="true">typedef struct elf64_shdr {
     Elf64_Word sh_name;        /* Section name, index in string tbl */
     Elf64_Word sh_type;        /* Type of section */
@@ -112,6 +116,37 @@
     Elf64_Xword sh_entsize;    /* Entry size if section holds table */
 } Elf64_Shdr;
 </code-snippet>
+<h4>String Table Section</h4>
+<p indent="0">String table sections hold null-terminated character sequences, commonly called strings. </p>
+<p indent="0">An empty string table section is permitted, in this case its section header's sh_size member would contain zero.</p>
+<p indent="0">An non-empty string table section's first byte, which is index zero, is defined to hold a null character. Likewise, a string table's last byte is defined to hold a null character, ensuring null termination for all strings.</p>
+<p indent="0">One references a string as an index into the string table section. The following figures show a string table with 25 bytes and the strings associated with various indexes.</p>
+<code-snippet indent="0" block="true">| Index |  0  | 1 | 2 | 3 |
+|---------------------------------------
+|       |  \0 |  a  b
+|Index | +0 | +1 | +2 | +3 | +4 | +5 | +6 | +7 | +8 | +9 |
+| 0    | \0 | n  | a  | m  | e  | .  | \0 | V  | a  | r  |
+| 10   | i  | a  | b  | l  | e  | \0 | a  | b  | l  | e  |
+| 20   | \0 | \0 | x  | x  | \0 |
+</code-snippet>
+<p indent="0">As the example shows, </p>
+<p indent="1">- a string table index may refer to any byte in the section.</p>
+<p indent="1">- A string may appear more than once</p>
+<p indent="1">- references to substrings may exist</p>
+<h4>Symbol Table </h4>
+<p indent="0">An object file's symbol table holds information needed to locate and relocate a program's symbolic definitions and references.</p>
+<p indent="0">Index 0 both designates the first entry in the table and serves as the undefined symbol index. </p>
+<code-snippet indent="0" block="true">// symbol table entry:
+typedef struct elf64_sym {
+    Elf64_Word st_name;         /* Symbol name, holds an index into the in string tbl */
+    unsigned char st_info;      /* Type and binding attributes */
+    unsigned char st_other;     /* holds 0 and has no defined meaning */
+    Elf64_Half st_shndx;        /* Associated section index */
+    Elf64_Addr st_value;        /* Value of the symbol */
+    Elf64_Xword st_size;        /* Associated symbol size, holds 0 if the symbol has no size or an unknown size. */
+} Elf64_Sym;
+</code-snippet>
+<h3>Segments</h3>
 <p indent="0">Program Header Table 记载了分段资讯，因此也可称为 Segment Header Table。The program header table tells the system how to create a process image.</p>
 <code-snippet indent="0" block="true">typedef struct elf64_phdr {
     Elf64_Word p_type;          /* Identifies the type of the segment. */
@@ -122,7 +157,7 @@
     Elf64_Xword p_filesz;       /* Segment size in file */
     Elf64_Xword p_memsz;        /* Segment size in memory /
     Elf64_Xword p_align;        /* Segment alignment, file &amp; memory */
-} Elf64_Phdr;
+} Elf64_Phdr;54
 </code-snippet></section>
     </article>
 </main>

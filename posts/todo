@@ -1,0 +1,44 @@
+关于类型系统的最简基础概述——type systems
+https://zhuanlan.zhihu.com/p/55926585
+
+Type systems
+http://gallium.inria.fr/research-types.html
+
+rp
+file:///C:/Users/Vanis/Documents/Tencent%20Files/1404931815/FileRecv/GraduateMScResearchProposalTemplate.pdf
+
+rust Academic Research
+https://doc.rust-lang.org/1.2.0/book/academic-research.html
+
+gradual typing 
+https://thzt.github.io/2018/05/31/gradual-typing/
+
+
+flowjs type system
+https://flow.org/en/docs/lang/
+
+typescript type system
+https://lucifer.ren/blog/2020/08/15/ts-type-system/
+
+Typescript Tips: 动态重载实现廉价版dependent type
+https://zhuanlan.zhihu.com/p/95829351
+
+typescript-dependent-types
+https://www.javiercasas.com/articles/typescript-dependent-types
+
+liquid haskell
+https://ucsd-progsys.github.io/liquidhaskell-blog/about.html
+
+Dependent type systems as macros
+https://dl.acm.org/doi/10.1145/3371071
+
+Implement partial type argument inference using the _ sigil 
+https://github.com/Microsoft/TypeScript/pull/26349
+
+程序验证（七）：可满足性模理论(Satisfiability Modulo Theories)
+https://blog.csdn.net/swy_swy_swy/article/details/106675816
+
+DECISION PROCEDURES
+FOR
+BIT-VECTORS, ARRAYS AND INTEGERS
+https://ece.uwaterloo.ca/~vganesh/Publications_files/vg2007-PhD-STANFORD.pdf

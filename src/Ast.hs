@@ -45,8 +45,8 @@ data SentenceComponent = SText Text | SCode Text | SEquation Text | SBold Text
 
 instance Show SentenceComponent where
   show (SText t) = T.unpack t
-  show (SCode t) = printf "<code-snippet>%s</code-snippet>" (T.unpack t)
-  show (SEquation t) = printf "<mathjax-panel>%s</mathjax-panel>" (T.unpack t)
+  show (SCode t) = printf "<code-snippet>%s</code-snippet>" (renderHtml . toHtml . text $ t)
+  show (SEquation t) = printf "<mathjax-panel>%s</mathjax-panel>" (renderHtml . toHtml . text $ t)
   show (SBold t) = printf "<b>%s</b>" (T.unpack t)
 
 data Element

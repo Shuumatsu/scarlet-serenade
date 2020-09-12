@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-10-10-Polymorphic recursion</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-10-10-Polymorphic recursion</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">Type inference for polymorphic recursion is undecidable, 这意味着即使一个 function 是 well-typed，编译器也无法推导出其类型</p>
+<p indent="0">For example:</p>
+<code-snippet indent="0" block="true">data Nested a = Cons a (Nested [a]) | Epsilon
+
+length' Epsilon = 0
+length' (Cons _ rest) = 1 + length' rest
+</code-snippet>
+<p indent="0">会产生一个 type error，因为 length 被应用到了两个不同的类型上  <code-snippet>Nested a
+</code-snippet> and  <code-snippet>Nested [a]
+</code-snippet> .</p>
+<p indent="0">The solution is to assert that the type is indeed  <code-snippet>Nested a -&gt; Int
+</code-snippet> .</p>
+<code-snippet indent="0" block="true">length' :: Nested a -&gt; Int
+length' Epsilon = 0
+length' (Cons _ rest) = 1 + length' rest
+</code-snippet>
+<bq>https://stackoverflow.com/questions/40247339/polymorphic-recursion-syntax-and-uses</bq></section>
+    </article>
+</main>
+
+    </body>
+</html>

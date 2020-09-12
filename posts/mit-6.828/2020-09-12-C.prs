@@ -1,0 +1,75 @@
+https://courses.cs.washington.edu/courses/cse351/16wi/sections/1/Cheatsheet-c.pdf
+
+:br
+
+:h3 file 
+
+Code for execution goes into files with ".c" suffix. 
+Shared decl's (included using #include "mylib.h") in “header” files, end in “.h”
+
+:h3 Casting
+
+```
+int a = (int) 3.131; // assigns a=3
+double b = 3.131;
+int a = *(int*)&b; // interprets the double b as an integer (not necessarily 3)
+```
+
+:h3 Pointers & Array
+
+一个指针是包含某个地址的一个变量。
+Note that a pointer is constrained to point to a particular kind of object: every pointer points to a specific data type. 
+- (There is one exception: a pointer to `void` is used to hold any type of pointer but cannot be dereferenced itself. 
+- C 保证 0 永远不是一个有效的地址，所以一个 0 的返回值可以用来 signal an abnormal event。
+
+:br
+
+通过一元运算符 `&` 可以得到一个内存中的对象的地址（variables and array elements
+- 语句 `p = &c;` 将 `c` 的地址赋予了变量 `p`，此时 `p` 被称作 `c` 的指针。
+当将一元运算符 `*` 应用到一个指针上时，it accesses the object the pointer points to. 
+- The declaration of the pointer, `int *ip;` is intended as a mnemonic; it says that the expression `*ip` is an int. 
+
+:br
+
+e.g., `double *dp, atof(char *);` 表示 `*dp` 与 `atof(s)` 有着 double 类型的值，并且 `atof` 的参数是一个指向 char 的指针
+
+:h4 Array
+
+`a[i]` 可以写作 `*(a+i)`. 一个 array name 通常可被看作一个指针使用。不过有一点区别是，一个指针是一个变量，所以 `pa = arr_name` and `pa++` 是合法的。但是 array name 并不是，所以 `arr_name = pa` and `arr_name++` 这样的不合法。
+
+当一个 array name 作为参数传递到一个函数，实际上是传递了数组首元素的地址。在被调用的函数中，这个参数是一个指针局部变量。
+可以基于这个事实写出另一个版本的 `strlen`：
+```
+int strlen(char* s) {
+    int n;
+    for (n = 0; *s != '\0'; s++) { n++; };
+    return n;
+}
+```
+基于同样的理由，也可以将一个子数组作为指针传递给函数，比如 `f(&arr[2])` or `f(arr + 2)`
+
+:br
+
+`p[-1], p[-2]` 这样的表达式都是合法的, 并且指向 `p[0]` 前相应距离的元素。
+```
+int main() {
+    int val = -1;
+    printf("%d\n", &val);
+    // -44822660
+    int arr[10];
+    printf("%d %d %d\n", arr - 1, arr[-1], *(arr - 1));
+    // -44822660 -1 -1
+}
+```
+
+:h4 String
+
+C 语言没有直接的字符串类型支持，在 C 中，一个字符串是一个由 '\0' 结尾的 char 类型的数组。
+
+:h4 Pointers to Functions
+
+需要注意括号与星号的位置：
+```
+int* func_returns_int_pointer(void*, void*);
+int (*func_pointer_returns_int)(void*, void*);
+```

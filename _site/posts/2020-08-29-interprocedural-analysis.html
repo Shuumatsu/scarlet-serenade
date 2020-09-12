@@ -71,21 +71,36 @@
 <p indent="1">- # target methods: >= 1</p>
 <p indent="1">- determinacy: runtime</p></ul>
 <p indent="0">During run-time, a virtual call is resolved based on</p>
-<p indent="1">1. type of the receiver object:  <code-snippet>c</code-snippet></p>
-<p indent="1">2. method signature at the call site:  <code-snippet>m</code-snippet></p>
+<p indent="1">1. type of the receiver object:  <code-snippet>c
+</code-snippet></p>
+<p indent="1">2. method signature at the call site:  <code-snippet>m
+</code-snippet></p>
 <p indent="2">(signature = class type + method name + descriptor</p>
 <p indent="2">(descriptor = return type + parameter types</p>
-<p indent="0">We define a function  <code-snippet>dispatch(c, m)</code-snippet> to simulate the procedure of run-time method dispatch</p>
-<p indent="1">-  <code-snippet>m'</code-snippet> : if  <code-snippet>c</code-snippet> contains non-abstract method  <code-snippet>m'</code-snippet> that has the same name and descriptor</p>
-<p indent="1">-  <code-snippet>dispatch(c', m)</code-snippet> where  <code-snippet>c'</code-snippet> is a superclass of  <code-snippet>c</code-snippet> : otherwise</p>
-<p indent="0">e.g. consider  <code-snippet>dispatch(B, A.foo)</code-snippet> with the following classes.</p>
+<p indent="0">We define a function  <code-snippet>dispatch(c, m)
+</code-snippet> to simulate the procedure of run-time method dispatch</p>
+<p indent="1">-  <code-snippet>m'
+</code-snippet> : if  <code-snippet>c
+</code-snippet> contains non-abstract method  <code-snippet>m'
+</code-snippet> that has the same name and descriptor</p>
+<p indent="1">-  <code-snippet>dispatch(c', m)
+</code-snippet> where  <code-snippet>c'
+</code-snippet> is a superclass of  <code-snippet>c
+</code-snippet> : otherwise</p>
+<p indent="0">e.g. consider  <code-snippet>dispatch(B, A.foo)
+</code-snippet> with the following classes.</p>
 <code-snippet indent="0" block="true">class A { void foo() {} }
 class B extends A {}
 </code-snippet>
-<p indent="0">here  <code-snippet>A.</code-snippet> is not considered according to rule 1. and B has no mathed method, so we go to its superclass  <code-snippet>dispatch(A, A.foo()) == A.foo()</code-snippet></p>
+<p indent="0">here  <code-snippet>A.
+</code-snippet> is not considered according to rule 1. and B has no mathed method, so we go to its superclass  <code-snippet>dispatch(A, A.foo()) == A.foo()
+</code-snippet></p>
 <h4>Call Resolution of CHA</h4>
-<p indent="0">Resolve a virtual call based on the declared type of receiver variable of the call site  <code-snippet>A a = ...; a.foo();</code-snippet></p>
-<p indent="1">the receiver variable a may point to objects of class  <code-snippet>A</code-snippet> and all subclasses of  <code-snippet>A</code-snippet></p>
+<p indent="0">Resolve a virtual call based on the declared type of receiver variable of the call site  <code-snippet>A a = ...; a.foo();
+</code-snippet></p>
+<p indent="1">the receiver variable a may point to objects of class  <code-snippet>A
+</code-snippet> and all subclasses of  <code-snippet>A
+</code-snippet></p>
 <code-snippet indent="0" block="true">resolve(cs) // I think it's call site...
     m = method signature at cs 
     if cs is a static call then:
@@ -99,7 +114,10 @@ class B extends A {}
 </code-snippet>
 <h4>Call Graph Construction</h4>
 <p indent="0">1. start from entry methods </p>
-<p indent="0">2. for each reachable method  <code-snippet>m</code-snippet> , resolve target methods for each call site  <code-snippet>cs</code-snippet> in  <code-snippet>m</code-snippet> via CHA.  <b>Record every edges</b> .</p>
+<p indent="0">2. for each reachable method  <code-snippet>m
+</code-snippet> , resolve target methods for each call site  <code-snippet>cs
+</code-snippet> in  <code-snippet>m
+</code-snippet> via CHA.  <b>Record every edges</b> .</p>
 <p indent="0">3. Repeat until no new method is discovered</p>
 <p indent="0">四舍五入就是个图的搜索算法</p>
 <h3>Interprocedural Control-Flow Graph (ICFG</h3>

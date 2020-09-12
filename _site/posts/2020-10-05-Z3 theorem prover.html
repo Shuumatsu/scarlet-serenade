@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-10-05-Z3 theorem prover</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-10-05-Z3 theorem prover</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0"><b>definition</b> : an  <b>uninterpreted function</b> or  <b>function symbol</b> is one that has no other property than its name and n-ary form.</p>
+<p indent="0"><b>definition</b> : Z3 uses the notion of  <b>congruence closure</b> to check the satisfiability of equalities.</p>
+<p indent="0">Let  <mathjax-panel>\mathcal{T}
+</mathjax-panel> be a set of terms and  <mathjax-panel>\mathcal{E}
+</mathjax-panel> set of equalities over  <mathjax-panel>\mathcal{T}
+</mathjax-panel> . A congruence closure over  <mathjax-panel>\mathcal{T}
+</mathjax-panel> modulo  <mathjax-panel>\mathcal{E}
+</mathjax-panel> is the finest partition  <mathjax-panel>cc
+</mathjax-panel> of  <mathjax-panel>\mathcal{T}
+</mathjax-panel> , such that:</p>
+<p indent="1">- if  <mathjax-panel>(s=t) \in \mathcal{E}
+</mathjax-panel> then  <mathjax-panel>s, t
+</mathjax-panel> are in the same partition in  <mathjax-panel>cc
+</mathjax-panel> .</p>
+<p indent="1">- if  <mathjax-panel>s_i, t_i
+</mathjax-panel> are in the same partition of  <mathjax-panel>cc
+</mathjax-panel> for each  <mathjax-panel>i = 1, \ldots, k
+</mathjax-panel> then  <mathjax-panel>s:=f\left(s_{1}, \ldots, s_{k}\right), t:=f\left(t_{1}, \ldots, t_{k}\right) \in \mathcal{T}
+</mathjax-panel> are in the same partition under  <mathjax-panel>cc
+</mathjax-panel></p>
+<p indent="0">Decision procedures for quantifier-free EUF formulas are usually based on  <b>union-find</b> to maintain equivalence classes of terms that are equated.</p>
+<p indent="0">e.g., 给定 constraints  <mathjax-panel>a = b; \ b = c; \ d = e; \ b = s; \ d = t; \ a \neq t
+</mathjax-panel></p>
+<p indent="0">Z3 会根据等式关系生成  <mathjax-panel>[a, b, c, s]
+</mathjax-panel> 与  <mathjax-panel>[d, e, t]
+</mathjax-panel> 两个 equivalence classes，不等式  <mathjax-panel>a \neq t
+</mathjax-panel> 不会产生矛盾，所以给定的 constraints 是可满足的</p>
+<p indent="0">e.g., 给定 constraints:  <mathjax-panel>a=b, b=c, d=e, b=s, d=t, f(a, g(d)) \neq f(g(e), b)
+</mathjax-panel> . 首先引入几个常量  <mathjax-panel>v_1 := g(e); v_2 := g(d); v_3 := f(a, v_2); v4 := f(v_1, b)
+</mathjax-panel> and we can associate a distinct value with each equivalence class.</p>
+<p indent="0"><mathjax-panel>\diamond_{0}: [a, b, c, s]
+</mathjax-panel> &  <mathjax-panel>\diamond_{1}: [d, e, t]
+</mathjax-panel> &  <mathjax-panel>\diamond_{0}: [v_1, v_2]
+</mathjax-panel> & &  <mathjax-panel>\diamond_{3}: [v_3]
+</mathjax-panel> &  <mathjax-panel>\diamond_{4}: [v_4]
+</mathjax-panel></p>
+<p indent="0">When presenting the formula to Z3, it produces a model, that may look as follows:</p>
+<code-snippet indent="0" block="true">[s = S!val!0, b = S!val!0, a = S!val!0,
+ c = S!val!0, d = S!val!1, e = S!val!1, t = S!val!1,
+ f = [(S!val!2, S!val!0) -&gt; S!val!4, else -&gt; S!val!3],
+ g = [else -&gt; S!val!2]]
+</code-snippet>
+<p indent="0">在这个模型中，像  <code-snippet>S!val!0
+</code-snippet> 这样的是 fresh constant that are distinct from each other. </p>
+<p indent="0"><code-snippet>f
+</code-snippet> maps the arguments  <code-snippet>(S!val!2, S!val!0)
+</code-snippet> to  <code-snippet>S!val!4
+</code-snippet> . All other arguments are mapped by the else clause to  <code-snippet>S!val!3
+</code-snippet> . </p>
+<p indent="0">The interpretation of S is a finite set  <code-snippet>{S!val!0, S!val!1, S!val!2, S!val!3, S!val!4}
+</code-snippet> .</p>
+<p indent="0">Array 在某种意味上可以看作一个函数，Z3 decides arrays by reduction to EUF. The theory of arrays is extensional. That is, two arrays are equal if they behave the same on all selected indices.</p>
+<p indent="0">Z3 mostly uses a  <b>bit-blasting</b> approach to deciding bit-vectors. By bit-blasting we refer to 将每个位都视为命题变量。以位向量加法为例，表达式  <mathjax-panel>out := v + w
+</mathjax-panel> 通过编码为一个 ripple-carry adder 来得到变量间的约束关系。</p>
+<p indent="0">Floating points are bit-vectors with an interpretation specified by the IEEE floating point standard.</p>
+<p indent="0">The theory of first-order algebraic data-types captures the theory of finite trees. It is characterized by the properties that:</p>
+<p indent="1">- All trees are finite (occurs check).</p>
+<p indent="1">- All trees are generated from the constructors (no junk).</p>
+<p indent="1">- Two trees are equal if and only if they are constructed exactly the same way (no confusion).</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

@@ -1,0 +1,73 @@
+6 种基本指令格式
+- \- R 型：用于 register - register 
+- \- I 型：用于短立即数和访存 Load 操作 （有 12 位用于 Imm
+- \- U 型：用于长立即数 （有 20 位用于 Imm
+-- （RISC V 指令中所有的立即数总是符号扩展
+- \- S 型：用于访存 Store 操作
+- \- B 型：用于条件跳转操作
+- \- J 型：用于无条件跳转
+
+所有位全是 1 或 全是 0 的指令是非法指令
+
+RV32I 有 31 个通用寄存器和一个恒为 0 的 X0 寄存器；在 RISC V 中，PC 不是通用寄存器
+
+lui 将 20 位常量加载到寄存器的高 20 位
+auipc 将20 位常量加载到 PC 的高 20 位
+e.g., 用 lui 加载立即数到寄存器的高 20 位，再用一般的立即数指令弄低 12 位可构造出构造大的常量
+e.g., 用 auipc 的 20 位与 jalr 的 12 位立即数的组合可以将执行流跳转到任何 32 位 PC 相对位置
+
+除 32 位的 lw, sw 外，RV32I 还支持
+- 加载有符号和无符号的字节和半字（lb, lbu, lh, lhu
+-- 都将被[符号]扩展后再写入寄存器
+- 存储字节和半字（sb, sh
+
+加载与存储仅支持唯一的位置模式：位偏移寻址模式
+- 符号扩展 12 位立即数到基地址寄存器
+
+RV32I 基于比较两个寄存器的结果进行分支跳转（有的 architecture 用控制位记录溢出等，并根据此进行跳转
+由于 RISC V 的指令长度必须是 2 字节的倍数，所以分支指令的寻址方式是 12 位立即数乘 2 后符号扩展再加到 PC 上作为 target addr
+
+
+RV32A 有 2 种类型的原子操作
+- \- atomic memory operation
+-- AMO 对内存执行一个原子操作，并将寄存器设置为操作前的内存值；原子表示内存读写之间的过程不会被打断，内存值不会被其它处理器修改
+- \- load reserved / store conditional
+
+RISC V 有宽松的内存一致性模型（relaxed memory consistency model）因此其它线程看到的内存访问可以是乱序的
+所有的 RV32A 指令都有一个请求位 aq 一个释放位 rl
+
+RISC V 提供三种模式：user mode, supervisor mode, machine mode 
+
+machine mode 是硬件线程可以执行的最高权限模式，对内存， I/O 等底层功能有完全的控制权
+
+machine mode 最重要的特性是控制和处理异常；RISC V 的异常 (exception) 分为两类
+- \- 同步异常，再指令执行期间产生
+- \- 中断 interrupt ，与指令异步的外部事件；有三种标准中断源：
+-- \- 软件：通过像内存映射寄存器种存数并通常用一个 hart 来中断另一个 hart
+-- \- 时钟：当实时计数器 mtime 大于 hart 的时间比较器（一个名为 mtimecmp 的内存映射寄存器）时触发时钟中断
+-- \- 外部来源：由平台级中断控制器引发（大部分外部设备连接到这个中断控制器）
+RISC V 的异常 are precise：所有异常前的指令已完全执行 & 所有异常后的指令还未开始执行
+
+8 个 Control Status Registers 时机器模式下异常处理的必要部分
+- \- Machine Trap Vector: 保存发生异常时需跳转到的地址
+- \- Machine Exception PC: 指向发生异常的指令
+-- 对于同步异常，mepc 指向发生异常的指令
+-- 对于中断，指向应恢复的位置
+- \- Machine Exception Cause: 异常发生的种类
+- \- Machine Interrupt Enable: 列出目前 CPU 能处理和必须忽略的中断
+-- 每个中断再 MIE 中都有对应的使能位，例如 MIE[7] 对应时钟中断
+- \- Machine Interrupt Pending: lists pending interrupts
+- \- Machine Trap Value: 保存了 trap 的附加信息（地址例外中出错的地址，非法指令的指令本身
+- \- 通常包含指向附加临时内存空间的指针
+-- 在中断处理工程中可能会用到部分寄存器，为避免覆盖，中断处理程序会用附加内存空间保存用到的寄存器
+--- 一个异常处理程序会先用 csrw 指令交换 a0 与 mscratch 再用 sw 与 a0 来保存寄存器。在中断处理完成后用 lw 与 a0 恢复寄存器，再交换回 a0 与 mscratch。最后用 mret 返回
+- \- Machine Status: 包含全局设定是否开启中断（MIE）等信息
+-- 若 mstatus.MIE = 1 & MIE[7] = 1 & MIP[7] = 1 则 CPU 可处理时钟中断
+
+当一个 hart 发生异常时，硬件自动做以下处理
+- 1. 异常指令的 PC vei存在 mepc 中；PC 被设置为 mtvec
+- 2. 根据异常来源设置 mcause 并设置 mtval
+- 3. mstatus.mpie = mstatus.mie; mstatus.mie = 0
+- 4. 将异常前的权限模式保存在 mstatus.mpp 中，并切换到 machine mode
+
+有时在处理异常的过程中需要跳转到更高优先级的中断，然而 CSRs 只有一个副本，接受一个更高优先级的中断会破坏旧值。一个抢占式的中断 handler 在启用终端前将 CSRs 保存到内存栈中，在推出前禁用中断并恢复 CSRs

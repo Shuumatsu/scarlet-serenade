@@ -1,3 +1,7 @@
+Software threads are threads of execution managed by the operating system.
+Hardware threads are a feature of some processors that allow better utilisation of the processor under some circumstances. They may be exposed to/by the operating system as appearing to be additional cores ("hyperthreading").
+One hardware thread can run many software threads. （time-slicing
+
 6 种基本指令格式
 - \- R 型：用于 register - register 
 - \- I 型：用于短立即数和访存 Load 操作 （有 12 位用于 Imm
@@ -58,11 +62,16 @@ RISC V 的异常 are precise：所有异常前的指令已完全执行 & 所有�
 -- 每个中断再 MIE 中都有对应的使能位，例如 MIE[7] 对应时钟中断
 - \- Machine Interrupt Pending: lists pending interrupts
 - \- Machine Trap Value: 保存了 trap 的附加信息（地址例外中出错的地址，非法指令的指令本身
-- \- 通常包含指向附加临时内存空间的指针
+- \- Machine Scratch 通常包含指向附加临时内存空间的指针
 -- 在中断处理工程中可能会用到部分寄存器，为避免覆盖，中断处理程序会用附加内存空间保存用到的寄存器
 --- 一个异常处理程序会先用 csrw 指令交换 a0 与 mscratch 再用 sw 与 a0 来保存寄存器。在中断处理完成后用 lw 与 a0 恢复寄存器，再交换回 a0 与 mscratch。最后用 mret 返回
 - \- Machine Status: 包含全局设定是否开启中断（MIE）等信息
 -- 若 mstatus.MIE = 1 & MIE[7] = 1 & MIP[7] = 1 则 CPU 可处理时钟中断
+
+CSRs 通过以下指令操作以及其对应的立即数版本：
+- csrrw dest, csr, src 将 src 写入 csr 并将其旧值写入 dest
+- csrrs dest, csr, src 通过 or src csr 操作将 src 写入 csr 并将其旧值写入 dest
+- csrrc dest, csr, src 通过 and src csr 操作将 src 写入 csr 并将其旧值写入 dest
 
 当一个 hart 发生异常时，硬件自动做以下处理
 - 1. 异常指令的 PC vei存在 mepc 中；PC 被设置为 mtvec

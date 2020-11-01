@@ -48,7 +48,7 @@ machine mode 最重要的特性是控制和处理异常；RISC V 的异常 (exce
 -- \- 外部来源：由平台级中断控制器引发（大部分外部设备连接到这个中断控制器）
 RISC V 的异常 are precise：所有异常前的指令已完全执行 & 所有异常后的指令还未开始执行
 
-8 个 Control Status Registers 时机器模式下异常处理的必要部分
+8 个 Control and Status Registers 时机器模式下异常处理的必要部分
 - \- Machine Trap Vector: 保存发生异常时需跳转到的地址
 - \- Machine Exception PC: 指向发生异常的指令
 -- 对于同步异常，mepc 指向发生异常的指令
@@ -71,3 +71,21 @@ RISC V 的异常 are precise：所有异常前的指令已完全执行 & 所有�
 - 4. 将异常前的权限模式保存在 mstatus.mpp 中，并切换到 machine mode
 
 有时在处理异常的过程中需要跳转到更高优先级的中断，然而 CSRs 只有一个副本，接受一个更高优先级的中断会破坏旧值。一个抢占式的中断 handler 在启用终端前将 CSRs 保存到内存栈中，在推出前禁用中断并恢复 CSRs
+
+通过将 mstatus.mpp 设置为 u 然后执行 mret 指令，软件可以从 machine mode 进入 user mode
+
+实现了 machine 和 user mode 的处理器具有一个叫做 physical memory protection 的功能：允许 machine mode 指定 user mode 可访问的内存地址
+PMP 包含几个地址寄存器和相应的配置寄存器，这些配置寄存器可授予或拒绝读写执行权限
+当处于 user mode 对内存进行操作时，将地址和所有的 PMP 地址寄存器进行比较，若地址大于第 i 个地址寄存器小于第 i + 1 个地址寄存器，则由第 i + 1 个配置寄存器进行校验
+
+与 user mode 相同，supervisor mode 下也不能使用 machine mode 的 CSRs 和指令切受 PMP 限制
+
+默认情况下，所有发生异常的时候，控制权都被移交到 machine mode 的异常处理程序，但 unix 系统中大多数异常都进行在 supervisor mode 下的系统调用。RISC V 提供了一种异常委托机制，可选择性地将终端和异常委托给 supervisor mode 处理
+- Machine Interrupt Delegation CSR 控制将哪些中断委托给 supervisor mode
+与 machine mode 类似，supervisor mode 有对应的异常处理 CSRs：sie, sip, sepc, stvec, scause, sscratch, stval, sstatus; mret 对应 sret 指令。异常的处理流程也和 machine mode 类似
+
+supervisor mode 提供了虚拟内存，启用分页的时候大多数地址（包括 load/store 和 pc 中的地址）都是虚拟地址。
+要访问物理内存，它们必须通过页表被转换为珍重的物理地址。
+RISC V 的分页方案以 SvX 命名，其中 X 为虚拟地址的长度。
+- \- 例如 RV32 采用 Sv32 方案，采用了两级页表，每页 4KB
+- \- 例如 RV64 采用 Sv39 方案，采用了三级页表，每页 4KB

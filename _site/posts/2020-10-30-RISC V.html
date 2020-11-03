@@ -126,11 +126,87 @@
 <p indent="0">默认情况下，所有发生异常的时候，控制权都被移交到 machine mode 的异常处理程序，但 unix 系统中大多数异常都进行在 supervisor mode 下的系统调用。RISC V 提供了一种异常委托机制，可选择性地将终端和异常委托给 supervisor mode 处理</p>
 <p indent="1">Machine Interrupt Delegation CSR 控制将哪些中断委托给 supervisor mode</p>
 <p indent="0">与 machine mode 类似，supervisor mode 有对应的异常处理 CSRs：sie, sip, sepc, stvec, scause, sscratch, stval, sstatus; mret 对应 sret 指令。异常的处理流程也和 machine mode 类似</p>
-<p indent="0">supervisor mode 提供了虚拟内存，启用分页的时候大多数地址（包括 load/store 和 pc 中的地址）都是虚拟地址。</p>
-<p indent="0">要访问物理内存，它们必须通过页表被转换为珍重的物理地址。</p>
+<p indent="0">RISC V ISA 采用 12-bit encoding space for up to 4096 CSRs. 惯例上，最高两位用来表示在指定 privilege level 下的读写权限，次高两位表示该 CSR 要求的最低 privilege level</p>
+<p indent="1">（一个可写寄存器也可能部分位是只读的，对这些位进行写入会被忽略</p>
+<p indent="0">CSR Field Specification</p>
+<p indent="1">- Reserved Writes Preserve Values, Reads Ignore Values (WPRI</p>
+<p indent="2">有些 fields 被保留 for future use。软件应忽略从中读取到的值并且在写入寄存器时不改变其值</p>
+<p indent="1">- Write/Read Only Legal Values (WLRL</p>
+<p indent="2">对某些 fields 来说，只有部分 bit encoding 是有效的。软件不应向这些 fields 中写入非法的值并且不应假定读出的值是合法的除非上次写入的是一个有效的值</p>
+<p indent="1">- Write Any Values, Read Legal Values (WARL</p>
+<p indent="2">对某些 fields 来说，只有部分 bit encoding 是有效的。允许向其中写入任意值并且保证任意时候读出的值都是合法的</p>
+<p indent="3">- 若上次写入的值是不合法的，则根据实现，可能返回任意的一个合法的值</p>
+<p indent="3">- 若上次写入的值是合法的，则保证返回该合法值</p>
+<p indent="0"><b>Machine ISA Register (misa)</b> <code-snippet>[MXL 2 bits - WARL, WLRL, EXTENSIONS - 26 bits - WARL]
+</code-snippet> reporting the ISA supported byt the hart; 该寄存器在任何实现中都必须可读</p>
+<p indent="1">其最高两位 MXL 表示 ISA 宽度，可选值为 32, 64 以及 128。在支持多种 ISA 宽度的实现上，该 field 是可写的</p>
+<p indent="1">最低 0 到 25 的 26 位 EXTENSIONS field 的每一个 bit 根据其位置表示从 A 到 Z 的 extension。e.g., bit-2 代表 C 表示 Compress Ext</p>
+<p indent="1">读取 misa 可能返回 0 表示未实现此 CSR，此时需要用非标准的机制来获取信息</p>
+<p indent="2">例如当 misa 返回 0 时获取 ISA 宽度：将立即数 4 置于一个寄存器中，每次向左移动 31 位。若一次位移后归零，则是 RV32，两次则是 RV64，三次则是 RV128</p>
+<p indent="0"><b>Machine Vendor ID Register (mvendorid)</b> <code-snippet>[Bank - 25 bits, offset - 7 bits]
+</code-snippet> 是一个 32 位只读寄存器 providing the JEDEC manufacture ID of the provider of the core; 该寄存器在任何实现中都必须可读</p>
+<p indent="1">读取该寄存器时返回 0 表示未实现或表明这是一个 non-commercial 实现</p>
+<p indent="0"><b>Machine Architecture ID Register (marchid)</b> <code-snippet>[Architecture ID - MXLEN bits]
+</code-snippet> 是一个 MXLEN-bit 只读寄存器 encoding the base microarchitecture of the hart; 该寄存器在任何实现中都必须可读</p>
+<p indent="1">读取该寄存器时返回 0 表示未实现</p>
+<p indent="0">The combination of mvendorid and marchid should uniquely identify the type of hart microarchitecture that is implemented.</p>
+<p indent="0"><b>Machine Implementation ID Register (mimpid)</b> <code-snippet>[Implementation - MXLEN bits]
+</code-snippet> provides a unique encoding of the version of the processor implementation; 该寄存器在任何实现中都必须可读</p>
+<p indent="1">读取该寄存器时返回 0 表示未实现</p>
+<p indent="0"><b>Hart ID Register (mhartid)</b> 是一个 MXLEN-bit 只读寄存器，containing the integer ID of the hardware thread running the code; 该寄存器在任何实现中都必须可读</p>
+<p indent="1">要求至少有一个额 hart 有 ID 0 并且所有 hart 有不同的 ID</p>
+<p indent="0"><b>Machine Status Register (mstatus)</b> 是一个 MXLEN-bit 读写寄存器。mstatus keeps track of and controls the hart’s 当前状态。Restricted views of the mstatus register appear as the sstatus and ustatus registers in the S-level and U-level ISAs respectively.</p>
+<code-snippet indent="0" block="true">for RV32: 
+[
+SD, 8 bits - WPRI, TSR, TW, TVM, MXR, SUM, MPRV, XS - 2 bits, FS - 2 bits, 
+MPP - 2bits, WPRI - 2 bits, SPP, MPIE, WPRI, SPIE, UPIE, MIE, WPRI, SIE, UIE
+]
+
+for RV64:
+[
+
+]
+</code-snippet>
+<p indent="0">每个 privilege mode 在其对应的状态寄存器中都有 global interrupt-enable bits (MIE, SIE, UIE). 这些位主要是用来保证在当前 privilege mode 中中断处理程序的原子性</p>
+<p indent="0">在 privilege mode x 下，当 xIE = 1 时，中断是全局 enabled；当 xIE = 0 时，中断是全局 disabled</p>
+<p indent="0">为了支持 nested traps，每个 privilege mode x 都有 two-level stack of interrupt-enable bits and privilege modes:</p>
+<p indent="1">- xPIE 记录当前 trap 之前的 interrupt-enable bit</p>
+<p indent="1">- xPP 记录当前 trap 之前的 privilege mode</p>
+<p indent="0">supervisor mode 提供了虚拟内存，启用分页的时候大多数地址（包括 loa  d/store 和 pc 中的地址）都是虚拟地址。</p>
+<p indent="0">要访问物理内存，它们必须通过页表被转换为真正的物理地址。</p>
 <p indent="0">RISC V 的分页方案以 SvX 命名，其中 X 为虚拟地址的长度。</p>
 <p indent="1">- 例如 RV32 采用 Sv32 方案，采用了两级页表，每页 4KB</p>
-<p indent="1">- 例如 RV64 采用 Sv39 方案，采用了三级页表，每页 4KB</p></section>
+<p indent="1">- 例如 RV64 采用 Sv39 方案（通常），采用了三级页表，每页 4KB</p>
+<p indent="0">当 satp register 的 MODE field 是 Sv32 时，supervisor 运行在 32-bit paged virtual-memory system. 在该模式下 supervisor and user 虚拟地址通过遍历  radix-tree 结构的页表来 translated into 物理地址。</p>
+<p indent="1">Sv32 virtual address:  <code-snippet>(VPN[1] - 10 bits, VPN[0] - 10 bits, page offset - 12 bits)
+</code-snippet></p>
+<p indent="1">Sv32 physical address:  <code-snippet>(PPN[1] - 12 bits, PPN[0] - 12 bits, page offset - 12 bits)
+</code-snippet></p>
+<p indent="1">Sv32 page  table entry:  <code-snippet>(PPN[1] - 12 bits, PPN[0] - 10 bits, RSW - 2 bits, D, A, G, U, X, W, R, V)
+</code-snippet></p>
+<p indent="2">the V bits indicates 该 PTE 是否有效</p>
+<p indent="2">权限位 R, W, and X indicate </p>
+<p indent="0">20 位的 VPN is translated into 22 位的 physical page number (PPN), while the offset is untranslated. 结果的 supervisor-level 物理地址在经过 physical memory protection structures 检查后 converted to machine-level 物理地址</p>
+<p indent="0">Sv32 page tables 由 2e10 PTE 组成，每个 4 bytes。一个页表总是一页大小并且总是按页对齐的。根页表的 physical page number 被存储 在 satp 寄存器中。</p>
+<code-snippet indent="0" block="true">la: load absolute address
+li: load immediate
+csrr: read csr
+</code-snippet>
+<p indent="0">kernel/kernel.ld 声明 architecture 为 riscv，入口为 _entry</p>
+<p indent="0">将代码起始位置设置为内存 0x80000000 处（更低处的内存用于 I/O）</p>
+<p indent="0">Xv6 从 kernel/entry.S （_entry) 开始执行，_entry 为 C 代码初始化栈</p>
+<p indent="1">对每个 CPU：sp = stack0 + (hartid * 4096) 其中 stack0 定义在 kernel/start.c 中</p>
+<p indent="0">而后跳转到 start() in kernel/start.c</p>
+<p indent="0">kernel/start.c 中</p>
+<p indent="1">为每个 CPU 定义了栈 char stack0[4096 * NCPU]</p>
+<p indent="1">为每个 CPU 定义了 uint64 mscratch0[NCPU * 32] 用于 interrupt</p>
+<p indent="0">在 start() 中设置 MPP 为 supervisor mode，设置 mepc 为 main</p>
+<p indent="0">以在 machine mode 下进行必要的处理后使用 mret 进入 supervisor mode</p>
+<p indent="0">禁用页表</p>
+<p indent="0">代理所有 interrupts and exceptions 到 supervisor mode</p>
+<p indent="0">timerinit();</p>
+<p indent="0">保存每个 CPU 的 hartid 到它的 thread pointer register 用于 cpuid()</p>
+<p indent="0">执行 mret</p></section>
     </article>
 </main>
 

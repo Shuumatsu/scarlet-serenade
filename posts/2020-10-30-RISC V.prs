@@ -153,7 +153,7 @@ for RV64:
 - \- xPP 记录当前 trap 之前的 privilege mode
 
 
-
+All harts in a system must employ the same PTE-update scheme as each other
 supervisor mode 提供了虚拟内存，启用分页的时候大多数地址（包括 loa  d/store 和 pc 中的地址）都是虚拟地址。
 要访问物理内存，它们必须通过页表被转换为真正的物理地址。
 RISC V 的分页方案以 SvX 命名，其中 X 为虚拟地址的长度。
@@ -163,14 +163,42 @@ RISC V 的分页方案以 SvX 命名，其中 X 为虚拟地址的长度。
 
 当 satp register 的 MODE field 是 Sv32 时，supervisor 运行在 32-bit paged virtual-memory system. 在该模式下 supervisor and user 虚拟地址通过遍历  radix-tree 结构的页表来 translated into 物理地址。
 - Sv32 virtual address: `(VPN[1] - 10 bits, VPN[0] - 10 bits, page offset - 12 bits)`
-- Sv32 physical address: `(PPN[1] - 12 bits, PPN[0] - 12 bits, page offset - 12 bits)`
+- Sv32 physical address: `(PPN[1] - 12 bits, PPN[0] - 10 bits, page offset - 12 bits)`
 - Sv32 page  table entry: `(PPN[1] - 12 bits, PPN[0] - 10 bits, RSW - 2 bits, D, A, G, U, X, W, R, V)`
 -- the V bits indicates 该 PTE 是否有效
--- 权限位 R, W, and X indicate 
+-- R, W, and X indicate 权限以及该 PTE 指向下一级页表
+```
+X | W | R || Meaning
+0 | 0 | 0 || Pointer to next level of page table
+0 | 0 | 1 || Read-only page
+0 | 1 | 0 || Reserved for future use
+0 | 1 | 1 || Read-write page
+1 | 0 | 0 || Execute-only page
+1 | 0 | 1 || Read-execute page
+1 | 1 | 0 || Reserved for future use
+1 | 1 | 1 || Read-write-execute page
+```
+-- the U bit indicates whether the page is accessible to user mode。通常情况下 supervisor mode operates with the SUM bit clear，supervisor mode 不能访问用户页，但是如果 SUM bit is set, supervisor mode 也能访问用户页
+-- the G bit 指定全局映射，意味着该映射存在于所有地址空间中（如果是一个非页 PTE 被设置为 global 则其 subsequent levels of the page table are global.
+-- Each leaf PTE contains an accessed (A) and dirty (D) bit. 
+--- The A bit indicates the virtual page has been read, written, or fetched from since the last time the A bit was cleared.
+--- The D bit indicates the virtual page has been written since the last time the D bit was cleared.
 20 位的 VPN is translated into 22 位的 physical page number (PPN), while the offset is untranslated. 结果的 supervisor-level 物理地址在经过 physical memory protection structures 检查后 converted to machine-level 物理地址
 
 Sv32 page tables 由 2e10 PTE 组成，每个 4 bytes。一个页表总是一页大小并且总是按页对齐的。根页表的 physical page number 被存储 在 satp 寄存器中。
   
+
+
+
+Virtual Address Translation Process
+- 1. 通过 satp.ppn * page_size 得到根页表物理地址
+- 2. 根据 page_table_addr + va.vpn[i] * pte_size 得到当前层级下对应的 pte 地址
+-- 如果访问 pte violates a PMA or PMP check，抛出一个 access exception
+- 3. 检查 pte 的标志位，若有问题则抛出一个 page-fault exception
+- 4. 若当前 pte 指向下一层页表，则根据 pte.ppn * page_size 得到下一级页表地址
+根据 pte 的标志位以及，mstatus.SUN 以及 mstatus.MXR 检查是否允许访问，若不则抛出一个 page-fault exception
+
+
 
 
 ```
@@ -195,5 +223,37 @@ kernel/start.c 中
 代理所有 interrupts and exceptions 到 supervisor mode
 timerinit();
 保存每个 CPU 的 hartid 到它的 thread pointer register 用于 cpuid()
-执行 mret
+执行 mret （跳转到 kernel/main.c main(）
+
+
+kernel/main.c main() 中的逻辑仅在 cpu0 中执行
+初始化 console 
+kinit() 初始化 physical page allocator
+kvminit() create kernel page table
+kvminithart() Switch h/w page table register to the kernel's page table, and enable paging.
+procinit();  // process table
+
+kernel/kalloc.c 
+在 kernel/kernel.ld 中定义了内核代码后的第一个地址 extern char end[]
+定义了一个带锁的结构体 kmem，其主体为一个链表，指向一串空闲的物理页
+void kfree(void* pa) free 以 pa 开头的一页大小的内存
+- 填入垃圾数据以 catch dangling refs
+- 加入到 kmem.freelist
+void freerange(void* pa_start, void* pa_end) 通过 kfree free 区间内的所有页 pa_start 会向上页对齐
+void* kalloc(void) 从 kmem 中分配一页物理内存，如果无法分配则返回 0
+
+kernel/vm.c 
+定义了一个内核页表 kernel_pagetable
+void kvminit()
+- 分配一个空页 for kernel_pagetable
+void kvmmap(uint64 va, uint64 pa, uint64 sz, int perm) 在 kernel_pagetable 上 va 与 pa 之间添加一个映射，如果映射失败则抛出异常
+
+int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)
+从 va 与 pa 开始 为 pagetable 建立映射，如果
+
+
+
+kernel/proc.c 
+void procinit(void) 在开机时初始化 proc table
+- 为每个进程分配一页的内核栈  Map it high in memory, followed by an invalid guard page.
 

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-09-07-programming-language-foundations</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-09-07-programming-language-foundations</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><h3>Program Equivalence</h3>
+<p indent="0">Two expressions are  <b>behaviorally equivalent</b> if they evaluate to the same result in every state. 对指令而言，若两个指令在任何给定的初始状态下，要么发散， 要么在相同的状态下停机，则二者行为等价。” 简单来说，就是： “若其中一个指令在某状态下停机，那么另一个也在该状态下停机，反之亦然。</p>
+<code-snippet indent="0" block="true">Definition aequiv (a1 a2 : aexp) : Prop := 
+    forall (st : state), aeval st a1 = aeval st a2.
+Definition bequiv (b1 b2 : bexp) : Prop := 
+    forall (st : state), beval st b1 = beval st b2.
+Definition cequiv (c1 c2 : com) : Prop := 
+    forall (st st' : state), (st =[ c1 ]=&gt; st') &lt;-&gt; (st =[ c2 ]=&gt; st').
+</code-snippet>
+<p indent="0">行为等价满足 <b>一致性（congruence）</b> 。That is, the equivalence of two subprograms implies the equivalence of the larger programs in which they are embedded.</p>
+<p indent="1">它最主要意义在于，allow us to replace a small part of a large program with an equivalent small part and know that the whole large programs are equivalent without doing an explicit proof about the non-varying parts</p>
+<h4>Program Transformations</h4>
+<p indent="0"><b>程序变换（program transformation）</b> 是一种以某个程序作为输入， 产生该程序的某种变体作为输出的函数。如果一个程序变换保留了其原始行为，那么它就是' 可靠（sound）' 的。</p>
+<code-snippet indent="0" block="true">Definition atrans_sound (atrans : aexp -&gt; aexp) : Prop :=
+    forall (a : aexp), aequiv a (atrans a).
+Definition btrans_sound (btrans : bexp -&gt; bexp) : Prop :=
+    forall (b : bexp), bequiv b (btrans b).
+Definition ctrans_sound (ctrans : com -&gt; com) : Prop :=
+    forall (c : com), cequiv c (ctrans c).
+</code-snippet>
+<h3>Hoare Logic</h3>
+<p indent="0">要讨论程序的规范，我们需要的首先是一种在程序执行过程中某个时刻， 关于程序性质做出 <b>断言（assertions）</b> 的方法。也就是说，我们要讨论执 行到某处时，当时的内存状态。形式化地说，一项断言就是一系列关于 state 的命题。</p>
+<code-snippet indent="0" block="true">Definition Assertion := state -&gt; Prop.
+</code-snippet>
+<p indent="0">给出两断言  <code-snippet>P
+</code-snippet> 与  <code-snippet>Q
+</code-snippet> ，我们说  <code-snippet>P
+</code-snippet> '蕴含'  <code-snippet>Q
+</code-snippet> ， 写作  <code-snippet>P -&gt;&gt; Q
+</code-snippet> ，如果当  <code-snippet>P
+</code-snippet> 在  <code-snippet>st
+</code-snippet> 下成立， <code-snippet>Q
+</code-snippet> 也成立。 </p>
+<code-snippet indent="0" block="true">Definition assert_implies (P Q : Assertion) : Prop :=
+    forall st, P st -&gt; Q st.
+
+Notation &quot;P -&gt;&gt; Q&quot; := (assert_implies P Q) (at level 80) : hoare_spec_scope.
+Notation &quot;P &lt;&lt;-&gt;&gt; Q&quot; := (assert_implies P Q /\ assert_implies Q P) (at level 80) : hoare_spec_scope.
+</code-snippet>
+<br />
+<p indent="0">广泛而言，一个命令的行为就是把一个状态转变成另一个状态，所以 我们可以自然地通过命令运行前后的断言来描述一个命令。A Hoare triple is a claim about the state before and after executing a command. A standard notation is  <mathjax-panel>{P} \; c \; {Q}
+</mathjax-panel></p>
+<p indent="0">meaning: </p>
+<p indent="1">- If command  <code-snippet>c
+</code-snippet> begins execution in a state satisfying assertion  <code-snippet>P
+</code-snippet> ,</p>
+<p indent="1">- and if c eventually terminates in some final state,</p>
+<p indent="1">- then that final state will satisfy the assertion  <code-snippet>Q
+</code-snippet> .</p>
+<p indent="0">Assertion P is called the precondition of the triple, and Q is the postcondition</p>
+<code-snippet indent="0" block="true">Definition hoare_triple (P : Assertion) (c : com) (Q : Assertion) : Prop :=
+  forall st st', st =[ c ]=&gt; st' -&gt; P st -&gt; Q st'.
+Notation &quot;{{ P }} c {{ Q }}&quot; := (hoare_triple P c Q) (at level 90, c at next level) : hoare_spec_scope.
+</code-snippet>
+<p indent="0">For example,  <mathjax-panel>\{X = 0\} \; X := X+1 \; \{X = 1\}
+</mathjax-panel> is a valid Hoare triple, stating that command X := X + 1 would transform a state in which X = 0 to a state in which X = 1.</p>
+<br />
+<p indent="0"><b>Definition</b> :  <mathjax-panel>P
+</mathjax-panel> is a  <b>weakest precondition</b> of command  <mathjax-panel>c
+</mathjax-panel> for postcondition  <mathjax-panel>Q
+</mathjax-panel> if:</p>
+<p indent="1">-  <mathjax-panel>P
+</mathjax-panel> is a precondition, that is,  <mathjax-panel>\{P\} \quad c \quad \{Q\}
+</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>P
+</mathjax-panel> is at least as weak as all other preconditions, that is, if  <mathjax-panel>\{P'\} \quad c \quad \{Q\}
+</mathjax-panel> then  <mathjax-panel>P' \rightarrow P
+</mathjax-panel> .</p>
+<h4>Hoare logic Proof Rules</h4>
+<p indent="0">The goal of Hoare logic is to provide a  <b>compositional</b> method for proving the validity of specific Hoare triples.</p>
+<h5>Assignment</h5>
+<p indent="0">Consider this incomplete Hoare triple:  <mathjax-panel>\{ ??? \} \quad X := a \quad \{ Q \}
+</mathjax-panel></p>
+<p indent="0">The postcondition identifies some property  <mathjax-panel>Q
+</mathjax-panel> that we want to hold of the variable  <mathjax-panel>X
+</mathjax-panel> being assigned. The precondition must ensure that the same property holds of whatever is being assigned to X. The precondition would then be  <mathjax-panel>Q
+</mathjax-panel> , but with any occurrences of  <mathjax-panel>X
+</mathjax-panel> in it replaced by  <mathjax-panel>a
+</mathjax-panel> . </p>
+<p indent="0">That is: If you want statement  <mathjax-panel>X := a
+</mathjax-panel> to terminate in a state that satisfies assertion  <mathjax-panel>Q
+</mathjax-panel> , then it suffices to start in a state that also satisfies  <mathjax-panel>Q
+</mathjax-panel> , except where  <mathjax-panel>a
+</mathjax-panel> is substituted for every occurrence of  <mathjax-panel>X
+</mathjax-panel> .</p>
+<div indent="1"><p indent="0">introduce a notation for this idea of replacing occurrences: Define  <mathjax-panel>Q [X \mapsto a]
+</mathjax-panel> to mean " <mathjax-panel>Q
+</mathjax-panel> where  <mathjax-panel>a
+</mathjax-panel> is substituted in place of  <mathjax-panel>X
+</mathjax-panel> ". (which we refer to as assertion substitution</p>
+<code-snippet indent="0" block="true">Definition assn_sub X a (P:Assertion) : Assertion := 
+        fun (st : state) =&gt; P (X !-&gt; aeval st a ; st).
+    Notation &quot;P [ X |-&gt; a ]&quot; := (assn_sub X a P) (at level 10, X at next level).
+</code-snippet>
+<p indent="0">That yields the Hoare logic rule for assignment:</p>
+<mathjax-panel indent="0" block="true">\frac{}{ \{Q [X \mapsto a]\} \quad X ::= a \quad \{Q\} }
+</mathjax-panel>
+<p indent="0">We can prove formally that this rule is indeed valid.</p>
+<code-snippet indent="0" block="true">Theorem hoare_asgn : forall Q X a,
+    {{ Q [X |-&gt; a] }} (CAss X a) {{ Q }}.
+    Proof.
+        unfold hoare_triple. unfold assn_sub.
+        intros Q X a st st' HE HQ. inversion HE. subst.
+        assumption.
+    Qed.
+</code-snippet></div>
+<h5>Consequence</h5>
+<p indent="0">有的时候我们从其它证明规则中得到的前置条件和后置条件可能并不 是我们想使用的那个情形：</p>
+<p indent="1">- 它们可能在逻辑上符合需要，但是有着不同的形式而无法和期望的情形匹配；</p>
+<p indent="1">- 或者我们所得到的这个三元组的前条件 太弱，抑或是后条件太强。</p>
+<p indent="0">例如， <mathjax-panel>\{(X = 3) [X \mapsto 3] \} \; X := 3 \; \{X = 3\}
+</mathjax-panel> 可以直接由赋值规则所得，而  <mathjax-panel>\{ True \} \; X := 3 \; \{X = 3\}
+</mathjax-panel> 却不行。这个三元组是成立的，不过它并不是 hoare_asgn 的实例，因 为  <mathjax-panel>True
+</mathjax-panel> and  <mathjax-panel>(X = 3) [X \mapsto 3]
+</mathjax-panel> 在语法上并不是相同的断言。</p>
+<p indent="0">我们可以看到对一个成立的三元组加强前置条件 或者减弱后置条件总是能得到一个成立的三元组。这种想法可以用两条 '缩放规则（Rules of Consequence）' 来描述：</p>
+<div class="flex"><div><p indent="0">hoare_consequence_pre_equiv</p>
+<mathjax-panel indent="0" block="true">\frac{
+            \begin{gathered}
+            \{ P' \} \quad c \quad \{ Q \} \\
+            P \rightarrow P'
+            \end{gathered}
+        }{
+            \{ P \} \quad c \quad \{ Q \}
+        }
+</mathjax-panel>
+<code-snippet indent="0" block="true">Theorem hoare_consequence_pre : forall (P P' Q : Assertion) c,
+            {{ P' }} c {{ Q }} -&gt;
+            P -&gt;&gt; P' -&gt;
+            {{ P }} c {{ Q }}.
+        Proof.
+            intros P P' Q c Hhoare Himp.
+            intros st st' Hc HP. apply (Hhoare st st').
+            assumption. apply Himp. assumption. 
+        Qed.
+</code-snippet></div>
+<div><p indent="0">hoare_consequence_post</p>
+<mathjax-panel indent="0" block="true">\frac{
+            \begin{gathered}
+            \{ P \} \quad c \quad \{ Q' \} \\
+            Q' \rightarrow Q
+            \end{gathered}
+        }{
+            \{ P \} \quad c \quad \{ Q \}
+        }
+</mathjax-panel>
+<code-snippet indent="0" block="true">Theorem hoare_consequence_post : forall (P Q Q' : Assertion) c,
+            {{ P }} c {{ Q' }} -&gt;
+            Q' -&gt;&gt; Q -&gt;
+            {{ P }} c {{ Q }}.
+        Proof.
+            intros P Q Q' c Hhoare Himp.
+            intros st st' Hc HP.
+            apply Himp.
+            apply (Hhoare st st').
+            assumption. assumption. 
+        Qed.
+</code-snippet></div></div>
+<p indent="0">为了证明中的方便，我们有一个组合起来的缩放规则，可以让 我们同时改变前置条件和后置条件。</p>
+<code-snippet indent="0" block="true">Theorem hoare_consequence : forall (P P' Q Q' : Assertion) c,
+    {{ P' }} c {{ Q' }} -&gt;
+    P -&gt;&gt; P' -&gt;
+    Q' -&gt;&gt; Q -&gt;
+    {{ P }} c {{ Q }}.
+Proof.
+    intros P P' Q Q' c Hht HPP' HQ'Q.
+    apply hoare_consequence_pre with (P' := P').
+    apply hoare_consequence_post with (Q' := Q').
+    assumption. assumption. assumption. 
+Qed.
+</code-snippet>
+<h5>Skip</h5>
+<p indent="0">因为 SKIP 并不改变当前状态，它会保持 P：</p>
+<mathjax-panel indent="0" block="true">\frac{}{ \{P\} \quad skip \quad \{P\} }
+</mathjax-panel>
+<code-snippet indent="0" block="true">Theorem hoare_skip : forall P,
+    {{ P }} CSkip {{ P }}.
+Proof.
+    intros P st st' H HP. inversion H. subst.
+    assumption. 
+Qed.
+</code-snippet>
+<h5>Sequencing</h5>
+<p indent="0">如果命令 c1 将一个 P 成立的状态转变为 Q 成立的状态，而如果 c2 将 Q 成立的状态转变为 R 成立的， 那么先执行 c1 然后执行 c2 将会把一个 P 成立的状态转变 为一个 R 成立的状态：</p>
+<mathjax-panel indent="0" block="true">\frac{
+    \begin{gathered}
+    \{ P \} \quad c_1 \quad \{ Q \} \\
+    \{ Q \} \quad c_2 \quad \{ R \} 
+    \end{gathered}
+}{
+    \{ P \} \quad c_1; c_2 \quad \{ R \}
+}
+</mathjax-panel>
+<code-snippet indent="0" block="true">Theorem hoare_seq : forall P Q R c1 c2,
+    {{ Q }} c2 {{ R }} -&gt;
+    {{ P }} c1 {{ Q }} -&gt;
+    {{ P }} (CSeq c1 c2) {{ R }}.
+Proof.
+    intros P Q R c1 c2 H1 H2 st st' H12 Pre.
+    inversion H12; subst.
+    apply (H1 st'0 st'); try assumption.
+    apply (H2 st st'0); assumption. 
+Qed.
+</code-snippet>
+<h5>Conditionals</h5>
+<p indent="0">首先我们可以给出一个较弱的规则：如果断言 Q 在两个分支执行后都成立，它就对整个条件命令成立。</p>
+<mathjax-panel indent="0" block="true">\frac{
+    \begin{gathered}
+    \{ P \} \quad c_1 \quad \{ Q \} \\
+    \{ P \} \quad c_2 \quad \{ Q \} 
+    \end{gathered}
+}{
+    \{ P \} \quad \operatorname{TEST}\; b \;\operatorname{THEN}\; c1 \;\operatorname{ELSE}\; c2 \;\operatorname{FI} \quad \{ R \}
+}
+</mathjax-panel>
+<p indent="0">这没有利用到在 " <mathjax-panel>THEN
+</mathjax-panel> 分支中， <mathjax-panel>b
+</mathjax-panel> 化简为  <mathjax-panel>true
+</mathjax-panel> ，而在  <mathjax-panel>ELSE
+</mathjax-panel> 分支中我们知道它化简为  <mathjax-panel>false
+</mathjax-panel> " 这个信息。我们可以让这个信息作为 c1 和 c2 的假设出现。</p>
+<mathjax-panel indent="0" block="true">\frac{
+    \begin{gathered}
+    \{ P \land b \} \quad c_1 \quad \{ Q \} \\
+    \{ P \land \neg b \} \quad c_2 \quad \{ Q \} 
+    \end{gathered}
+}{
+    \{ P \} \quad \operatorname{TEST}\; b \;\operatorname{THEN}\; c1 \;\operatorname{ELSE}\; c2 \;\operatorname{FI} \quad \{ R \}
+}
+</mathjax-panel>
+<code-snippet indent="0" block="true">Theorem hoare_if : forall (P Q : Assertion) (b : bexp) c1 c2,
+    {{ fun st =&gt; P st /\ (beval st b = true) }} c1 {{ Q }} -&gt;
+    {{ fun st =&gt; P st /\ (beval st b = false) }} c2 {{ Q }} -&gt;
+    {{ P }} (CIf b c1 c2) {{Q}}.
+Proof.
+    intros P Q b c1 c2 HTrue HFalse st st' HE HP.
+    inversion HE; subst; eauto.
+Qed.
+</code-snippet>
+<h5>While Loops</h5>
+<p indent="0">The Hoare rule for while loops is based on the idea of an  <b>invariant</b> : an assertion whose truth is guaranteed before and after executing a command. An assertion P is an invariant of c if  <mathjax-panel>\{ P \} \quad c \quad \{ P \}
+</mathjax-panel> holds. </p>
+<p indent="1">Note that in the middle of executing c, the invariant might temporarily become false, but by the end of c, it must be restored.</p>
+<mathjax-panel indent="0" block="true">\frac{
+    \begin{gathered}
+    \{ P \} \quad c \quad \{ P \} 
+    \end{gathered}
+}{
+    \{ P \} \quad \operatorname{WHILE}\; b \;\operatorname{DO}\; c \;\operatorname{END} \quad \{ P \}
+}
+</mathjax-panel>
+<p indent="0">But the rule also omits two crucial pieces of information. </p>
+<p indent="1">- the loop terminates when b becomes false. So we can strengthen the postcondition in the conclusion.</p>
+<p indent="1">- the loop body will be executed only if b is true. So we can also strengthen the precondition in the premise.</p>
+<mathjax-panel indent="0" block="true">\frac{
+    \begin{gathered}
+    \{ P \land b \} \quad c \quad \{ P \} 
+    \end{gathered}
+}{
+    \{ P \} \quad \operatorname{WHILE}\; b \;\operatorname{DO}\; c \;\operatorname{END} \quad \{ P \land \neg b \}
+}
+</mathjax-panel>
+<p indent="0">断言  <mathjax-panel>P
+</mathjax-panel> 叫做 <b>循环不变式（invariant of the loop）</b> 。例如，如果  <mathjax-panel>P
+</mathjax-panel> 是断言  <mathjax-panel>X = 0
+</mathjax-panel> ，那么  <mathjax-panel>P
+</mathjax-panel> 是下述循环的不变式： <mathjax-panel>\operatorname{WHILE}\; (X = 2) \;\operatorname{DO}\; (X := 1) \;\operatorname{END}
+</mathjax-panel></p>
+<p indent="1">（我们把断言  <mathjax-panel>P
+</mathjax-panel> 叫做循环不变式并不代表它只是由  <mathjax-panel>\{ P \} \quad c \quad \{ P \}
+</mathjax-panel> 所保证。Being a loop invariant is different from being an invariant of the body</p>
+<code-snippet indent="0" block="true">Theorem hoare_while : forall (P : Assertion) (b : bexp) c,
+    {{ fun st =&gt; P st /\ (beval st b = true) }} c {{ P }} -&gt;
+    {{ P }} (CWhile b c) {{ fun st =&gt; P st /\ (beval st b = false) }}.
+Proof.
+    intros P b c Hhoare st st' He HP.
+    remember (CWhile b c) as wcom eqn:Heqwcom.
+    induction He;
+        try (inversion Heqwcom); subst; clear Heqwcom.
+    - (* E_WhileFalse *)
+        split; assumption. 
+    - (* E_WhileTrue *)
+        apply IHHe2. reflexivity.
+        apply (Hhoare st st'). assumption.
+        split; assumption. 
+Qed.
+</code-snippet>
+<h6>example</h6>
+<code-snippet indent="0" block="true">{{ X = m /\ Y = n }}
+while ~(X = 0) do
+    Y := Y - 1;
+    X := X - 1
+end
+{{ X = m /\ Y = n }}
+</code-snippet>
+<p indent="0">Once the outermost precondition and postcondition are chosen, the only creative part in verifying programs using Hoare Logic is finding the right loop invariants. </p>
+<p indent="0">To verify this program, we need to find an invariant Inv for the loop. As a first step we can leave Inv as an unknown and build a skeleton for the proof</p>
+<p indent="1">(working  <b>from the end of the program to the beginning</b> , as usual, and without any thinking at all yet).</p>
+<code-snippet indent="0" block="true">{{ X = m /\ Y = n }} -&gt;&gt; {{ Inv }} (a)
+while ~(X = 0) do
+{{ Inv /\ X != 0 }} -&gt;&gt; {{ Inv [X |-&gt; X-1] [Y |-&gt; Y-1] }} (b)
+    Y := Y - 1;
+{{ Inv [X |-&gt; X-1] }}
+    X := X - 1
+{{ Inv }}
+end
+{{ Inv /\ ~(X != 0) }} -&gt;&gt; {{ Y = n - m }} (c)
+</code-snippet>
+<p indent="0">我们需要找到一个  <code-snippet>Inv
+</code-snippet> 同时满足 (a)、(b)、(c)。One way to find an invariant that simultaneously satisfies these three conditions is by using an iterative process: </p>
+<p indent="1">start with a "candidate" invariant (e.g., a guess or a heuristic choice) and check the three conditions above; if any of the checks fails, try to use the information that we get from the failure to produce another.</p>
+<p indent="0">Guess  <code-snippet>Inv = (Y = n - m)
+</code-snippet> , </p>
+<code-snippet indent="0" block="true">{{ X = m /\ Y = n }} -&gt;&gt; {{ Y = n - m }} (a)
+while ~(X = 0) do
+{{ Y = n - m /\ X != 0 }} -&gt;&gt; {{ Y - 1 = n - m }} (b)
+    Y := Y - 1;
+{{ Y = n - m }}
+    X := X - 1
+{{ Y = n - m }}
+end
+{{ Y = n - m /\ ~(X != 0) }} -&gt;&gt; {{ Y = n - m }} (c)
+</code-snippet>
+<p indent="0">condition (c) is trivially satisfied, conditions (a) and (b) are wrong: the variable  <code-snippet>Y
+</code-snippet> changes during the loop, while  <code-snippet>m
+</code-snippet> and  <code-snippet>n
+</code-snippet> are constant, so the assertion we chose didn't have much chance of being an invariant!</p>
+<p indent="0">但是观察程序可以发现， <code-snippet>X
+</code-snippet> 和  <code-snippet>Y
+</code-snippet> 以相同的速率减小，我们可以利用 (c) 中  <code-snippet>~(X != 0)
+</code-snippet> 的条件将  <code-snippet>Inv
+</code-snippet> 改为  <code-snippet>Y - X = n - m
+</code-snippet></p>
+<code-snippet indent="0" block="true">{{ X = m /\ Y = n }} -&gt;&gt; {{ Y - X = n - m }} (a)
+while ~(X = 0) do
+{{ Y - X = n - m /\ X != 0 }} -&gt;&gt; {{ (Y - 1) - (X - 1) = n - m }} (b)
+    Y := Y - 1;
+{{ Y - (X - 1) = n - m }}
+    X := X - 1
+{{ Y - X = n - m }}
+end
+{{ Y - X = n - m /\ ~(X != 0) }} -&gt;&gt; {{ Y = n - m }} (c)
+</code-snippet>
+<p indent="0">Success! Conditions (a), (b) and (c) all hold now.</p>
+<br />
+<p indent="0">Property (Strong Progress): If t is a term, then either t is a value or else there exists a term t' such that t --> t'.</p>
+<p indent="1">tell us something interesting about values: they are exactly the terms that cannot make progress (normal forms) in this sense.</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

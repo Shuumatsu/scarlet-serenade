@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-09-12-C</title>
+        <link rel="stylesheet" href="../../web/static/main.css" />
+        <script src="../../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../../">Home</a>
+                <a href="../../about.html">About</a>
+                <a href="../../contact.html">Contact</a>
+                <a href="../../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-09-12-C</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">https://courses.cs.washington.edu/courses/cse351/16wi/sections/1/Cheatsheet-c.pdf</p>
+<br />
+<h3>file </h3>
+<p indent="0">Code for execution goes into files with ".c" suffix. </p>
+<p indent="0">Shared decl's (included using #include "mylib.h") in “header” files, end in “.h”</p>
+<h3>Casting</h3>
+<code-snippet indent="0" block="true">int a = (int) 3.131; // assigns a=3
+double b = 3.131;
+int a = *(int*)&amp;b; // interprets the double b as an integer (not necessarily 3)
+</code-snippet>
+<h3>Pointers & Array</h3>
+<p indent="0">一个指针是包含某个地址的一个变量。</p>
+<p indent="0">Note that a pointer is constrained to point to a particular kind of object: every pointer points to a specific data type. </p>
+<p indent="1">(There is one exception: a pointer to  <code-snippet>void
+</code-snippet> is used to hold any type of pointer but cannot be dereferenced itself. </p>
+<p indent="1">C 保证 0 永远不是一个有效的地址，所以一个 0 的返回值可以用来 signal an abnormal event。</p>
+<br />
+<p indent="0">通过一元运算符  <code-snippet>&amp;
+</code-snippet> 可以得到一个内存中的对象的地址（variables and array elements</p>
+<p indent="1">语句  <code-snippet>p = &amp;c;
+</code-snippet> 将  <code-snippet>c
+</code-snippet> 的地址赋予了变量  <code-snippet>p
+</code-snippet> ，此时  <code-snippet>p
+</code-snippet> 被称作  <code-snippet>c
+</code-snippet> 的指针。</p>
+<p indent="0">当将一元运算符  <code-snippet>*
+</code-snippet> 应用到一个指针上时，it accesses the object the pointer points to. </p>
+<p indent="1">The declaration of the pointer,  <code-snippet>int *ip;
+</code-snippet> is intended as a mnemonic; it says that the expression  <code-snippet>*ip
+</code-snippet> is an int. </p>
+<br />
+<p indent="0">e.g.,  <code-snippet>double *dp, atof(char *);
+</code-snippet> 表示  <code-snippet>*dp
+</code-snippet> 与  <code-snippet>atof(s)
+</code-snippet> 有着 double 类型的值，并且  <code-snippet>atof
+</code-snippet> 的参数是一个指向 char 的指针</p>
+<h4>Array</h4>
+<p indent="0"><code-snippet>a[i]
+</code-snippet> 可以写作  <code-snippet>*(a+i)
+</code-snippet> . 一个 array name 通常可被看作一个指针使用。不过有一点区别是，一个指针是一个变量，所以  <code-snippet>pa = arr_name
+</code-snippet> and  <code-snippet>pa++
+</code-snippet> 是合法的。但是 array name 并不是，所以  <code-snippet>arr_name = pa
+</code-snippet> and  <code-snippet>arr_name++
+</code-snippet> 这样的不合法。</p>
+<p indent="0">当一个 array name 作为参数传递到一个函数，实际上是传递了数组首元素的地址。在被调用的函数中，这个参数是一个指针局部变量。</p>
+<p indent="0">可以基于这个事实写出另一个版本的  <code-snippet>strlen
+</code-snippet> ：</p>
+<code-snippet indent="0" block="true">int strlen(char* s) {
+    int n;
+    for (n = 0; *s != '\0'; s++) { n++; };
+    return n;
+}
+</code-snippet>
+<p indent="0">基于同样的理由，也可以将一个子数组作为指针传递给函数，比如  <code-snippet>f(&amp;arr[2])
+</code-snippet> or  <code-snippet>f(arr + 2)
+</code-snippet></p>
+<br />
+<p indent="0"><code-snippet>p[-1], p[-2]
+</code-snippet> 这样的表达式都是合法的, 并且指向  <code-snippet>p[0]
+</code-snippet> 前相应距离的元素。</p>
+<code-snippet indent="0" block="true">int main() {
+    int val = -1;
+    printf(&quot;%d\n&quot;, &amp;val);
+    // -44822660
+    int arr[10];
+    printf(&quot;%d %d %d\n&quot;, arr - 1, arr[-1], *(arr - 1));
+    // -44822660 -1 -1
+}
+</code-snippet>
+<h4>String</h4>
+<p indent="0">C 语言没有直接的字符串类型支持，在 C 中，一个字符串是一个由 '0' 结尾的 char 类型的数组。</p>
+<h4>Pointers to Functions</h4>
+<p indent="0">需要注意括号与星号的位置：</p>
+<code-snippet indent="0" block="true">int* func_returns_int_pointer(void*, void*);
+int (*func_pointer_returns_int)(void*, void*);
+</code-snippet></section>
+    </article>
+</main>
+
+    </body>
+</html>

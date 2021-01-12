@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-08-30-logical-foundations</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-30-logical-foundations</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><h3>Functional Programming in Coq</h3>
+<p indent="0">在 Coq 中，检验的方式一共有三种：</p>
+<p indent="0">第一，我们可以用 Compute 指令来计算包含 next_weekday 的复合表达式：</p>
+<code-snippet indent="0" block="true">Compute (next_weekday friday).
+(* ==&gt; monday : day *)
+</code-snippet>
+<p indent="0">第二，我们可以将' 期望' 的结果写成 Coq 的示例：</p>
+<code-snippet indent="0" block="true">Example test_next_weekday:
+  (next_weekday (next_weekday saturday)) = tuesday.
+Proof. simpl. reflexivity. Qed.
+</code-snippet>
+<p indent="0">第三，我们可以让 Coq 从 Definition 中' 提取（Extract）' 出用其它更加常规的编程语言编写的程序 （如 OCaml、Scheme、Haskell 等）</p>
+<p indent="0">Coq 中的每个表达式都有类型，它描述了该表达式所计算的东西的类别。 Check 指令会让 Coq 显示一个表达式的类型。</p>
+<code-snippet indent="0" block="true">Check true.
+(* ===&gt; true : bool *)
+</code-snippet>
+<h4>Fixpoints and Structural Recursion</h4>
+<p indent="0">Coq 要求每个 Fixpoint 定义中的某些参数必须是 "递减的"。</p>
+<p indent="0">这项要求是 Coq 的基本特性之一，它保证了 Coq 中定义的所有函数对于所有输入都会终止。 然而，由于 Coq 的 "递减分析" 不是非常精致， 因此有时必须用一点不同寻常的方式来编写函数。</p>
+<p indent="0">you can write a sensible Fixpoint definition (of a simple function on numbers, say) that does terminate on all inputs, but that Coq will reject because of this restriction. </p>
+<h3>Proof by Induction</h3>
+<p indent="0">omitted</p>
+<h3>Working with Structured Data</h3>
+<p indent="0">执行 Search foo 会让 Coq 显示所有涉及到 foo 的定理。例如，去掉下面的注释后， 你会看到一个我们证明过的所有关于 rev 的定理的列表：</p>
+<code-snippet indent="0" block="true">(*  Search rev. *)
+</code-snippet>
+<h3>Polymorphism and Higher-Order Functions</h3>
+<p indent="0">Coq 支持定义' 多态' 归纳类型。 例如，以下就是 '多态列表' 数据类型。</p>
+<code-snippet indent="0" block="true">Inductive list (X:Type) : Type :=
+  | nil
+  | cons (x : X) (l : list X).
+</code-snippet>
+<p indent="0">list 是个从 Type 类型到 Type 类型的函数。</p>
+<code-snippet indent="0" block="true">Check list : Type -&gt; Type.
+Check nil : forall X : Type, list X.
+Check cons : forall X : Type, X -&gt; list X -&gt; list X.
+</code-snippet>
+<p indent="0">要使用多态函数，我们需要为其参数再额外传入一个或更多类型。 例如，前面 repeat 函数体中的递归调用必须传递类型 X。幸运的是，Coq 允许我们避免这种冗余。在任何我们可以写类型参数的地方，我们都可 以将类型参数写为 "洞" _，可以看做是说 "请 Coq 自行找出这里应该填什么。更确切地说，当 Coq 遇到 _ 时，它会尝试  <b>统一 (unify)</b> 所有的局部变量信息， 包括函数应当应用到的类型，其它参数的类型，以及应用函数的上下文中期望的类型， 以此来确定 _ 处应当填入的具体类型。</p>
+<p indent="0">这听起来很像类型标注推断。实际上，这两种个过程依赖于同样的底层机制。我们可以这样写  <code-snippet>repeat' (X : _) (x : _) (count : _) : list X :=
+</code-snippet></p>
+<p indent="0">我们甚至可以通过告诉 Coq ' 总是' 推断给定函数的类型参数来在大多数情况下 直接避免写 _。</p>
+<p indent="0">Arguments 用于指令指定函数或构造子的名字并列出其参数名， 花括号中的任何参数都会被视作隐式参数。（如果定义中的某个参数没有名字， 那么它可以用通配模式 _ 来标记。这种情况常见于构造子中。）</p>
+<code-snippet indent="0" block="true">Arguments nil {X}.
+Arguments cons {X} _ _.
+Arguments repeat {X} x count.
+</code-snippet>
+<p indent="0">现在我们完全不用提供类型参数了:  <code-snippet>Definition list123'' := cons 1 (cons 2 (cons 3 nil)).
+</code-snippet></p>
+<p indent="0">此外，我们还可以在定义函数时就声明隐式参数， 只需要将某个参数两边的圆括号换成花括号。例如：</p>
+<code-snippet indent="0" block="true">Fixpoint repeat''' {X : Type} (x : X) (count : nat) : list X :=
+  match count with
+  | 0 ⇒ nil
+  | S count' ⇒ cons x (repeat''' x count')
+  end.
+</code-snippet>
+<p indent="0">（注意我们现在甚至不必在  <code-snippet>repeat'''
+</code-snippet> 的递归调用中提供类型参数了， 实际上提供了反而是无效的，因为 Coq 并不想要它。）</p>
+<p indent="0">此外，我们还可以在函数名前加上前缀 @ 来强制将隐式参数变成显式的：</p>
+<code-snippet indent="0" block="true">Check @nil : forall X : Type, list X.
+Definition mynil' := @nil nat.
+</code-snippet>
+<h3>More Basic Tactics</h3>
+<p indent="0">所有构造子都是单射的， 而不同构造子构造出的值绝不可能相等</p>
+<p indent="0">在 Coq 中进行归纳证明时，有时控制归纳假设的确切形式是十分重要的。 特别是，在调用 induction 策略前，我们有时需要用 intros 将假设从目标移到上下文中时要十分小心。</p>
+<p indent="0">在 induction 之前做一些 intros 来获得更一般归纳假设并不总是奏效。 有时需要对量化的变量做一下' 重排'。例如，假设我们想要通过对 m 而非 n 进行归纳来证明 double_injective。我们可以先引入所有量化的变量，然后' 重新一般化（re-generalize）' 其中的一个或几个，选择性地从上下文中挑出几个变量并将它们放回证明目标的开始处。 用 generalize dependent 策略就能做到。</p>
+<code-snippet indent="0" block="true">Proof.
+  intros n m.
+  (* n and m are both in the context *)
+  generalize dependent n.
+  ...
+</code-snippet>
+<h3>Logic in Coq</h3>
+<p indent="0">Coq 是一门拥有' 类型' 的语言，也就是说，一切有意义的 表达式都具有一个相应的类型。逻辑表达也不例外，我们试图在 Coq 中证明的一切语句都有名为 Prop 的类型，即' 命题类型'。</p>
+<p indent="0">除了拥有类型之外，命题还是' 一等的（First-Class）' 实体， 即在 Coq 的世界中，我们可以像操作其它实体那样操作命题。例如，我们可以用 Definition 为命题取名，就像为其它表达式取名一样。</p>
+<code-snippet indent="0" block="true">Definition is_three (n : nat) : Prop :=
+  n = 3.
+</code-snippet>
+<p indent="0">相等关系运算符 = 也是一个返回 Prop 的函数。</p>
+<p indent="0">表达式 n = m 只是 eq n m 的语法糖（它使用 Notation 机制定义在 Coq 标准库中）。由于 eq 可被用于任何类型的元素，因此它也是多态的：</p>
+<code-snippet indent="0" block="true">Check @eq : forall A : Type, A -&gt; A -&gt; Prop.
+</code-snippet>
+<p indent="0">（注意我们写的是 @eq 而非 eq：eq 的类型参数 A 是隐式声明的，因此我们需要关掉隐式参数的类型推断以便看到 eq 的完整类型。）</p>
+<p indent="0">Coq 将  <code-snippet>¬ P
+</code-snippet> 定义为  <code-snippet>P -&gt; False
+</code-snippet> ，而 False 是在标准库中特别定义的矛盾性命题。</p>
+<p indent="0">除 False 外，Coq 的标准库中还定义了 True，一个明显真的命题。 为了证明它，我们使用了预定义的常量 I : True：</p>
+<code-snippet indent="0" block="true">Lemma True_is_true : True.
+Proof. apply I. Qed.
+</code-snippet>
+<p indent="0">不等性是十分常见的否定句的例子，，它有一个特别的记法 x ≠ y：</p>
+<code-snippet indent="0" block="true">Notation &quot;x &lt;&gt; y&quot; := (~(x = y)).
+</code-snippet>
+<h4>Existential Quantification</h4>
+<p indent="0">为了证明形如 ∃ x, P 的语句，我们必须证明 P 对于某些特定的 x 成立，这些特定的 x 被称作存在性的' 例证'。反之，如果我们的的上下文中有形如 ∃ x, P 的存在前提， 可以将其解构得到一个例证 x 和一个陈述 P 对于 x 成立的前提。</p>
+<code-snippet indent="0" block="true">Definition even x := ∃ n : nat, x = double n.
+Lemma four_is_even : even 4.
+Proof.
+  unfold even. ∃ 2. reflexivity.
+Qed.
+</code-snippet>
+<h4>Applying Theorems to Arguments</h4>
+<p indent="0">Coq 的一个特性是， 它将' 证明' 本身也作为一等对象。</p>
+<p indent="0">对于几乎所有将定理名作为参数的策略而言，你都可以 "将定理作为函数" 来使用。 注意，定理应用与函数应用使用了同样的类型推导机制，所以你可以将通配符作为定理的参数， 或者为定理声明默认的隐式前提。</p>
+<p indent="0">显式地对 x 的值应用引理。</p>
+<code-snippet indent="0" block="true">Lemma in_not_nil_42_take4 :
+  forall l : list nat, In 42 l -&gt; l ≠ [].
+Proof.
+  intros l H.
+  apply (in_not_nil nat 42).
+  apply H.
+Qed.
+</code-snippet>
+<p indent="0">显式地对假设应用引理。</p>
+<code-snippet indent="0" block="true">Lemma in_not_nil_42_take5 :
+  forall l : list nat, In 42 l -&gt; l ≠ [].
+Proof.
+  intros l H.
+  apply (in_not_nil _ _ _ H).
+Qed.
+</code-snippet>
+<h4>Coq vs. Set Theory</h4>
+<p indent="0">Coq 的逻辑核心，即' 归纳构造演算（Calculus of Inductive Constructions）' 系统， 在很多重要的方面不同于数学家用来写下精确而严谨的定义和证明的形式化系统。 例如，在主流的纸笔数学家中使用最普遍的' 策梅洛 - 弗兰克尔集合论（ZFC）' 中， 一个数学对象可同时属于不同的集合；而在 Coq 的逻辑中，一个项最多只属于一个类型。</p>
+<p indent="0">在一般的数学研究中，对于任意两个函数 f 和 g， 只要它们对相同的输入产生相等的结果，那么它们就被认为相等：</p>
+<code-snippet indent="0" block="true">(forall x, f x = g x) -&gt; f = g
+</code-snippet>
+<p indent="0">This is known as the principle of functional extensionality. Thus, functional extensionality simply means that a function's identity is completely determined by what we can observe from it </p>
+<p indent="0">我们可以用 Axiom 指令将函数的外延性添加到 Coq 的核心逻辑系统中。</p>
+<code-snippet indent="0" block="true">Axiom functional_extensionality : forall {X Y: Type}
+                                    {f g : X -&gt; Y},
+  (forall (x:X), f x = g x) -&gt; f = g.
+</code-snippet>
+<h4>Classical vs. Constructive Logic</h4>
+<p indent="0">以下推理原则即便符合直觉， 不过在 Coq 中它是不可证明的：</p>
+<code-snippet indent="0" block="true">Definition excluded_middle := forall P : Prop,
+  P ∨ ¬ P.
+</code-snippet>
+<p indent="0">一般的排中律在 Coq 中默认并不可用，像 Coq 一样不假设排中律成立的逻辑系统被称作' 构造逻辑'。</p>
+<p indent="0">以下四条陈述的每一条，以及 excluded_middle 可以认为刻画了经典逻辑。</p>
+<code-snippet indent="0" block="true">Definition peirce := forall P Q: Prop,
+  ((P -&gt; Q) -&gt; P) -&gt; P.
+
+Definition double_negation_elimination := forall P: Prop,
+  ~~P -&gt; P.
+
+Definition de_morgan_not_and_not := forall P Q: Prop,
+  ~(~P /\ ~Q) -&gt; P \/ Q.
+
+Definition implies_to_or := forall P Q: Prop,
+  (P -&gt; Q) -&gt; (~P \/ Q).
+</code-snippet>
+<p indent="0">证明如下（证明一条将它们连接起来的单向蕴含环链。</p>
+<code-snippet indent="0" block="true">(* excluded_middle -&gt; peirce: 直接展开即可
+peirce -&gt; excluded_middle: 排中律可看作 perice 的 Q 为 ~(P \/ ~P) 时的情况 *)
+Theorem exc_mid_peirce:
+  excluded_middle &lt;-&gt; peirce.
+Proof. intros. unfold excluded_middle, peirce. split.
+  - intros. destruct (H P).
+    + assumption.
+    + apply H0. intros. unfold not in H1. apply H1 in H2. contradiction.
+  - intros. apply (H _ (~(P \/ ~P))). unfold not. intro. right. intro. 
+    apply H0; left; assumption.
+Qed.
+</code-snippet>
+<h3>Inductively Defined Propositions</h3>
+<p indent="0">可将偶数性质的定义翻译为在 Coq 中使用 Inductive 声明的定义， 声明中每一个构造子对应一个推断规则：</p>
+<code-snippet indent="0" block="true">Inductive ev : nat -&gt; Prop :=
+| ev_0 : ev 0
+| ev_SS (n : nat) (H : ev n) : ev (S (S n)).
+</code-snippet>
+<p indent="0">在 Coq 中，我们可以认为  <code-snippet>ev
+</code-snippet> 定义了一个性质  <code-snippet>ev : nat -&gt; Prop
+</code-snippet> ，其包括 "证据构造子"  <code-snippet>ev_0 : ev 0
+</code-snippet> 和  <code-snippet>ev_SS : forall n, ev n -&gt; ev (S (S n))
+</code-snippet> 。这些 “证据构造子” 等同于已经证明过的定理。 具体来说，我们可以使用 Coq 中的  <code-snippet>apply
+</code-snippet> 策略和规则名称来证明某个数的  <code-snippet>ev
+</code-snippet> 性质</p>
+<code-snippet indent="0" block="true">Theorem ev_4 : ev 4.
+Proof. apply ev_SS. apply ev_SS. apply ev_0. Qed.
+</code-snippet>
+<p indent="0">在  <code-snippet>Inductive
+</code-snippet> 定义中，类型构造子冒号左侧的参数叫做形参（Parameter）， 而右侧的叫做索引（Index）或注解（Annotation）。</p>
+<p indent="0"><code-snippet>ev
+</code-snippet> 中的  <code-snippet>nat
+</code-snippet> 参数出现在冒号'右侧'，这允许在不同的构造子类型中使用不同的值：例如  <code-snippet>ev_0
+</code-snippet> 类型中的  <code-snippet>0
+</code-snippet> 以及  <code-snippet>ev_SS
+</code-snippet> 类型中的  <code-snippet>S (S n)
+</code-snippet> 。与此相应， 每个构造子的类型必须在冒号后显式指定</p>
+<p indent="0">对比  <code-snippet>list
+</code-snippet> 的定义</p>
+<code-snippet indent="0" block="true">Inductive list (X:Type) : Type :=
+    | nil
+    | cons (x : X) (l : list X).
+</code-snippet>
+<p indent="0">它以'全局的方式'在冒号'左侧' 引入了参数 X， 强迫 nil 和 cons 的结果为同一个类型（list X）。如果在定义  <code-snippet>ev
+</code-snippet> 时将  <code-snippet>nat
+</code-snippet> 置于冒号左侧，就会得到如下错误：</p>
+<code-snippet indent="0" block="true">Fail Inductive wrong_ev (n : nat) : Prop :=
+| wrong_ev_0 : wrong_ev 0
+| wrong_ev_SS (H: wrong_ev n) : wrong_ev (S (S n)).
+(* ===&gt; Error: Last occurrence of &quot;wrong_ev&quot; must have &quot;n&quot;
+        as 1st argument in &quot;wrong_ev 0&quot;. *)
+</code-snippet>
+<p indent="0"><code-snippet>wrong_ev_0
+</code-snippet> 与  <code-snippet>wrong_ev_SS
+</code-snippet> 的类型不一致，前者是 wrong_ev 0 而后者不是。</p>
+<h4>Inversion on Evidence</h4>
+<p indent="0">对于这类证据使用' 归纳（induction）' 和' 分类讨论（case analysis）' 来进行论证是可行的。</p>
+<p indent="0">用 destruct 解构证据即可证明下述定理（这就是对证明进行反演）：</p>
+<code-snippet indent="0" block="true">Theorem ev_minus2 : forall n,
+  ev n → ev (pred (pred n)).
+Proof.
+  intros n E.
+  destruct E as [| n' E'].
+  - (* E = ev_0 *) simpl. apply ev_0.
+  - (* E = ev_SS n' E' *) simpl. apply E'.
+Qed.
+</code-snippet>
+<p indent="0">考虑另一种情况</p>
+<code-snippet indent="0" block="true">Theorem evSS_ev : forall n,
+  ev (S (S n)) → even n.
+Proof.
+  intros n E.
+  destruct E as [| n' E'] eqn:EE.
+  - (* E = ev_0. *)
+    (* 我们须证明 n 是偶数，但没有任何有用的假设信息可以使用！ *)
+Abort.
+</code-snippet>
+<p indent="0">直观来说，我们知道支撑前提的证据不会由 ev_0 组成，因为 0 和 S 是 nat 类型不同的构造子；由此 ev_SS 是唯一需要应对的情况（译注：ev_0 无条件成立）。 不幸的是，destruct 并没有如此智能，它仍然为我们生成两个子目标。</p>
+<p indent="0">这里  <code-snippet>destruct E
+</code-snippet> 之后， <code-snippet>ev (S (S n))
+</code-snippet> 中的  <code-snippet>S (S n)
+</code-snippet> 在假设中被"忘记"了，并为  <code-snippet>ev_0
+</code-snippet> 的情况生成了子目标，如果我们记住  <code-snippet>S (S n)
+</code-snippet> 的话就可以利用爆炸原理  <code-snippet>0 = S (S n)
+</code-snippet> 证得该子目标：</p>
+<code-snippet indent="0" block="true">Theorem evSS_ev_remember : ∀ n,
+  ev (S (S n)) → ev n.
+Proof.
+  intros n H. remember (S (S n)) as k. destruct H as [|n' E'].
+  - (* E = ev_0 *)
+    (* Now we do have an assumption, in which k = S (S n) has been
+       rewritten as 0 = S (S n) by destruct. That assumption
+       gives us a contradiction. *)
+    discriminate Heqk.
+  - (* E = ev_S n' E' *)
+    (* This time k = S (S n) has been rewritten as S (S n') = S (S n). *)
+    injection Heqk as Heq. rewrite Heq in E'. apply E'.
+Qed.
+</code-snippet>
+<p indent="0">Alternatively, the proof is straightforward using our inversion lemma.</p>
+<code-snippet indent="0" block="true">Theorem evSS_ev : ∀ n, ev (S (S n)) → ev n.
+Proof. intros n H. apply ev_inversion in H. destruct H.
+ - discriminate H.
+ - destruct H as [n' [Hnm Hev]]. injection Hnm as Heq.
+   rewrite Heq. apply Hev.
+Qed.
+</code-snippet>
+<p indent="0"><code-snippet>inversion
+</code-snippet> 的工作原理大致如下：</p>
+<p indent="1">- 接受一个前提  <code-snippet>H
+</code-snippet> ，该前提的类型  <code-snippet>P
+</code-snippet> 是通过归纳定义的，以及</p>
+<p indent="1">- 对于  <code-snippet>P
+</code-snippet> 的定义里的每一个构造子  <code-snippet>C
+</code-snippet> ，</p>
+<p indent="2">- 产生一个新的子目标，在该子目标中我们假设  <code-snippet>H
+</code-snippet> 是通过  <code-snippet>C
+</code-snippet> 构造的，</p>
+<p indent="2">- 作为额外的假设，在子目标的上下文中增加  <code-snippet>C
+</code-snippet> 的论据（前提），</p>
+<p indent="2">- 将  <code-snippet>C
+</code-snippet> 的结论（结果类型）与当前的目标相匹配，计算出为了能够应用  <code-snippet>C
+</code-snippet> 而必须成立的一些相等关系，将这些相等关系加入上下文中（以及，为了方便，在目标中替换它们），以及</p>
+<p indent="2">- 如果这些相等关系无法满足（例如，它们涉及到 S n = O），那么立即解决这个子目标。</p>
+<h4>Induction on Evidence</h4>
+<p indent="0">我们可以用  <code-snippet>destruct
+</code-snippet> 进行分类讨论，同样我们也可以用  <code-snippet>induction
+</code-snippet> 进行归纳</p>
+<h4>Inductive Relations</h4>
+<p indent="0">我们可以认为被一个数所参数化的命题（比如 ev）是一个' 性质'，也即， 它定义了 nat　的一个子集，其中的数可以被证明满足此命题。 以同样的方式，我们可认为有两个参数的命题是一个' 关系'，也即，它定义了一个 可满足此命题的序对集合。</p>
+<h4>remember tactics</h4>
+<p indent="0">在 Coq 中调用 remember e as x 策略会（1）替换所有表达式 e 为变量 x， （2）在当前上下文中添加一个等式 x = e。</p>
+<p indent="0">// TODO</p>
+<h4>Improving Reflection</h4>
+<p indent="0">TODO </p>
+<h3>Total And Partial Maps</h3>
+<p indent="0">omitted </p>
+<h3>The Curry-Howard Correspondence</h3>
+<p indent="0">该同构启发很多看问题的新方法。例如考虑偶数的 inductive 定义：</p>
+<code-snippet indent="0" block="true">Inductive ev : nat -&gt; Prop :=
+  | ev_0 : ev 0
+  | ev_SS : forall n, ev n -&gt; ev (S (S n)).
+</code-snippet>
+<p indent="0"><code-snippet>ev
+</code-snippet> 定义中第二行的  <code-snippet>ev_0 : ev 0
+</code-snippet> 可以读作 “ev_0 是 ev 0 的证明” 也可以读作 “ev_0 的类型为 ev 0”。</p>
+<p indent="0"><code-snippet>Check ev_SS : forall n, ev n -&gt; ev (S (S n)).
+</code-snippet> 可以将其读作 “ev_SS 构造子接受两个参数 —— 数字 n 以及命题 ev n 的证明 —— 并产生 ev (S (S n)) 的证明。”</p>
+<p indent="0">既在类型层面表达 “具有……类型”，又在命题层面表示 “是……的证明”。 这种双关称为' 柯里 - 霍华德同构（Curry-Howard correspondence）'。 </p>
+<br />
+<p indent="0">有关  <code-snippet>ev
+</code-snippet> 的一个证明,  <code-snippet>Theorem ev_4 : ev 4. Proof. apply ev_SS. apply ev_SS. apply ev_0. Qed.
+</code-snippet> 产生了一个  <b>'证据对象' (proof object)</b></p>
+<p indent="0">实际上，我们也可以不借助脚本 '直接' 写出表达式作为证明。 <code-snippet>Check (ev_SS 2 (ev_SS 0 ev_0)) : ev 4.
+</code-snippet></p>
+<br />
+<p indent="0">在 Coq 的计算世界里（即所有的数据结构和程序存在的地方），有两种值的 类型中拥有箭头：一种是' 构造子 (Constructor)'，它通过归纳地定义数据类型 引入，另一种是' 函数 (Function)'。</p>
+<p indent="0">类似地，在 Coq 的逻辑世界里（即我们运用证明的地方），有两种方式来给 与蕴含式需要的证据：构造子，通过归纳地定义命题引入，和函数</p>
+<p indent="1">考虑下列陈述： <code-snippet>Theorem ev_plus4 : forall n, ev n → ev (4 + n).
+</code-snippet> 我们在寻找一个 '类型 (Type)' 是  <code-snippet>forall n, ev n -&gt; ev (4 + n)
+</code-snippet> 的表达式 —— 也 就是说，一个接受两个参数（一个数字和一个证据）并返回一个证据的 ' 函数 (Function)'</p>
+<br />
+<p indent="0">到蕴含式（->）和量化（∀）都表示证据上的函数。事实上，他们 是同一个东西：当我们使用  <code-snippet>∀
+</code-snippet> 时没有依赖，就可以简写为当  <code-snippet>-&gt;
+</code-snippet> 。即，我们没有必要给与箭头左边的类型一个名字： <code-snippet>forall (x:nat), nat = forall (_: nat), nat = nat -&gt; nat
+</code-snippet></p>
+<p indent="0">总的来说，"P -> Q"只是"forall (_:P), Q" 的语法糖。</p>
+<code-snippet indent="0" block="true">Definition conj_fact : forall P Q R, P /\ Q -&gt; Q /\ R -&gt; P /\ R := 
+  fun P Q R (H1: P /\ Q) (H2: Q /\ R) =&gt; match H1 with 
+    | conj P _ =&gt; match H2 with 
+      | conj _ R =&gt; conj P R
+    end
+  end.
+</code-snippet>
+<br />
+<p indent="0">归纳定义足够用于表达我们目前为止遇到的大多数的联结词。事实上， 只有全称量化（以及作为特殊情况的蕴含式）是 Coq 内置的，所有其他的都是被归纳 定义的。</p>
+<code-snippet indent="0" block="true">Inductive and (A B:Prop) : Prop :=
+  conj : A -&gt; B -&gt; A /\ B
+
+Inductive or (A B:Prop) : Prop :=
+  | or_introl : A -&gt; A \/ B
+  | or_intror : B -&gt; A \/ B
+where &quot;A \/ B&quot; := (or A B) : type_scope.
+
+Inductive ex {A : Type} (P : A → Prop) : Prop :=
+| ex_intro : ∀ x : A, P x → ex P.
+
+Inductive True : Prop :=
+  I : True.
+
+(* False 是一个 '没有' 构造子的归纳类型 -- 即，没有任何方式能够构造一个它的证明。 *)
+Inductive False : Prop :=.
+
+Definition not (A:Prop) := A -&gt; False.
+
+Inductive ex (A:Type) (P:A -&gt; Prop) : Prop :=
+  ex_intro : forall x:A, P x -&gt; ex (A:=A) P.
+</code-snippet>
+<p indent="0">在 Coq 里，甚至连相等关系都不是内置的。它拥有如下的归纳定义。</p>
+<code-snippet indent="0" block="true">Inductive eq (A:Type) (x:A) : A -&gt; Prop :=
+    eq_refl : x = x :&gt;A
+</code-snippet>
+<p indent="0">事实上，相等关系的归纳定义和 Leibniz 相等关系是 '等价的 (equivalent)'。</p>
+<code-snippet indent="0" block="true">Lemma leibniz_equality_equality : forall (X : Type) (x y: X),
+  (forall P: X -&gt; Prop, P x -&gt; P y) -&gt; x = y.
+Proof.
+  intros. apply (H (fun z =&gt; x = z)). apply eq_refl.
+Qed.
+</code-snippet>
+<h3>IndPrinciples</h3>
+<p indent="0">每当我们使用 Inductive 来声明数据类型时，Coq 就会自动为该类型生成 '归纳法则'。通常，为归纳类型 t 生成的归纳法则形式如下：每个构造子 c 都会生成归纳法则中的一种情况</p>
+<p indent="1">- 若 c 不接受参数，该情况为 </p>
+<p indent="2">P 对 c 成立</p>
+<p indent="1">- 若 c 接受参数 x1:a1 ... xn:an，该情况为：</p>
+<p indent="2">对于所有的  <code-snippet>x1:a1 ... xn:an
+</code-snippet> ，若  <code-snippet>P
+</code-snippet> 对每个类型为  <code-snippet>t
+</code-snippet> 的参数都成立，则  <code-snippet>P
+</code-snippet> 对于  <code-snippet>c x1 ... xn
+</code-snippet> 成立</p>
+<p indent="0">例如对归纳定义的自然数和多态列表</p>
+<code-snippet indent="0" block="true">Check nat_ind.
+(* ===&gt;
+   nat_ind : forall P : nat -&gt; Prop,
+      P 0 -&gt;
+      (forall n : nat, P n -&gt; P (S n)) -&gt;
+      forall n : nat, P n  *)
+
+Inductive list (X:Type) : Type :=
+    | nil : list X
+    | cons : X -&gt; list X -&gt; list X.
+
+Check list_ind.
+(* list_ind: forall (X : Type) (P : list X -&gt; Prop),
+       P (nil X) -&gt;
+       (forall (x : X) (l : list X), P l -&gt; P (cons X x l)) -&gt;
+       forall l : list X, P  *)
+</code-snippet>
+<p indent="0">There's nothing magic about this induction lemma: it's just another Coq lemma that requires a proof. Coq generates the proof automatically too...</p>
+<code-snippet indent="0" block="true">Definition nat_id := 
+    fun (P : nat -&gt; Prop)
+        (* Suppose we have evidence f that P holds on 0 *)
+        (f : P 0)
+        (* and evidence f0 that ∀ n:nat, P n -&gt; P (S n) *)
+        (f0 : forall n : nat, P n -&gt; P (S n)) =&gt; 
+        (* Then we can prove that P holds of an arbitrary nat n via a recursive function F  *)
+        (* (here defined using the expression form Fix rather than by a top-level Fixpoint declaration) *)
+            fix F (n : nat) : P n := match n with
+                | 0 =&gt; f
+                | S n0 =&gt; f0 n0 (F n0)
+            end.
+</code-snippet>
+<p indent="0">We can adapt this approach to proving nat_ind to help prove non-standard induction principles too. 例如证明  <code-snippet>Lemma evenb_ev : ∀ n: nat, evenb n = true -&gt; ev n.
+</code-snippet> 时，偶数是两个一跳的，对  <code-snippet>n
+</code-snippet> 进行归纳对于  <code-snippet>evenb
+</code-snippet> 并没有多大作用。Attempts to prove this by standard induction on n fail in the case for S (S n), because the induction hypothesis only tells us something about S n, which is useless.</p>
+<p indent="0">But we can make a much better proof by defining and proving a non-standard induction principle that goes "by twos":</p>
+<code-snippet indent="0" block="true">Definition nat_ind2 : forall (P : nat -&gt; Prop),
+    P 0 -&gt;
+    P 1 -&gt;
+    (forall n : nat, P n -&gt; P (S(S n))) -&gt;
+    forall n : nat , P n := fun P P0 P1 PSS =&gt;
+        fix f (n:nat) := match n with
+            | 0 =&gt; P0
+            | 1 =&gt; P1
+            | S (S n') =&gt; PSS n' (f n')
+        end.
+
+Fixpoint evenb (n:nat) : bool := match n with
+    | O        =&gt; true
+    | S O      =&gt; false
+    | S (S n') =&gt; evenb n'
+end.
+
+Inductive ev : nat -&gt; Prop :=
+    | ev_0 : ev 0
+    | ev_SS (n : nat) (H : ev n) : ev (S (S n)).
+
+
+Lemma evenb_ev : forall n, evenb n = true -&gt; ev n.
+Proof.
+    intros. induction n as [ | |n'] using nat_ind2.
+        - apply ev_0.
+        - simpl in H. inversion H.
+        - simpl in H. apply ev_SS. apply IHn'. apply H.
+Qed.
+</code-snippet>
+<p indent="0">Coq 也为归纳定义的'命题'生成归纳法则，例如我们要对具有性质  <code-snippet>even
+</code-snippet> 的自然数归纳证明证明  <code-snippet>P
+</code-snippet></p>
+<code-snippet indent="0" block="true">Inductive even : nat -&gt; Prop :=
+    | ev_0 : even 0
+    | ev_SS (n : nat) : even n -&gt; even (S (S n)).
+
+Check even_ind.
+(* even_ind: forall P : nat -&gt; Prop,
+       P 0 -&gt;
+       (forall n : nat, even n -&gt; P n -&gt; P (S (S n))) -&gt;
+       forall n : nat, even n -&gt; P  *)
+</code-snippet></section>
+    </article>
+</main>
+
+    </body>
+</html>

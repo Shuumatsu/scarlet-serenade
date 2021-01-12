@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-08-24-software-analysis</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-08-24-software-analysis</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">Analyze a program to reason about its behaviors and determine whether it satisfies some properties </p>
+<h3>Sound & Complete</h3>
+<p indent="0"><b>Sound</b> : over-approximation</p>
+<p indent="0"><b>Complete</b> : under-approximation</p>
+<p indent="1">e.g. 某个程序有 10 个指针错误，一个 Sound 的分析可能得出除了真实的那 10 个错误外还有其他错误，一个 Complete 的分析可能得出在那 10 个错误中的 2 个错误</p>
+<code-snippet indent="1" block="true">+------------------------------+
+|                              |
+|        +---------------------+
+|        |                     |
+|        |         +-----------+
+|        |         |           |
+| Sound  |  Truth  |  Complete |
+|        |         |           |
++--------+---------+-----------+
+</code-snippet>
+<p indent="0">Rice Theorem tells us that we cannot build an analyzer thats both  <b>sound</b> and  <b>complete</b></p>
+<p indent="0">Two options:</p>
+<p indent="1">- Compromise Soundness: 造成漏报</p>
+<p indent="1">- Compromise Completeness: 造成误报</p>
+<p indent="0">Most of the time we prefer compromising completeness. </p>
+<p indent="0">Static Analysis ensure (or get close to) Soundness while making good trade offs between precision and speed.</p>
+<h3>Static Analysis</h3>
+<p indent="0">Static Analysis = Abstraction + over-approximation</p>
+<p indent="1">e.g. 例如分析程序中变量的符号</p>
+<p indent="2">- Abstraction: </p>
+<code-snippet indent="3" block="true">Concrete Domain         Abstract Domain
+    v = 100                 P
+    v = - 1                 N 
+    v = 0                   O
+    v = e ? 1 : -1          T (unknown)
+</code-snippet>
+<p indent="2">- over-approximation: Transfer function</p>
+<p indent="3">defines how to evaluate different program statements on abstract values</p>
+<p indent="4">e.g. </p>
+<code-snippet indent="4" block="true">P + P = P
+P + N = T
+</code-snippet>
+<h3>IR</h3>
+<h4>Ast vs IR</h4>
+<p indent="0">Ast: </p>
+<p indent="1">- high level and close to grammar structure</p>
+<p indent="1">- usually language dependent </p>
+<p indent="1">- lack of control flow information</p>
+<p indent="1">- suitable for fast type checking </p>
+<p indent="0">IR:</p>
+<p indent="1">- low level and closed to machine code</p>
+<p indent="1">- usually language independent</p>
+<p indent="1">- contains control flow information</p>
+<p indent="0">IR is usually considered as the basis for static analysis.</p>
+<h4>3-addr-code </h4>
+<p indent="0">omitted.</p>
+<h4>Static Single Assignment</h4>
+<p indent="0">All assignments in SSA are to variables with distinct names</p>
+<br />
+<p indent="0">What if a variable use is at control flow merges?</p>
+<code-snippet indent="1" block="true">if a = 1                if a = 1 
+then x_0 = 1            then x_0 = 1
+else x_1 = 2            else x_1 = 2
+y = x + 7        =&gt;     x = phi(x_0, x_1)
+                        y = x + 7
+</code-snippet>
+<p indent="0">A special merge operator  <mathjax-panel>\phi
+</mathjax-panel> , (called phi-function), is introduced to select the values at merge nodes</p>
+<p indent="0"><mathjax-panel>\phi(x_0, x_1)
+</mathjax-panel> has the value  <mathjax-panel>x_0
+</mathjax-panel> if the control flow passes through the true part of the conditional and the value  <mathjax-panel>x_1
+</mathjax-panel> otherwise</p>
+<h5>Advantages & Disadvantages</h5>
+<p indent="0">Advantages of SSA:</p>
+<p indent="1">Flow information is indirectly incorporated into the unique variable names</p>
+<p indent="2">(even flow-insensitive analysis gains partial precision of flow-sensitive analysis via SSA</p>
+<p indent="1">Define-and-Use pairs are explicit</p>
+<p indent="2">Enable more effective data facts storage and propagation in some on-demand tasks</p>
+<p indent="2">Some optimization tasks perform better on SSA (e.g. conditional constant propagation, global value numbering</p>
+<p indent="0">Disadvantages of SSA: </p>
+<p indent="1">May introduce too many variables and phi-functions</p>
+<p indent="1">May introduce inefficiency problem when translating to machine code (due to copy operations)</p>
+<h3>Control Flow Analysis</h3>
+<p indent="0">Usually refer to building Control Flow Graph (CFG)</p>
+<p indent="1">CFG serves as the basic structure for static analysis. The node in CFG is a Basic Block (BB). </p>
+<p indent="0"><b>Basic blocks (BB)</b> are maximal sequences of consecutive three-address instructions with the properties that</p>
+<p indent="1">It can be entered only at the beginning</p>
+<p indent="1">It can be exited only at the end</p>
+<p indent="0"><b>How to build Basic Blocks?</b></p>
+<p indent="0">INPUT: A sequence of three-address instructions </p>
+<p indent="0">OUTPUT: A list of basic blocks of P</p>
+<p indent="0">Steps: </p>
+<p indent="1">1. Determine the leaders in P</p>
+<p indent="2">- The first instruction in P is a leader</p>
+<p indent="2">- Any target instruction of a conditional or unconditional jump is a leader</p>
+<p indent="2">- Any instruction that immediately follows a conditional or unconditional jump is a leader</p>
+<p indent="1">2. Build BBs for P</p>
+<p indent="2">- A BB consists of a leader and all its subsequent instructions until the next leader</p>
+<p indent="0"><b>How to build CFG on top of BBs?</b></p>
+<p indent="1">The nodes of CFG are basic blocks. Usually we add two nodes, Entry and Exit. (They do not correspond to executable IR</p>
+<p indent="1">There is an edge from block A to block B if and only if</p>
+<p indent="2">- There is a conditional or unconditional jump from the end of A to the beginning of B</p>
+<p indent="2">- B immediately follows A in the original order of instructions</p>
+<p indent="0">may analysis: outputs information that may be true (over-approximation)</p>
+<p indent="0">must analysis: outputs information that must be true (under-approximation)</p>
+<p indent="0">Input and Output States</p>
+<p indent="0">Each execution of an IR statement transforms an input state to a new output state</p>
+<p indent="0">The input (output) state is associated with the program point before (after) the statement</p>
+<p indent="0">In each data-flow analysis application, we associate with every program point a data-flow value that represents an abstraction of the set of all possible program states that can be observed for that point.</p>
+<p indent="0">Data-flow analysis is to find a solution to a set of safe-approximation directed constraints on the IN[s]’s and OUT[s]’s, for all statements s.</p>
+<p indent="1">- constraints based on semantics of statements (transfer functions)</p>
+<p indent="1">- constraints based on the flows of control</p>
+<h3>Forward Analysis & Backward Analysis</h3>
+<p indent="0">omitted</p>
+<h3>Reaching Definitions Analysis</h3>
+<p indent="0">Definition: A definition  <code-snippet>d
+</code-snippet> at program point  <code-snippet>p
+</code-snippet> reaches a point  <code-snippet>q
+</code-snippet> if there is a path from  <code-snippet>p
+</code-snippet> to  <code-snippet>q
+</code-snippet> such that  <code-snippet>d
+</code-snippet> is not “killed” along that path</p>
+<img src="./reaching-definition.png" height="120" />
+<p indent="0">Reaching definitions can be used to detect possible undefined variables.</p>
+<p indent="1">e.g. introduce a dummy definition for each variable v at the entry of CFG, and if the dummy definition of v reaches a point p where v is used, then v may be used before definition (as undefined reaches v)</p>
+<p indent="0">abstraction: definitions can be represented by bit vectors</p>
+<p indent="1"><code-snippet>e.g., D1, D2, D3, D4, ..., D100 (100 definitions)
+</code-snippet></p>
+<p indent="0">transfer function: </p>
+<code-snippet indent="0" block="true">D: v = x op y
+</code-snippet>
+<p indent="0">This statement </p>
+<p indent="1">- "generates" a definition D of variable v</p>
+<p indent="1">- "kills" all the other definitions in the program that define variable v.</p>
+<p indent="0"><code-snippet>OUT[B] = genB U (IN[B] - killB)
+</code-snippet></p>
+<p indent="0">A definition reaches a program point as long as there exists at least one path along which the definition reaches.</p>
+<p indent="0"><mathjax-panel>IN [B]=\bigcup_{P \text { predecessors of } B}
+</mathjax-panel> OUT  <mathjax-panel>[P]
+</mathjax-panel></p>
+<code-snippet indent="0" block="true">output[entry] = empty
+for block of all_other_blocks:
+    output[block] = empty 
+
+while changes to any output:
+    for block of all_blocks:
+        input = merge output of predecessors
+        output[block] = gen(block) &lt;&gt; (input[block] - kill(block))
+</code-snippet>
+<p indent="0">Why this iterative can finally algorithm stop? </p>
+<p indent="0"><code-snippet>output[block] = gen(block) &lt;&gt; (input[block] - kill(block))
+</code-snippet> every part of this statement except input[block] is constant. </p>
+<p indent="0">When a fact is added to  <code-snippet>output[block]
+</code-snippet> , whether it's from  <code-snippet>gen(block)
+</code-snippet> or survived from  <code-snippet>input[block] - kill(block)
+</code-snippet> , it stays there forever</p>
+<p indent="0">Thus output never shrinks.</p>
+<p indent="0">As the set of facts is finite (e.g., all definitions in the program), there must exist a pass of iteration during which nothing is added to any OUT, and then the algorithm terminates</p>
+<h3>Live Variables Analysis</h3>
+<p indent="0">Live variables analysis tells whether the value of variable v at program point p could be used along some path in CFG starting at p. If so, v is live at p; otherwise, v is dead at p.</p>
+<img src="./live-variable.png" height="120" />
+<p indent="0">Information of live variables can be used for register allocations. e.g., at some point all registers are full and we need to use one, then we should favor using a register with a dead value.</p>
+<p indent="0">transfer function </p>
+<p indent="0">对于一个  <code-snippet>a = x op y
+</code-snippet></p>
+<p indent="0">x y 确定存活，kill a</p>
+<p indent="0">backward analysis</p>
+<p indent="0">input[block] = (output[block] - kills) + uses </p>
+<p indent="0">output[block]: It is live coming out of B and is not redefined in B</p>
+<p indent="0">uses: It is used before redefinition in B</p>
+<p indent="0">kills: It is redefined in B</p>
+<h3>Available Expressions Analysis</h3>
+<p indent="0">An expression x op y is available at program point p if </p>
+<p indent="1">1.  <b>all paths</b> from the entry to p  <b>must</b> pass through the evaluation of x op y</p>
+<p indent="1">2. after the last evaluation of x op y, there is no redefinition of x or y</p>
+<p indent="0">This definition means at program p, we can replace expression x op y by the result of its last evaluation.</p>
+<p indent="0">transfer function </p>
+<p indent="0">对于一个  <code-snippet>a = x op y
+</code-snippet></p>
+<p indent="1">Add to OUT the expression x op y (gen)</p>
+<p indent="1">Delete from IN any expression involving variable  <code-snippet>a
+</code-snippet> (kill)</p>
+<h3>Foundations</h3>
+<p indent="0">Given a CFG (program) with k nodes, the iterative algorithm updates  <code-snippet>output[n]
+</code-snippet> for every node n in each iteration.</p>
+<p indent="0">Then we can make a k-tuple:  <mathjax-panel>(output[n_1], output[n_2], \dots, output[n_k])
+</mathjax-panel> as an element of set  <mathjax-panel>\left( V _{1} \times V _{2} \ldots \times V _{ k }\right)
+</mathjax-panel> denoted as  <mathjax-panel>V^k
+</mathjax-panel> , to hold the values of the analysis after each iteration.</p>
+<p indent="0">Then each iteration can be considered as taking an action to map an element of  <mathjax-panel>V^k
+</mathjax-panel> to a new element of  <mathjax-panel>V^k
+</mathjax-panel> . Abstracted as a function  <mathjax-panel>F : V ^{ k } \rightarrow V ^{ k }
+</mathjax-panel></p>
+<p indent="0">Then the algorithm outputs a series of k-tuples iteratively until a k-tuple is the same as the last one in two consecutive iterations.</p>
+<p indent="0">Data flow analysis can be seen as iteratively applying transfer functions and meet/join operations on the values of a lattice until we reach.</p>
+<p indent="0">If we guarantee that  <mathjax-panel>F
+</mathjax-panel> is monotonic, then its compromised to terminate, and finally reach the fixed point.</p>
+<p indent="0">In each iteration, it is equivalent to think that we apply function  <mathjax-panel>F
+</mathjax-panel> which consists of</p>
+<p indent="1">1. transfer function  <mathjax-panel>f_i: L \rightarrow L
+</mathjax-panel> for every node</p>
+<p indent="1">2. join/meet function  <mathjax-panel>\sqcup / \sqcap : L \times L \rightarrow L
+</mathjax-panel> for control-flow confluence</p>
+<h3>Meet-Over-All-Paths Solution (MOP)</h3>
+<p indent="0">MOP 和上面讨论的 iterative approach 的区别在于 CFG 中汇聚点的处理方式不同。</p>
+<p indent="0">以  <mathjax-panel>S_4
+</mathjax-panel> 为例</p>
+<p indent="1"><mathjax-panel>input[S_4] = f_{s_3}(f_{s_1}(output[entry]) \sqcup f_{s_2}(output[entry]))
+</mathjax-panel></p>
+<p indent="1"><mathjax-panel>mop[S_4] = f_{s_3}(f_{s_1}(output[entry])) \sqcup f_{s_3}(f_{s_2}(output[entry]))
+</mathjax-panel></p>
+<p indent="0">四舍五入就是 </p>
+<p indent="1">-  <mathjax-panel>input = F ( x \sqcup y )
+</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>mop = F ( x ) \sqcup F ( y )
+</mathjax-panel></p>
+<p indent="2">(如果 F 满足分配律的话二者就是相同的</p>
+<p indent="0">我们可以证明，MOP 有着更高的精度：</p>
+<p indent="1">by definition of lub  <mathjax-panel>\sqcup
+</mathjax-panel> , we have  <mathjax-panel>x \subseteq x \sqcup y
+</mathjax-panel> and  <mathjax-panel>y \subseteq x \sqcup y
+</mathjax-panel></p>
+<p indent="1">as  <mathjax-panel>F
+</mathjax-panel> is monotonic, we have  <mathjax-panel>F ( x ) \sqsubseteq F ( x \sqcup y )
+</mathjax-panel> and  <mathjax-panel>F ( y ) \sqsubseteq F ( x \sqcup y )
+</mathjax-panel> , which means  <mathjax-panel>F ( x \sqcup y )
+</mathjax-panel> is a upper bound for  <mathjax-panel>x
+</mathjax-panel> and also for  <mathjax-panel>y
+</mathjax-panel></p>
+<p indent="1">thus we have the lub  <mathjax-panel>F(x) \sqcup F(y) \sqsubseteq F ( x \sqcup y )
+</mathjax-panel></p>
+<h3>Constant Propagation</h3></section>
+    </article>
+</main>
+
+    </body>
+</html>

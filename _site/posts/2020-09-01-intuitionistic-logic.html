@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-09-01-intuitionistic-logic</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-09-01-intuitionistic-logic</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p indent="0">基于经典逻辑，我们可以 “非构造地” 证明一个命题。例如：</p>
+<p indent="1">Theorem : 存在两个无理数  <mathjax-panel>x, y
+</mathjax-panel> ，使得  <mathjax-panel>x ^ y
+</mathjax-panel> 为有理数</p>
+<p indent="1">Proof: 如果  <mathjax-panel>\sqrt{2}^{\sqrt{2}}
+</mathjax-panel> 是有理数，那么我们可以取  <mathjax-panel>x=y=\sqrt{2}
+</mathjax-panel> ，否则可以取  <mathjax-panel>x=\sqrt{2}^{\sqrt{2}}, y=\sqrt{2}
+</mathjax-panel></p>
+<p indent="0">上面的证明虽然在经典逻辑里没有问题，但我们仍无法确定究竟哪一种情况是正确的。除此之外，我们还可以做出一个构造性证明（constructive proof）</p>
+<p indent="1">对于  <mathjax-panel>x=\sqrt{2}, y=2 \log _{2} 3
+</mathjax-panel> ，我们有  <mathjax-panel>x^{y}=3 \in Q
+</mathjax-panel> .</p>
+<p indent="0">这种 “构造式” 的推理方式对应着 “直觉主义逻辑”（intuitionistic logic）。</p>
+<h3>BHK 释义（The BHK interpretation）</h3>
+<p indent="0">直觉主义命题逻辑，或称直觉主义命题演算（Intuitionistic propositional calculus, IPC），的语言和经典命题逻辑的语言是一样的。</p>
+<p indent="0"><b>Definition:</b> 假设一个命题变量 (propositional variables) 无限集合  <mathjax-panel>PV
+</mathjax-panel> ，我们定义逻辑式（formulas）的集合  <mathjax-panel>\Phi
+</mathjax-panel> 为满足下列条件的最小集合</p>
+<p indent="1">- 所有谓词变量和常量  <mathjax-panel>\perp
+</mathjax-panel> （谬）都是  <mathjax-panel>\Phi
+</mathjax-panel> 的元素；变量和常量被称为原子式（atomic formulas）。</p>
+<p indent="1">- 如果  <mathjax-panel>\phi, \psi \in \Phi
+</mathjax-panel> ，那么  <mathjax-panel>(\phi \rightarrow \psi),(\phi \vee \psi),(\phi \wedge \psi) \in \Phi
+</mathjax-panel></p>
+<p indent="0">否定、等价和真（truth）定义如下：</p>
+<p indent="1">-  <mathjax-panel>\neg \phi \equiv_{d f} \phi \rightarrow \perp
+</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>\phi \leftrightarrow \psi \equiv_{d f}(\phi \rightarrow \psi) \wedge(\psi \rightarrow \phi)
+</mathjax-panel></p>
+<p indent="1">-  <mathjax-panel>\top \equiv{ }_{d f} \perp \rightarrow \perp
+</mathjax-panel></p>
+<p indent="0">直觉主义逻辑里的语义不是通过真值表来判断的，而是通过构建模式来解释的。这就是著名的 BHK 释义（Brouwer-Heyting-Kolmogorov interpretation）</p>
+<p indent="1"><mathjax-panel>\phi_{1} \wedge \phi_{2}
+</mathjax-panel> 的构造（或证明）包含  <mathjax-panel>\phi_{1}
+</mathjax-panel> 的构造和  <mathjax-panel>\phi_{2}
+</mathjax-panel> 的构造；</p>
+<p indent="1"><mathjax-panel>\phi_{1} \vee \phi_{2}
+</mathjax-panel> 的构造包含一个指数（indicator）  <mathjax-panel>i \in\{1,2\}
+</mathjax-panel> 和一个  <mathjax-panel>\phi_{i}
+</mathjax-panel> 的构造；</p>
+<p indent="1"><mathjax-panel>\phi_{1} \rightarrow \phi_{2}
+</mathjax-panel> 的构造是一个把每一个  <mathjax-panel>\phi_{1}
+</mathjax-panel> 的构造都转换为  <mathjax-panel>\phi_{2}
+</mathjax-panel> 的构造的函数（方法）；</p>
+<p indent="1">不存在  <mathjax-panel>\perp
+</mathjax-panel> 的构造。</p>
+<p><span>examples: </span>
+<a href="https://gist.github.com/Shuumatsu/f47781cc3af7affbe410a33788ced731">https://gist.github.com/Shuumatsu/f47781cc3af7affbe410a33788ced731</a></p>
+<h3>自然演绎（natural deduction）</h3>
+<p indent="0">直觉主义逻辑的一个证明系统是自然演绎系统 [公式] 。其中 J 代表直觉主义逻辑。NK 是经典逻辑的自然演绎系统。</p>
+<p indent="0"><b>Definition:</b> 自然演绎里的  <b>判断（judgement）</b> 是一个对子，写作  <mathjax-panel>\Gamma \vdash \phi
+</mathjax-panel> ，读作 “Gamma 证明 phi”，包括一个有限逻辑式集合  <mathjax-panel>\Gamma
+</mathjax-panel> 和一个逻辑式  <mathjax-panel>\phi
+</mathjax-panel> （这里的  <mathjax-panel>\phi
+</mathjax-panel> 不是空集）.</p>
+<p indent="0"><mathjax-panel>\Gamma \vdash \phi
+</mathjax-panel> 的形式证明（proof）或推导（derivation）是一个满足下列条件的有限判断树：</p>
+<p indent="1">- 根标记为  <mathjax-panel>\Gamma \vdash \phi
+</mathjax-panel> ；</p>
+<p indent="1">- 所有的叶子都是公理（公设，axioms），即形如  <mathjax-panel>\Gamma, \phi \vdash \phi
+</mathjax-panel> 的判断；</p>
+<p indent="1">- 其他节点的符号都可以从子节点借助定义的法则得到</p>
+<h3>经典逻辑的代数语义学</h3>
+<p indent="0"><b>Definition:</b> 布尔代数（Boolean algebra）是有顶端和底端元素的 lattice  <mathjax-panel>B
+</mathjax-panel> ， <mathjax-panel>B
+</mathjax-panel> 中的每一个元素  <mathjax-panel>a
+</mathjax-panel> 都有一个补（记为  <mathjax-panel>-a
+</mathjax-panel> ）。</p>
+<p indent="0">布尔代数通常记为  <mathjax-panel>B =\langle B, \sqcup, \sqcap,-0,1\rangle
+</mathjax-panel> ，其中  <mathjax-panel>a \leq b \Longleftrightarrow a \sqcap b=a
+</mathjax-panel> .</p>
+<p><span>TODO: </span>
+<a href="https://zhuanlan.zhihu.com/p/33228589">https://zhuanlan.zhihu.com/p/33228589</a></p></section>
+    </article>
+</main>
+
+    </body>
+</html>

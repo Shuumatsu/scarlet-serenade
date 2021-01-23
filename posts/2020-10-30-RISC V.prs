@@ -1,3 +1,6 @@
+全局变量：保存在数据段 .data 和 .bss 中，某些情况下 gp (x3) 寄存器保存两个数据段中间的一个位置，于是全局变量是基于 gp 加上一个偏移量来访问的。
+我们可以通过 链接脚本 (Linker Script) 调整链接器的行为，使得最终生成的可执行文件的内存布局符合我们的预期。
+
 https://riscv.org/wp-content/uploads/2018/05/08.45-09.10-RISCV-20180509-FastInts.pdf
 https://sifive.cdn.prismic.io/sifive/0d163928-2128-42be-a75a-464df65e04e0_sifive-interrupt-cookbook.pdf
 

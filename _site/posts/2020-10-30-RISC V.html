@@ -53,110 +53,83 @@
     <h1>2020-10-30-RISC V</h1>
     <article>
         <!-- <section class="header"></section> -->
-        <section><p indent="0">Software threads are threads of execution managed by the operating system.</p>
-<p indent="0">Hardware threads are a feature of some processors that allow better utilisation of the processor under some circumstances. They may be exposed to/by the operating system as appearing to be additional cores ("hyperthreading").</p>
-<p indent="0">One hardware thread can run many software threads. （time-slicing</p>
-<p indent="0">6 种基本指令格式</p>
-<p indent="1">- R 型：用于 register - register </p>
-<p indent="1">- I 型：用于短立即数和访存 Load 操作 （有 12 位用于 Imm</p>
-<p indent="1">- U 型：用于长立即数 （有 20 位用于 Imm</p>
-<p indent="2">（RISC V 指令中所有的立即数总是符号扩展</p>
-<p indent="1">- S 型：用于访存 Store 操作</p>
-<p indent="1">- B 型：用于条件跳转操作</p>
-<p indent="1">- J 型：用于无条件跳转</p>
-<p indent="0">所有位全是 1 或 全是 0 的指令是非法指令</p>
-<p indent="0">RV32I 有 31 个通用寄存器和一个恒为 0 的 X0 寄存器；在 RISC V 中，PC 不是通用寄存器</p>
-<p indent="0">lui 将 20 位常量加载到寄存器的高 20 位</p>
-<p indent="0">auipc 将20 位常量加载到 PC 的高 20 位</p>
-<p indent="0">e.g., 用 lui 加载立即数到寄存器的高 20 位，再用一般的立即数指令弄低 12 位可构造出构造大的常量</p>
-<p indent="0">e.g., 用 auipc 的 20 位与 jalr 的 12 位立即数的组合可以将执行流跳转到任何 32 位 PC 相对位置</p>
-<p indent="0">除 32 位的 lw, sw 外，RV32I 还支持</p>
-<p indent="1">加载有符号和无符号的字节和半字（lb, lbu, lh, lhu</p>
-<p indent="2">都将被[符号]扩展后再写入寄存器</p>
-<p indent="1">存储字节和半字（sb, sh</p>
-<p indent="0">加载与存储仅支持唯一的位置模式：位偏移寻址模式</p>
-<p indent="1">符号扩展 12 位立即数到基地址寄存器</p>
-<p indent="0">RV32I 基于比较两个寄存器的结果进行分支跳转（有的 architecture 用控制位记录溢出等，并根据此进行跳转</p>
-<p indent="0">由于 RISC V 的指令长度必须是 2 字节的倍数，所以分支指令的寻址方式是 12 位立即数乘 2 后符号扩展再加到 PC 上作为 target addr</p>
-<p indent="0">RV32A 有 2 种类型的原子操作</p>
-<p indent="1">- atomic memory operation</p>
-<p indent="2">AMO 对内存执行一个原子操作，并将寄存器设置为操作前的内存值；原子表示内存读写之间的过程不会被打断，内存值不会被其它处理器修改</p>
-<p indent="1">- load reserved / store conditional</p>
-<p indent="0">RISC V 有宽松的内存一致性模型（relaxed memory consistency model）因此其它线程看到的内存访问可以是乱序的</p>
-<p indent="0">所有的 RV32A 指令都有一个请求位 aq 一个释放位 rl</p>
-<p indent="0">RISC V 提供三种模式：user mode, supervisor mode, machine mode </p>
-<p indent="0">machine mode 是硬件线程可以执行的最高权限模式，对内存， I/O 等底层功能有完全的控制权</p>
-<p indent="0">machine mode 最重要的特性是控制和处理异常；RISC V 的异常 (exception) 分为两类</p>
-<p indent="1">- 同步异常，再指令执行期间产生</p>
-<p indent="1">- 中断 interrupt ，与指令异步的外部事件；有三种标准中断源：</p>
-<p indent="2">- 软件：通过像内存映射寄存器种存数并通常用一个 hart 来中断另一个 hart</p>
-<p indent="2">- 时钟：当实时计数器 mtime 大于 hart 的时间比较器（一个名为 mtimecmp 的内存映射寄存器）时触发时钟中断</p>
-<p indent="2">- 外部来源：由平台级中断控制器引发（大部分外部设备连接到这个中断控制器）</p>
-<p indent="0">RISC V 的异常 are precise：所有异常前的指令已完全执行 & 所有异常后的指令还未开始执行</p>
-<p indent="0">8 个 Control and Status Registers 时机器模式下异常处理的必要部分</p>
-<p indent="1">- Machine Trap Vector: 保存发生异常时需跳转到的地址</p>
-<p indent="1">- Machine Exception PC: 指向发生异常的指令</p>
-<p indent="2">对于同步异常，mepc 指向发生异常的指令</p>
-<p indent="2">对于中断，指向应恢复的位置</p>
-<p indent="1">- Machine Exception Cause: 异常发生的种类</p>
-<p indent="1">- Machine Interrupt Enable: 列出目前 CPU 能处理和必须忽略的中断</p>
-<p indent="2">每个中断再 MIE 中都有对应的使能位，例如 MIE[7] 对应时钟中断</p>
-<p indent="1">- Machine Interrupt Pending: lists pending interrupts</p>
-<p indent="1">- Machine Trap Value: 保存了 trap 的附加信息（地址例外中出错的地址，非法指令的指令本身</p>
-<p indent="1">- Machine Scratch 通常包含指向附加临时内存空间的指针</p>
-<p indent="2">在中断处理工程中可能会用到部分寄存器，为避免覆盖，中断处理程序会用附加内存空间保存用到的寄存器</p>
-<p indent="3">一个异常处理程序会先用 csrw 指令交换 a0 与 mscratch 再用 sw 与 a0 来保存寄存器。在中断处理完成后用 lw 与 a0 恢复寄存器，再交换回 a0 与 mscratch。最后用 mret 返回</p>
-<p indent="1">- Machine Status: 包含全局设定是否开启中断（MIE）等信息</p>
-<p indent="2">若 mstatus.MIE = 1 & MIE[7] = 1 & MIP[7] = 1 则 CPU 可处理时钟中断</p>
-<p indent="0">CSRs 通过以下指令操作以及其对应的立即数版本：</p>
-<p indent="1">csrrw dest, csr, src 将 src 写入 csr 并将其旧值写入 dest</p>
-<p indent="1">csrrs dest, csr, src 通过 or src csr 操作将 src 写入 csr 并将其旧值写入 dest</p>
-<p indent="1">csrrc dest, csr, src 通过 and src csr 操作将 src 写入 csr 并将其旧值写入 dest</p>
-<p indent="0">当一个 hart 发生异常时，硬件自动做以下处理</p>
-<p indent="1">1. 异常指令的 PC vei存在 mepc 中；PC 被设置为 mtvec</p>
-<p indent="1">2. 根据异常来源设置 mcause 并设置 mtval</p>
-<p indent="1">3. mstatus.mpie = mstatus.mie; mstatus.mie = 0</p>
-<p indent="1">4. 将异常前的权限模式保存在 mstatus.mpp 中，并切换到 machine mode</p>
-<p indent="0">有时在处理异常的过程中需要跳转到更高优先级的中断，然而 CSRs 只有一个副本，接受一个更高优先级的中断会破坏旧值。一个抢占式的中断 handler 在启用终端前将 CSRs 保存到内存栈中，在推出前禁用中断并恢复 CSRs</p>
-<p indent="0">通过将 mstatus.mpp 设置为 u 然后执行 mret 指令，软件可以从 machine mode 进入 user mode</p>
-<p indent="0">实现了 machine 和 user mode 的处理器具有一个叫做 physical memory protection 的功能：允许 machine mode 指定 user mode 可访问的内存地址</p>
-<p indent="0">PMP 包含几个地址寄存器和相应的配置寄存器，这些配置寄存器可授予或拒绝读写执行权限</p>
-<p indent="0">当处于 user mode 对内存进行操作时，将地址和所有的 PMP 地址寄存器进行比较，若地址大于第 i 个地址寄存器小于第 i + 1 个地址寄存器，则由第 i + 1 个配置寄存器进行校验</p>
-<p indent="0">与 user mode 相同，supervisor mode 下也不能使用 machine mode 的 CSRs 和指令切受 PMP 限制</p>
-<p indent="0">默认情况下，所有发生异常的时候，控制权都被移交到 machine mode 的异常处理程序，但 unix 系统中大多数异常都进行在 supervisor mode 下的系统调用。RISC V 提供了一种异常委托机制，可选择性地将终端和异常委托给 supervisor mode 处理</p>
-<p indent="1">Machine Interrupt Delegation CSR 控制将哪些中断委托给 supervisor mode</p>
-<p indent="0">与 machine mode 类似，supervisor mode 有对应的异常处理 CSRs：sie, sip, sepc, stvec, scause, sscratch, stval, sstatus; mret 对应 sret 指令。异常的处理流程也和 machine mode 类似</p>
-<p indent="0">RISC V ISA 采用 12-bit encoding space for up to 4096 CSRs. 惯例上，最高两位用来表示在指定 privilege level 下的读写权限，次高两位表示该 CSR 要求的最低 privilege level</p>
-<p indent="1">（一个可写寄存器也可能部分位是只读的，对这些位进行写入会被忽略</p>
-<p indent="0">CSR Field Specification</p>
-<p indent="1">- Reserved Writes Preserve Values, Reads Ignore Values (WPRI</p>
-<p indent="2">有些 fields 被保留 for future use。软件应忽略从中读取到的值并且在写入寄存器时不改变其值</p>
-<p indent="1">- Write/Read Only Legal Values (WLRL</p>
-<p indent="2">对某些 fields 来说，只有部分 bit encoding 是有效的。软件不应向这些 fields 中写入非法的值并且不应假定读出的值是合法的除非上次写入的是一个有效的值</p>
-<p indent="1">- Write Any Values, Read Legal Values (WARL</p>
-<p indent="2">对某些 fields 来说，只有部分 bit encoding 是有效的。允许向其中写入任意值并且保证任意时候读出的值都是合法的</p>
-<p indent="3">- 若上次写入的值是不合法的，则根据实现，可能返回任意的一个合法的值</p>
-<p indent="3">- 若上次写入的值是合法的，则保证返回该合法值</p>
-<p indent="0"><b>Machine ISA Register (misa)</b> <code-snippet>[MXL 2 bits - WARL, WLRL, EXTENSIONS - 26 bits - WARL]
-</code-snippet> reporting the ISA supported byt the hart; 该寄存器在任何实现中都必须可读</p>
-<p indent="1">其最高两位 MXL 表示 ISA 宽度，可选值为 32, 64 以及 128。在支持多种 ISA 宽度的实现上，该 field 是可写的</p>
-<p indent="1">最低 0 到 25 的 26 位 EXTENSIONS field 的每一个 bit 根据其位置表示从 A 到 Z 的 extension。e.g., bit-2 代表 C 表示 Compress Ext</p>
-<p indent="1">读取 misa 可能返回 0 表示未实现此 CSR，此时需要用非标准的机制来获取信息</p>
-<p indent="2">例如当 misa 返回 0 时获取 ISA 宽度：将立即数 4 置于一个寄存器中，每次向左移动 31 位。若一次位移后归零，则是 RV32，两次则是 RV64，三次则是 RV128</p>
-<p indent="0"><b>Machine Vendor ID Register (mvendorid)</b> <code-snippet>[Bank - 25 bits, offset - 7 bits]
-</code-snippet> 是一个 32 位只读寄存器 providing the JEDEC manufacture ID of the provider of the core; 该寄存器在任何实现中都必须可读</p>
-<p indent="1">读取该寄存器时返回 0 表示未实现或表明这是一个 non-commercial 实现</p>
-<p indent="0"><b>Machine Architecture ID Register (marchid)</b> <code-snippet>[Architecture ID - MXLEN bits]
-</code-snippet> 是一个 MXLEN-bit 只读寄存器 encoding the base microarchitecture of the hart; 该寄存器在任何实现中都必须可读</p>
-<p indent="1">读取该寄存器时返回 0 表示未实现</p>
-<p indent="0">The combination of mvendorid and marchid should uniquely identify the type of hart microarchitecture that is implemented.</p>
-<p indent="0"><b>Machine Implementation ID Register (mimpid)</b> <code-snippet>[Implementation - MXLEN bits]
-</code-snippet> provides a unique encoding of the version of the processor implementation; 该寄存器在任何实现中都必须可读</p>
-<p indent="1">读取该寄存器时返回 0 表示未实现</p>
-<p indent="0"><b>Hart ID Register (mhartid)</b> 是一个 MXLEN-bit 只读寄存器，containing the integer ID of the hardware thread running the code; 该寄存器在任何实现中都必须可读</p>
-<p indent="1">要求至少有一个额 hart 有 ID 0 并且所有 hart 有不同的 ID</p>
-<p indent="0"><b>Machine Status Register (mstatus)</b> 是一个 MXLEN-bit 读写寄存器。mstatus keeps track of and controls the hart’s 当前状态。Restricted views of the mstatus register appear as the sstatus and ustatus registers in the S-level and U-level ISAs respectively.</p>
-<code-snippet indent="0" block="true">for RV32: 
+        <section><p>全局变量：保存在数据段 .data 和 .bss 中，某些情况下 gp (x3) 寄存器保存两个数据段中间的一个位置，于是全局变量是基于 gp 加上一个偏移量来访问的。 我们可以通过 链接脚本 (Linker Script) 调整链接器的行为，使得最终生成的可执行文件的内存布局符合我们的预期。</p>
+<p>https://riscv.org/wp-content/uploads/2018/05/08.45-09.10-RISCV-20180509-FastInts.pdf https://sifive.cdn.prismic.io/sifive/0d163928-2128-42be-a75a-464df65e04e0_sifive-interrupt-cookbook.pdf</p>
+<p>Local Interrupts - Directly connected to one hart - No arbitration between harts to service - Determine source directly through xcause CSR - Only two standard local interrupts (software, timer)</p>
+<p>Global (External) Interrupts - Routed via Platform-Level Interrupt Controller (PLIC) - PLIC arbitrates between multiple harts claiming interrupt - Read of memory-mapped register returns source</p>
+<p>The global interrupt controller is termed the Platform Local Interrupt Controller (PLIC). PLIC用于管理所有的全局中断，并将它们路由到一个或多个CPU中.通过 PLIC 路由的全局中断通过一个带有专用中断 ID 的单一中断连接到达 CPU</p>
+<p>每个全局中断在 PLIC memory map 中都有一个可编程的优先级寄存器。 最多有 1024 个可用的中断被路由到 PLIC，这些中断按 1 到 1024 的顺序编号。进入PLIC的每个中断都有一个可配置的优先级，从1-7，7为最高优先级。值为0表示不中断，有效地禁用该中断。PLIC内有一个全局阈值寄存器，允许配置低于一定水平的中断被阻断。例如，如果阈值寄存器包含的值为5，则所有配置优先级为1到5的PLIC中断将不允许传播到CPU。如果具有相同优先级的全局中断同时到达PLIC，则优先考虑两个中断ID中较低的一个。</p>
+<p>进入PLIC处理程序后，a CPU reads the claim register to acquire the interrupt ID. 在用MRET指令（或SRET/URET）退出PLIC处理程序之前，用处理程序进入时获得的 non zero claim/complete value 将 claim/complete register 写回</p>
+<p>申领成功后，将原子地清除PLIC中断待处理寄存器中的待处理位，向系统发出中断正在被服务的信号。即使在挂起位未被设置时，CPU试图申请中断是合法的。例如，当一个全局中断被路由到多个CPU时，一个CPU已经在另一个CPU尝试声称中断之前声称了该中断，这种情况可能会发生。</p>
+<p>CLINT有一个固定的优先级方案，实现了软件、定时器和外部中断。 当处于 Supervisor 模式时，Machine 模式的中断将立即获得优先权，并抢占 Supervisor 模式的操作。CLINT不支持在特权级别内进行抢占。 中断ID代表每个中断的固定优先级值，不可配置。</p>
+<p>Software interrupts 软件中断。是一条 CPU 指令，用以自陷一个中断。由于软中断指令通常要运行一个切换 CPU 至内核态（Kernel Mode/Ring 0）的子例程，它常被用作实现系统调用（System call）。 软件中断通过写入 memory mapped interrupt pending register msip for particular CPU 触发。在多CPU系统中，其他CPU能够写入 msip 来触发系统中任何其他 CPU 的软件中断。这样可以实现处理器间的高效通信。</p>
+<p>Timer interrupt 当内存映射寄存器mtime大于或等于全局时间基寄存器mtimecmp时，就会触发定时器中断，and both registers are part of the CLINT and CLIC memory map. 在多CPU系统中，mtimecmp可以被其他CPU写入来设置定时器中断。</p>
+<p>External interrupts 全局中断通常首先被路由到PLIC，然后使用外部中断ID #11进入CPU。</p>
+<p>Local Interrupts 本地中断可以直接连接到中断源，不需要通过PLIC进行路由。具体到CLINT，它们都根据自己的中断ID有固定的中断优先级。</p>
+<p>Software threads are threads of execution managed by the operating system. Hardware threads are a feature of some processors that allow better utilisation of the processor under some circumstances. They may be exposed to/by the operating system as appearing to be additional cores (“hyperthreading”). One hardware thread can run many software threads. （time-slicing</p>
+<p>6 种基本指令格式 - - R 型：用于 register - register - - I 型：用于短立即数和访存 Load 操作 （有 12 位用于 Imm - - U 型：用于长立即数 （有 20 位用于 Imm – （RISC V 指令中所有的立即数总是符号扩展 - - S 型：用于访存 Store 操作 - - B 型：用于条件跳转操作 - - J 型：用于无条件跳转</p>
+<p>所有位全是 1 或 全是 0 的指令是非法指令</p>
+<p>RV32I 有 31 个通用寄存器和一个恒为 0 的 X0 寄存器；在 RISC V 中，PC 不是通用寄存器</p>
+<p>lui 将 20 位常量加载到寄存器的高 20 位 auipc 将20 位常量加载到 PC 的高 20 位 e.g., 用 lui 加载立即数到寄存器的高 20 位，再用一般的立即数指令弄低 12 位可构造出构造大的常量 e.g., 用 auipc 的 20 位与 jalr 的 12 位立即数的组合可以将执行流跳转到任何 32 位 PC 相对位置</p>
+<p>除 32 位的 lw, sw 外，RV32I 还支持 - 加载有符号和无符号的字节和半字（lb, lbu, lh, lhu – 都将被[符号]扩展后再写入寄存器 - 存储字节和半字（sb, sh</p>
+<p>加载与存储仅支持唯一的位置模式：位偏移寻址模式 - 符号扩展 12 位立即数到基地址寄存器</p>
+<p>RV32I 基于比较两个寄存器的结果进行分支跳转（有的 architecture 用控制位记录溢出等，并根据此进行跳转 由于 RISC V 的指令长度必须是 2 字节的倍数，所以分支指令的寻址方式是 12 位立即数乘 2 后符号扩展再加到 PC 上作为 target addr</p>
+<p>RV32A 有 2 种类型的原子操作 - - atomic memory operation – AMO 对内存执行一个原子操作，并将寄存器设置为操作前的内存值；原子表示内存读写之间的过程不会被打断，内存值不会被其它处理器修改 - - load reserved / store conditional</p>
+<p>RISC V 有宽松的内存一致性模型（relaxed memory consistency model）因此其它线程看到的内存访问可以是乱序的 所有的 RV32A 指令都有一个请求位 aq 一个释放位 rl</p>
+<p>RISC V 提供三种特权模式：user mode, supervisor mode 以及 machine mode。machine mode 也是硬件 reset 后首先进入的模式。</p>
+<p>试图访问一个不存在的CSR会引起一个非法指令异常。试图在没有适当权限级别的情况下访问一个CSR或写入一个只读寄存器也会产生非法指令异常。读/写寄存器也可能包含一些只读的位，在这种情况下，对只读位的写入将被忽略。</p>
+<p>增加特权级别的陷阱被称为垂直陷阱，而保持在相同特权级别的陷阱被称为水平陷阱。 Traps never transition from a more-privileged mode to a less-privileged mode. 委托中断会导致中断在委托人权限级别被屏蔽。例如，如果通过设置mideleg[5] 将 supervisor timer interrupt (STI) 委托给 S 模式，那么在 M 模式下执行时将不会采取STI。相反，如果mideleg[5] is clear，STI可以在任何模式下进行，并且无论当前模式如何，都会将控制权转移到M模式下。</p>
+<p>Machine Trap Setup - misa: MRW - ISA and extensions - mstatus: MRW - Machine status register. mstatus寄存器跟踪并控制着hart的当前工作状态。mstatus寄存器的限制视图分别以S级和U级ISA中的sstatus和ustatus寄存器的形式出现。</p>
+<pre><code>每个特权模式提供了全局中断启用位，MIE、SIE和UIE。这些位主要用于保证当前特权模式下中断处理程序的原子性。
+
+当 hart 在特权模式 x 下执行时，当 xIE=1 时，中断全局启用，当 xIE=0 时，中断全局禁用。 
+    - 低特权模式 w&lt;x 的中断，无论低特权模式全局 wIE 位的设置如何，中断总是全局禁用。
+    - 高权限模式 y&gt;x 的中断，无论高权限模式全局 yIE位的设置如何，总是全局启用。
+        高权限级别的代码可以使用单独的每个中断使能位，在将控制权让渡给低权限模式之前，禁用选定的高权限模式中断。
+
+为了支持嵌套陷阱，每个特权模式 x 都有一个由中断使能位和特权模式组成的两级堆栈，xPIE持有陷阱前活跃的中断使能位的值，xPP持有之前的特权模式。xPP字段只能保存x以内的特权模式，所以MPP为2位宽，SPP为1位宽，UPP隐含为0。当一个陷阱从特权模式y进入特权模式x时，xPIE被设置为xIE的值；xIE被设置为0；xPP被设置为y。
+
+对于较低特权模式，任何 trap （同步或异步）通常在较高特权模式下处理，进入时禁用中断。
+
+MRET、SRET或URET指令分别用于从M模式、S模式或U模式的陷阱中返回。当执行x RET指令时，假设xPP持有值y，则x IE设置为xPIE；特权模式改为y；xPIE设置为1；xPP设置为U（如果不支持用户模式，则为M）。</code></pre>
+<ul>
+<li><p>mtvec: MRW - Machine trap handler base address. mtvec寄存器是一个MXLEN位的读/写寄存器，存放陷阱向量配置，由向量基地址（BASE）和向量模式（MODE）组成。 BASE 字段中的值必须始终在 4 个字节的边界上对齐，MODE 的设置可以对 BASE 字段中的值施加额外的对齐限制。 当MODE=Direct时，所有进入机器模式的陷阱都会导致pc被设置为BASE字段中的地址。当MODE=Vectored时，所有进入机器模式的同步异常都会导致pc被设置为BASE字段中的地址，而中断则会导致pc被设置为BASE字段中的地址加上四倍的中断原因号。</p></li>
+<li><p>medeleg: MRW - Machine exception delegation register.</p></li>
+<li><p>mideleg: MRW - Machine interrupt delegation register. 默认情况下，任何特权级别的所有陷阱都是在机器模式下处理的，尽管机器模式处理程序可以通过MRET指令将陷阱重定向回适当的级别。 medeleg 和 mideleg中提供的读/写位指示某些异常和中断应该由较低的特权级别直接处理。 在具有三种特权模式(M/S/U)的系统中，设置medeleg或mideleg中的一个位将把S模式或U模式下的相应陷阱委托给S模式陷阱处理程序。 如果支持U模式陷阱，S模式可以反过来设置sedeleg和sideleg寄存器中的相应位，将U模式下发生的陷阱委托给U模式陷阱处理程序。</p>
+<p>当一个陷阱委托给一个权限较小的模式x时， - xcause寄存器写入陷阱原因 - xepc寄存器写入采取陷阱的指令的虚拟地址 - xtval寄存器写入异常特定的数据元 - mstatus的 xPP 字段写入陷阱时的活动权限模式，xPIE 字段写入陷阱时的 xIE 字段的值 在权限较低的模式下，有些异常情况不能发生，相应的x edeleg位应硬接为零。尤其是medeleg[11]和sedeleg[11:9]都要硬接线为零。</p></li>
+<li><p>mie: MRW - Machine interrupt-enable register. mip寄存器是一个MXLEN位的读/写寄存器，包含了待处理的中断信息，而mie则是相应的MXLEN位的读/写寄存器，包含了中断使能位。只有mip中的低权限软件中断（USIP、SSIP）、定时器中断（UTIP、STIP）和外部中断（UEIP、SEIP）所对应的位可以通过这个CSR地址写入，其余的位都是只读的。</p>
+<p>mip和mie寄存器的限制视图在S模式和U模式下分别以sip/sie、uip/uie寄存器的形式出现。如果通过设置mideleg寄存器中的位将中断委托给特权模式x，则该中断在x ip寄存器中变得可见，并可使用x ie寄存器进行屏蔽。否则，x ip和x ie中的相应位似乎被硬接为零。</p>
+<p>MTIP、STIP、UTIP位分别对应机器、上位机和用户定时器中断的定时器中断待处理位。 MTIP位是只读的，通过写入内存映射的机器模式定时器比较寄存器来清除。 UTIP和STIP位可由M模式软件写入，以将定时器中断传递给较低的权限级别。 User and supervisor software may clear the UTIP and STIP bits with calls to the AEE and SEE respectively.</p>
+<p>有一个单独的定时器中断使能位，分别命名为MTIE、STIE和UTIE，用于M模式、S模式和U模式定时器中断。</p>
+<p>mip中的MEIP字段是一个只读位由特定平台的中断控制器设置和清除。SEIP可以由M模式软件写入，向S模式指示外部中断正在等待。 p31</p>
+<p>不同特权模式的多个并发中断按所定特权模式的递减顺序处理。同一特权模式下的多个并发中断按以下优先级递减的顺序处理：MEI、MSI、MTI、SEI、SSI、STI、UEI、USI、USI、STI。MEI、MSI、MTI、SEI、SSI、STI、UEI、USI、UTI。同步异常的优先级低于所有的中断。</p></li>
+<li><p>mcounteren: MRW - Machine counter enable.</p></li>
+</ul>
+<p>Machine Trap Handling - mscratch: SRW - Scratch register for machine trap handlers. - mepc: SRW - Machine exception program counter. - mcause: SRW - Machine trap cause. - mtval: SRW - Machine bad address or instruction - mip: SRW - Machine interrupt pending.</p>
+<p>Supervisor Trap Setup - sstatus: SRW - Supervisor status register. - sedeleg: SRW - Supervisor exception delegation register. - sideleg: SRW - Supervisor interrupt delegation register. - sie: SRW - Supervisor interrupt-enable register. - stvec: SRW - Supervisor trap handler base address. - scounteren: SRW - Supervisor counter enable.</p>
+<p>Supervisor Trap Handling - sscratch: SRW - Scratch register for supervisor trap handlers. - sepc: SRW - Supervisor exception program counter. - scause: SRW - Supervisor trap cause. - stval: SRW - Supervisor bad address or instruction - sip: SRW - Supervisor interrupt pending.</p>
+<p>machine mode 是硬件线程可以执行的最高特权模式，对内存， I/O 等底层功能有完全的控制权</p>
+<p>Machine Timer Registers (mtime and mtimecmp) 平台提供了一个64位内存映射的机器模式定时器比较寄存器(mtimecmp)，当mtime寄存器中的值大于或等于mtimecmp寄存器中的值时，会导致定时器中断的发生。</p>
+<p>MRET、SRET 或 URET 指令分别用于从 M 模式、S 模式或 U 模式的 trap 中返回。当执行 xRET 指令时，假设，xPP 持有值 y，xIE 设置为 xPIE；特权模式改为 y；xPIE 设置为 1；xPP 设置为 U（如果不支持用户模式，则为M）</p>
+<p>machine mode 最重要的特性是控制和处理异常；RISC V 的异常 (exception) 分为两类 - - 同步异常，再指令执行期间产生 - - 中断 interrupt ，与指令异步的外部事件；有三种标准中断源： – - 软件：通过像内存映射寄存器种存数并通常用一个 hart 来中断另一个 hart – - 时钟：当实时计数器 mtime 大于 hart 的时间比较器（一个名为 mtimecmp 的内存映射寄存器）时触发时钟中断 – - 外部来源：由平台级中断控制器引发（大部分外部设备连接到这个中断控制器） RISC V 的异常 are precise：所有异常前的指令已完全执行 &amp; 所有异常后的指令还未开始执行</p>
+<p>8 个 Control and Status Registers 时机器模式下异常处理的必要部分 - - Machine Trap Vector: 保存发生异常时需跳转到的地址 - - Machine Exception PC: 指向发生异常的指令 – 对于同步异常，mepc 指向发生异常的指令 – 对于中断，指向应恢复的位置 - - Machine Exception Cause: 异常发生的种类 - - Machine Interrupt Enable: 列出目前 CPU 能处理和必须忽略的中断 – 每个中断再 MIE 中都有对应的使能位，例如 MIE[7] 对应时钟中断 - - Machine Interrupt Pending: lists pending interrupts - - Machine Trap Value: 保存了 trap 的附加信息（地址例外中出错的地址，非法指令的指令本身 - - Machine Scratch 通常包含指向附加临时内存空间的指针 – 在中断处理工程中可能会用到部分寄存器，为避免覆盖，中断处理程序会用附加内存空间保存用到的寄存器 — 一个异常处理程序会先用 csrw 指令交换 a0 与 mscratch 再用 sw 与 a0 来保存寄存器。在中断处理完成后用 lw 与 a0 恢复寄存器，再交换回 a0 与 mscratch。最后用 mret 返回 - - Machine Status: 包含全局设定是否开启中断（MIE）等信息 – 若 mstatus.MIE = 1 &amp; MIE[7] = 1 &amp; MIP[7] = 1 则 CPU 可处理时钟中断</p>
+<p>CSRs 通过以下指令操作以及其对应的立即数版本： - csrrw dest, csr, src 将 src 写入 csr 并将其旧值写入 dest - csrrs dest, csr, src 通过 or src csr 操作将 src 写入 csr 并将其旧值写入 dest - csrrc dest, csr, src 通过 and src csr 操作将 src 写入 csr 并将其旧值写入 dest</p>
+<p>当一个 hart 发生异常时，硬件自动做以下处理 - 1. 异常指令的 PC vei存在 mepc 中；PC 被设置为 mtvec - 2. 根据异常来源设置 mcause 并设置 mtval - 3. mstatus.mpie = mstatus.mie; mstatus.mie = 0 - 4. 将异常前的特权模式保存在 mstatus.mpp 中，并切换到 machine mode</p>
+<p>有时在处理异常的过程中需要跳转到更高优先级的中断，然而 CSRs 只有一个副本，接受一个更高优先级的中断会破坏旧值。一个抢占式的中断 handler 在启用终端前将 CSRs 保存到内存栈中，在推出前禁用中断并恢复 CSRs</p>
+<p>通过将 mstatus.mpp 设置为 u 然后执行 mret 指令，软件可以从 machine mode 进入 user mode</p>
+<p>实现了 machine 和 user mode 的处理器具有一个叫做 physical memory protection 的功能：允许 machine mode 指定 user mode 可访问的内存地址 PMP 包含几个地址寄存器和相应的配置寄存器，这些配置寄存器可授予或拒绝读写执行权限 当处于 user mode 对内存进行操作时，将地址和所有的 PMP 地址寄存器进行比较，若地址大于第 i 个地址寄存器小于第 i + 1 个地址寄存器，则由第 i + 1 个配置寄存器进行校验</p>
+<p>与 user mode 相同，supervisor mode 下也不能使用 machine mode 的 CSRs 和指令切受 PMP 限制</p>
+<p>默认情况下，所有发生异常的时候，控制权都被移交到 machine mode 的异常处理程序，但 unix 系统中大多数异常都进行在 supervisor mode 下的系统调用。RISC V 提供了一种异常委托机制，可选择性地将终端和异常委托给 supervisor mode 处理 - Machine Interrupt Delegation CSR 控制将哪些中断委托给 supervisor mode 与 machine mode 类似，supervisor mode 有对应的异常处理 CSRs：sie, sip, sepc, stvec, scause, sscratch, stval, sstatus; mret 对应 sret 指令。异常的处理流程也和 machine mode 类似</p>
+<p>RISC V ISA 采用 12-bit encoding space for up to 4096 CSRs. 惯例上，最高两位用来表示在指定 privilege level 下的读写权限，次高两位表示该 CSR 要求的最低 privilege level - （一个可写寄存器也可能部分位是只读的，对这些位进行写入会被忽略</p>
+<p>CSR Field Specification - - Reserved Writes Preserve Values, Reads Ignore Values (WPRI – 有些 fields 被保留 for future use。软件应忽略从中读取到的值并且在写入寄存器时不改变其值 - - Write/Read Only Legal Values (WLRL – 对某些 fields 来说，只有部分 bit encoding 是有效的。软件不应向这些 fields 中写入非法的值并且不应假定读出的值是合法的除非上次写入的是一个有效的值 - - Write Any Values, Read Legal Values (WARL – 对某些 fields 来说，只有部分 bit encoding 是有效的。允许向其中写入任意值并且保证任意时候读出的值都是合法的 — - 若上次写入的值是不合法的，则根据实现，可能返回任意的一个合法的值 — - 若上次写入的值是合法的，则保证返回该合法值</p>
+<p><strong>Machine ISA Register (misa)</strong> <code>[MXL 2 bits - WARL, WLRL, EXTENSIONS - 26 bits - WARL]</code> reporting the ISA supported byt the hart; 该寄存器在任何实现中都必须可读 - 其最高两位 MXL 表示 ISA 宽度，可选值为 32, 64 以及 128。在支持多种 ISA 宽度的实现上，该 field 是可写的 - 最低 0 到 25 的 26 位 EXTENSIONS field 的每一个 bit 根据其位置表示从 A 到 Z 的 extension。e.g., bit-2 代表 C 表示 Compress Ext - 读取 misa 可能返回 0 表示未实现此 CSR，此时需要用非标准的机制来获取信息 – 例如当 misa 返回 0 时获取 ISA 宽度：将立即数 4 置于一个寄存器中，每次向左移动 31 位。若一次位移后归零，则是 RV32，两次则是 RV64，三次则是 RV128</p>
+<p><strong>Machine Vendor ID Register (mvendorid)</strong> <code>[Bank - 25 bits, offset - 7 bits]</code> 是一个 32 位只读寄存器 providing the JEDEC manufacture ID of the provider of the core; 该寄存器在任何实现中都必须可读 - 读取该寄存器时返回 0 表示未实现或表明这是一个 non-commercial 实现</p>
+<p><strong>Machine Architecture ID Register (marchid)</strong> <code>[Architecture ID - MXLEN bits]</code> 是一个 MXLEN-bit 只读寄存器 encoding the base microarchitecture of the hart; 该寄存器在任何实现中都必须可读 - 读取该寄存器时返回 0 表示未实现</p>
+<p>The combination of mvendorid and marchid should uniquely identify the type of hart microarchitecture that is implemented.</p>
+<p><strong>Machine Implementation ID Register (mimpid)</strong> <code>[Implementation - MXLEN bits]</code> provides a unique encoding of the version of the processor implementation; 该寄存器在任何实现中都必须可读 - 读取该寄存器时返回 0 表示未实现</p>
+<p><strong>Hart ID Register (mhartid)</strong> 是一个 MXLEN-bit 只读寄存器，containing the integer ID of the hardware thread running the code; 该寄存器在任何实现中都必须可读 - 要求至少有一个额 hart 有 ID 0 并且所有 hart 有不同的 ID</p>
+<p><strong>Machine Status Register (mstatus)</strong> 是一个 MXLEN-bit 读写寄存器。mstatus keeps track of and controls the hart’s 当前状态。Restricted views of the mstatus register appear as the sstatus and ustatus registers in the S-level and U-level ISAs respectively.</p>
+<pre><code>for RV32: 
 [
 SD, 8 bits - WPRI, TSR, TW, TVM, MXR, SUM, MPRV, XS - 2 bits, FS - 2 bits, 
 MPP - 2bits, WPRI - 2 bits, SPP, MPIE, WPRI, SPIE, UPIE, MIE, WPRI, SIE, UIE
@@ -165,29 +138,12 @@ MPP - 2bits, WPRI - 2 bits, SPP, MPIE, WPRI, SPIE, UPIE, MIE, WPRI, SIE, UIE
 for RV64:
 [
 
-]
-</code-snippet>
-<p indent="0">每个 privilege mode 在其对应的状态寄存器中都有 global interrupt-enable bits (MIE, SIE, UIE). 这些位主要是用来保证在当前 privilege mode 中中断处理程序的原子性</p>
-<p indent="0">在 privilege mode x 下，当 xIE = 1 时，中断是全局 enabled；当 xIE = 0 时，中断是全局 disabled</p>
-<p indent="0">为了支持 nested traps，每个 privilege mode x 都有 two-level stack of interrupt-enable bits and privilege modes:</p>
-<p indent="1">- xPIE 记录当前 trap 之前的 interrupt-enable bit</p>
-<p indent="1">- xPP 记录当前 trap 之前的 privilege mode</p>
-<p indent="0">All harts in a system must employ the same PTE-update scheme as each other</p>
-<p indent="0">supervisor mode 提供了虚拟内存，启用分页的时候大多数地址（包括 loa  d/store 和 pc 中的地址）都是虚拟地址。</p>
-<p indent="0">要访问物理内存，它们必须通过页表被转换为真正的物理地址。</p>
-<p indent="0">RISC V 的分页方案以 SvX 命名，其中 X 为虚拟地址的长度。</p>
-<p indent="1">- 例如 RV32 采用 Sv32 方案，采用了两级页表，每页 4KB</p>
-<p indent="1">- 例如 RV64 采用 Sv39 方案（通常），采用了三级页表，每页 4KB</p>
-<p indent="0">当 satp register 的 MODE field 是 Sv32 时，supervisor 运行在 32-bit paged virtual-memory system. 在该模式下 supervisor and user 虚拟地址通过遍历  radix-tree 结构的页表来 translated into 物理地址。</p>
-<p indent="1">Sv32 virtual address:  <code-snippet>(VPN[1] - 10 bits, VPN[0] - 10 bits, page offset - 12 bits)
-</code-snippet></p>
-<p indent="1">Sv32 physical address:  <code-snippet>(PPN[1] - 12 bits, PPN[0] - 10 bits, page offset - 12 bits)
-</code-snippet></p>
-<p indent="1">Sv32 page  table entry:  <code-snippet>(PPN[1] - 12 bits, PPN[0] - 10 bits, RSW - 2 bits, D, A, G, U, X, W, R, V)
-</code-snippet></p>
-<p indent="2">the V bits indicates 该 PTE 是否有效</p>
-<p indent="2">R, W, and X indicate 权限以及该 PTE 指向下一级页表</p>
-<code-snippet indent="0" block="true">X | W | R || Meaning
+]</code></pre>
+<p>每个 privilege mode 在其对应的状态寄存器中都有 global interrupt-enable bits (MIE, SIE, UIE). 这些位主要是用来保证在当前 privilege mode 中中断处理程序的原子性 在 privilege mode x 下，当 xIE = 1 时，中断是全局 enabled；当 xIE = 0 时，中断是全局 disabled</p>
+<p>为了支持 nested traps，每个 privilege mode x 都有 two-level stack of interrupt-enable bits and privilege modes: - - xPIE 记录当前 trap 之前的 interrupt-enable bit - - xPP 记录当前 trap 之前的 privilege mode</p>
+<p>All harts in a system must employ the same PTE-update scheme as each other supervisor mode 提供了虚拟内存，启用分页的时候大多数地址（包括 loa d/store 和 pc 中的地址）都是虚拟地址。 要访问物理内存，它们必须通过页表被转换为真正的物理地址。 RISC V 的分页方案以 SvX 命名，其中 X 为虚拟地址的长度。 - - 例如 RV32 采用 Sv32 方案，采用了两级页表，每页 4KB - - 例如 RV64 采用 Sv39 方案（通常），采用了三级页表，每页 4KB</p>
+<p>当 satp register 的 MODE field 是 Sv32 时，supervisor 运行在 32-bit paged virtual-memory system. 在该模式下 supervisor and user 虚拟地址通过遍历 radix-tree 结构的页表来 translated into 物理地址。 - Sv32 virtual address: <code>(VPN[1] - 10 bits, VPN[0] - 10 bits, page offset - 12 bits)</code> - Sv32 physical address: <code>(PPN[1] - 12 bits, PPN[0] - 10 bits, page offset - 12 bits)</code> - Sv32 page table entry: <code>(PPN[1] - 12 bits, PPN[0] - 10 bits, RSW - 2 bits, D, A, G, U, X, W, R, V)</code> – the V bits indicates 该 PTE 是否有效 – R, W, and X indicate 权限以及该 PTE 指向下一级页表</p>
+<pre><code>X | W | R || Meaning
 0 | 0 | 0 || Pointer to next level of page table
 0 | 0 | 1 || Read-only page
 0 | 1 | 0 || Reserved for future use
@@ -195,65 +151,21 @@ for RV64:
 1 | 0 | 0 || Execute-only page
 1 | 0 | 1 || Read-execute page
 1 | 1 | 0 || Reserved for future use
-1 | 1 | 1 || Read-write-execute page
-</code-snippet>
-<p indent="2">the U bit indicates whether the page is accessible to user mode。通常情况下 supervisor mode operates with the SUM bit clear，supervisor mode 不能访问用户页，但是如果 SUM bit is set, supervisor mode 也能访问用户页</p>
-<p indent="2">the G bit 指定全局映射，意味着该映射存在于所有地址空间中（如果是一个非页 PTE 被设置为 global 则其 subsequent levels of the page table are global.</p>
-<p indent="2">Each leaf PTE contains an accessed (A) and dirty (D) bit. </p>
-<p indent="3">The A bit indicates the virtual page has been read, written, or fetched from since the last time the A bit was cleared.</p>
-<p indent="3">The D bit indicates the virtual page has been written since the last time the D bit was cleared.</p>
-<p indent="0">20 位的 VPN is translated into 22 位的 physical page number (PPN), while the offset is untranslated. 结果的 supervisor-level 物理地址在经过 physical memory protection structures 检查后 converted to machine-level 物理地址</p>
-<p indent="0">Sv32 page tables 由 2e10 PTE 组成，每个 4 bytes。一个页表总是一页大小并且总是按页对齐的。根页表的 physical page number 被存储 在 satp 寄存器中。</p>
-<p indent="0">Virtual Address Translation Process</p>
-<p indent="1">1. 通过 satp.ppn * page_size 得到根页表物理地址</p>
-<p indent="1">2. 根据 page_table_addr + va.vpn[i] * pte_size 得到当前层级下对应的 pte 地址</p>
-<p indent="2">如果访问 pte violates a PMA or PMP check，抛出一个 access exception</p>
-<p indent="1">3. 检查 pte 的标志位，若有问题则抛出一个 page-fault exception</p>
-<p indent="1">4. 若当前 pte 指向下一层页表，则根据 pte.ppn * page_size 得到下一级页表地址</p>
-<p indent="0">根据 pte 的标志位以及，mstatus.SUN 以及 mstatus.MXR 检查是否允许访问，若不则抛出一个 page-fault exception</p>
-<code-snippet indent="0" block="true">la: load absolute address
+1 | 1 | 1 || Read-write-execute page</code></pre>
+<p>– the U bit indicates whether the page is accessible to user mode。通常情况下 supervisor mode operates with the SUM bit clear，supervisor mode 不能访问用户页，但是如果 SUM bit is set, supervisor mode 也能访问用户页 – the G bit 指定全局映射，意味着该映射存在于所有地址空间中（如果是一个非页 PTE 被设置为 global 则其 subsequent levels of the page table are global. – Each leaf PTE contains an accessed (A) and dirty (D) bit. — The A bit indicates the virtual page has been read, written, or fetched from since the last time the A bit was cleared. — The D bit indicates the virtual page has been written since the last time the D bit was cleared. 20 位的 VPN is translated into 22 位的 physical page number (PPN), while the offset is untranslated. 结果的 supervisor-level 物理地址在经过 physical memory protection structures 检查后 converted to machine-level 物理地址</p>
+<p>Sv32 page tables 由 2e10 PTE 组成，每个 4 bytes。一个页表总是一页大小并且总是按页对齐的。根页表的 physical page number 被存储 在 satp 寄存器中。</p>
+<p>Virtual Address Translation Process - 1. 通过 satp.ppn * page_size 得到根页表物理地址 - 2. 根据 page_table_addr + va.vpn[i] * pte_size 得到当前层级下对应的 pte 地址 – 如果访问 pte violates a PMA or PMP check，抛出一个 access exception - 3. 检查 pte 的标志位，若有问题则抛出一个 page-fault exception - 4. 若当前 pte 指向下一层页表，则根据 pte.ppn * page_size 得到下一级页表地址 根据 pte 的标志位以及，mstatus.SUN 以及 mstatus.MXR 检查是否允许访问，若不则抛出一个 page-fault exception</p>
+<pre><code>la: load absolute address
 li: load immediate
-csrr: read csr
-</code-snippet>
-<p indent="0">kernel/kernel.ld 声明 architecture 为 riscv，入口为 _entry</p>
-<p indent="0">将代码起始位置设置为内存 0x80000000 处（更低处的内存用于 I/O）</p>
-<p indent="0">Xv6 从 kernel/entry.S （_entry) 开始执行，_entry 为 C 代码初始化栈</p>
-<p indent="1">对每个 CPU：sp = stack0 + (hartid * 4096) 其中 stack0 定义在 kernel/start.c 中</p>
-<p indent="0">而后跳转到 start() in kernel/start.c</p>
-<p indent="0">kernel/start.c 中</p>
-<p indent="1">为每个 CPU 定义了栈 char stack0[4096 * NCPU]</p>
-<p indent="1">为每个 CPU 定义了 uint64 mscratch0[NCPU * 32] 用于 interrupt</p>
-<p indent="0">在 start() 中设置 MPP 为 supervisor mode，设置 mepc 为 main</p>
-<p indent="0">以在 machine mode 下进行必要的处理后使用 mret 进入 supervisor mode</p>
-<p indent="0">禁用页表</p>
-<p indent="0">代理所有 interrupts and exceptions 到 supervisor mode</p>
-<p indent="0">timerinit();</p>
-<p indent="0">保存每个 CPU 的 hartid 到它的 thread pointer register 用于 cpuid()</p>
-<p indent="0">执行 mret （跳转到 kernel/main.c main(）</p>
-<p indent="0">kernel/main.c main() 中的逻辑仅在 cpu0 中执行</p>
-<p indent="0">初始化 console </p>
-<p indent="0">kinit() 初始化 physical page allocator</p>
-<p indent="0">kvminit() create kernel page table</p>
-<p indent="0">kvminithart() Switch h/w page table register to the kernel's page table, and enable paging.</p>
-<p indent="0">procinit();  // process table</p>
-<p indent="0">kernel/kalloc.c </p>
-<p indent="0">在 kernel/kernel.ld 中定义了内核代码后的第一个地址 extern char end[]</p>
-<p indent="0">定义了一个带锁的结构体 kmem，其主体为一个链表，指向一串空闲的物理页</p>
-<p indent="0">void kfree(void* pa) free 以 pa 开头的一页大小的内存</p>
-<p indent="1">填入垃圾数据以 catch dangling refs</p>
-<p indent="1">加入到 kmem.freelist</p>
-<p indent="0">void freerange(void* pa_start, void* pa_end) 通过 kfree free 区间内的所有页 pa_start 会向上页对齐</p>
-<p indent="0">void* kalloc(void) 从 kmem 中分配一页物理内存，如果无法分配则返回 0</p>
-<p indent="0">kernel/vm.c </p>
-<p indent="0">定义了一个内核页表 kernel_pagetable</p>
-<p indent="0">void kvminit()</p>
-<p indent="1">分配一个空页 for kernel_pagetable</p>
-<p indent="0">void kvmmap(uint64 va, uint64 pa, uint64 sz, int perm) 在 kernel_pagetable 上 va 与 pa 之间添加一个映射，如果映射失败则抛出异常</p>
-<p indent="0">int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)</p>
-<p indent="0">从 va 与 pa 开始 为 pagetable 建立映射，如果</p>
-<p indent="0">kernel/proc.c </p>
-<p indent="0">void procinit(void) 在开机时初始化 proc table</p>
-<p indent="1">为每个进程分配一页的内核栈  Map it high in memory, followed by an invalid guard page.</p></section>
+csrr: read csr </code></pre>
+<p>kernel/kernel.ld 声明 architecture 为 riscv，入口为 _entry 将代码起始位置设置为内存 0x80000000 处（更低处的内存用于 I/O）</p>
+<p>Xv6 从 kernel/entry.S （_entry) 开始执行，_entry 为 C 代码初始化栈 - 对每个 CPU：sp = stack0 + (hartid * 4096) 其中 stack0 定义在 kernel/start.c 中 而后跳转到 start() in kernel/start.c</p>
+<p>kernel/start.c 中 - 为每个 CPU 定义了栈 char stack0[4096 * NCPU] - 为每个 CPU 定义了 uint64 mscratch0[NCPU * 32] 用于 interrupt 在 start() 中设置 MPP 为 supervisor mode，设置 mepc 为 main 以在 machine mode 下进行必要的处理后使用 mret 进入 supervisor mode 禁用页表 代理所有 interrupts and exceptions 到 supervisor mode timerinit(); 保存每个 CPU 的 hartid 到它的 thread pointer register 用于 cpuid() 执行 mret （跳转到 kernel/main.c main(）</p>
+<p>kernel/main.c main() 中的逻辑仅在 cpu0 中执行 初始化 console kinit() 初始化 physical page allocator kvminit() create kernel page table kvminithart() Switch h/w page table register to the kernel’s page table, and enable paging. procinit(); // process table</p>
+<p>kernel/kalloc.c 在 kernel/kernel.ld 中定义了内核代码后的第一个地址 extern char end[] 定义了一个带锁的结构体 kmem，其主体为一个链表，指向一串空闲的物理页 void kfree(void* pa) free 以 pa 开头的一页大小的内存 - 填入垃圾数据以 catch dangling refs - 加入到 kmem.freelist void freerange(void* pa_start, void* pa_end) 通过 kfree free 区间内的所有页 pa_start 会向上页对齐 void* kalloc(void) 从 kmem 中分配一页物理内存，如果无法分配则返回 0</p>
+<p>kernel/vm.c 定义了一个内核页表 kernel_pagetable void kvminit() - 分配一个空页 for kernel_pagetable void kvmmap(uint64 va, uint64 pa, uint64 sz, int perm) 在 kernel_pagetable 上 va 与 pa 之间添加一个映射，如果映射失败则抛出异常</p>
+<p>int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm) 从 va 与 pa 开始 为 pagetable 建立映射，如果</p>
+<p>kernel/proc.c void procinit(void) 在开机时初始化 proc table - 为每个进程分配一页的内核栈 Map it high in memory, followed by an invalid guard page.</p></section>
     </article>
 </main>
 

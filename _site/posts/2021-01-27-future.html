@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2021-01-27-future</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2021-01-27-future</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">// The Context of an asynchronous task.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">struct</span> Context<span class="op">&lt;</span><span class="ot">'a</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    waker<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> Waker<span class="op">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    _marker<span class="op">:</span> PhantomData<span class="op">&lt;</span><span class="kw">fn</span>(<span class="op">&amp;</span><span class="ot">'a</span> ()) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="ot">'a</span> ()<span class="op">&gt;,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">impl</span><span class="op">&lt;</span><span class="ot">'a</span><span class="op">&gt;</span> Context<span class="op">&lt;</span><span class="ot">'a</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    <span class="at">#[</span>inline<span class="at">]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="kw">pub</span> <span class="kw">fn</span> from_waker(waker<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> Waker) <span class="op">-&gt;</span> <span class="dt">Self</span> <span class="op">{</span> Context <span class="op">{</span> waker<span class="op">,</span> _marker<span class="op">:</span> PhantomData <span class="op">}</span> <span class="op">}</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="at">#[</span>inline<span class="at">]</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>    <span class="kw">pub</span> <span class="kw">fn</span> waker(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="ot">'a</span> Waker <span class="op">{</span> <span class="op">&amp;</span><span class="kw">self</span><span class="op">.</span>waker <span class="op">}</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<p>目前，Context只提供了对&amp;Waker的访问，可以用来唤醒当前任务。</p>
+<hr />
+<p>A Waker is a handle for waking up a task by notifying its executor that it is ready to be run.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">// 封装了一个 RawWaker 实例，它定义了特定于执行者的唤醒行为。</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">struct</span> Waker <span class="op">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    waker<span class="op">:</span> RawWaker<span class="op">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<hr />
+<p>RawWaker允许任务执行器的实现者创建一个Waker，提供自定义的唤醒行为。 它由一个数据指针和一个虚拟函数指针表（vtable）组成，可以自定义RawWaker的行为。</p>
+<p>(不过我不明白这里为什么不用一个 trait object)</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">struct</span> RawWaker <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    data<span class="op">:</span> <span class="op">*</span><span class="kw">const</span> ()<span class="op">,</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    vtable<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'static</span> RawWakerVTable<span class="op">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="kw">impl</span> RawWaker <span class="op">{</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    <span class="at">#[</span>inline<span class="at">]</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> new(data<span class="op">:</span> <span class="op">*</span><span class="kw">const</span> ()<span class="op">,</span> vtable<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'static</span> RawWakerVTable) <span class="op">-&gt;</span> RawWaker <span class="op">{</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>        RawWaker <span class="op">{</span> data<span class="op">,</span> vtable <span class="op">}</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    <span class="op">}</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<hr />
+<p>RawWakerVTable是一个虚拟函数指针表（vtable），它指定了RawWaker的行为。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="at">#[</span>derive<span class="at">(</span><span class="bu">PartialEq</span><span class="op">,</span> <span class="bu">Copy</span><span class="op">,</span> <span class="bu">Clone</span><span class="op">,</span> <span class="bu">Debug</span><span class="at">)]</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">struct</span> RawWakerVTable <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    <span class="co">/// This function will be called when the [`RawWaker`] gets cloned, e.g. when</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="co">/// the [`Waker`] in which the [`RawWaker`] is stored gets cloned.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    <span class="co">///</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>    <span class="co">/// The implementation of this function must retain all resources that are</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>    <span class="co">/// required for this additional instance of a [`RawWaker`] and associated</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>    <span class="co">/// task. Calling `wake` on the resulting [`RawWaker`] should result in a wakeup</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>    <span class="co">/// of the same task that would have been awoken by the original [`RawWaker`].</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>    clone<span class="op">:</span> <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="op">*</span><span class="kw">const</span> ()) <span class="op">-&gt;</span> RawWaker<span class="op">,</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>    <span class="co">/// This function will be called when `wake` is called on the [`Waker`].</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>    <span class="co">/// It must wake up the task associated with this [`RawWaker`].</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>    <span class="co">///</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>    <span class="co">/// The implementation of this function must make sure to release any</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>    <span class="co">/// resources that are associated with this instance of a [`RawWaker`] and</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>    <span class="co">/// associated task.</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>    wake<span class="op">:</span> <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="op">*</span><span class="kw">const</span> ())<span class="op">,</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>    <span class="co">/// This function will be called when `wake_by_ref` is called on the [`Waker`].</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>    <span class="co">/// It must wake up the task associated with this [`RawWaker`].</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>    <span class="co">///</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>    <span class="co">/// This function is similar to `wake`, but must not consume the provided data</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>    <span class="co">/// pointer.</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>    wake_by_ref<span class="op">:</span> <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="op">*</span><span class="kw">const</span> ())<span class="op">,</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a>    <span class="co">/// This function gets called when a [`RawWaker`] gets dropped.</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a>    <span class="co">///</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a>    <span class="co">/// The implementation of this function must make sure to release any</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a>    <span class="co">/// resources that are associated with this instance of a [`RawWaker`] and</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a>    <span class="co">/// associated task.</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a>    drop<span class="op">:</span> <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="op">*</span><span class="kw">const</span> ())<span class="op">,</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<hr />
+<div class="sourceCode" id="cb5"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">trait</span> <span class="bu">Future</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>    <span class="kw">type</span> Output<span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>    <span class="co">// 在多次调用轮询时，只有最近一次调用所传递的 Context 中的 Waker 应该被安排接收唤醒。</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>    <span class="co">// 一旦 future 已经完成就不应被再次轮循</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>    <span class="kw">fn</span> poll(<span class="kw">self</span><span class="op">:</span> Pin<span class="op">&lt;&amp;</span><span class="kw">mut</span> <span class="dt">Self</span><span class="op">&gt;,</span> cx<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Context<span class="op">&lt;</span><span class="ot">'_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> Poll<span class="op">&lt;</span><span class="dt">Self</span><span class="pp">::</span>Output<span class="op">&gt;;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<p>Future 是惰性的，它们必须被主动轮询才能取得进展，这意味着每次当前任务被唤醒时，它应该主动地重新轮询它仍有兴趣的待定 future。</p>
+<p>When poll is invoked, the future attempts to advance its internal state as much as possible.</p>
+<hr />
+<p>The executor is responsible for calling Future::poll on the outer future, driving the asynchronous computation to completion.</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

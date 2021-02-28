@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Ryokou - 2020-01-01-condition-variables</title>
+        <link rel="stylesheet" href="../web/static/main.css" />
+        <script src="../web/static/main.bundle.js"></script>
+        <style>
+            header {
+                width: 100%;
+            }
+            nav {
+                width: 100%;
+            }
+
+            header nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            footer {
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <style>
+    /* main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article {
+        max-width: 680px;
+    } */
+</style>
+
+<main role="main">
+    <h1>2020-01-01-condition-variables</h1>
+    <article>
+        <!-- <section class="header"></section> -->
+        <section><p>A condition variable is an explicit queue that threads can put themselves on when some state of execution (i.e. some condition) is not as desired (by waiting on the condition); some other thread, when it changes said state, can then wake one (or more) of those waiting threads and thus allow them to continue (by signaling on the condition)</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> Condition {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="kw">public</span>:</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    Condition(<span class="dt">char</span>* debugName);  </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    ~Condition(); </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    <span class="dt">void</span> Wait(Lock *conditionLock); </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>    <span class="dt">void</span> Signal(Lock *conditionLock);</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>    <span class="dt">void</span> Broadcast(Lock *conditionLock);</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>}</span></code></pre></div>
+<p>All locks must be the same. - <code>Wait(Lock *l)</code>: atomically releases the lock and waits. When <code>Wait</code> returns, the lock will have been reacquired - <code>Signal(Lock *l)</code>: Enables one of the waiting threads to run. When <code>Signal</code> returns the lock is still acquired - <code>Broadcast(Lock *l)</code>: Enables all of the waiting threads to run. When <code>Broadcast</code> returns the lock is still acquired</p>
+<p>There are two kinds of condition variables: - Mesa semantics, there are no guarantees when the signaled thread will run. Other threads that acquire the lock can execute between the signaler and the waiter. - Hoare semantics, is harder to build but provides a stronger guarantee that the woken thread will run immediately upon being woken</p>
+<p>When checking for a condition in a multi-threaded program, using a while loop is always correct; using an if statement only might be, depending on the semantics of signaling. Thus, always use <code>while</code> and your code will behave as expected. - Using while loops around conditional checks also handles the case where spurious wakeups occur. In some thread packages, due to details of the implementation, it is possible that two threads get woken up though just a single signal has taken place - Mesa semantics are also another reason to always use <code>while</code>.</p>
+<hr />
+<p>Let’s consider a bounded buffer problem. Suppose we have two consumer threads and one producer thread. Below is buggy implementation:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="dt">int</span> loops;  <span class="co">// must initialize somewhere...</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="dt">cond_t</span> cond;</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="dt">mutex_t</span> mutex;</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="dt">void</span>* producer(<span class="dt">void</span>* arg) {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>    <span class="dt">int</span> i;</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>    <span class="cf">for</span> (i = <span class="dv">0</span>; i &lt; loops; i++) {</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>        Pthread_mutex_lock(&amp;mutex);            <span class="co">// p1</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>        <span class="cf">if</span> (count == <span class="dv">1</span>)                        <span class="co">// p2</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>            Pthread_cond_wait(&amp;cond, &amp;mutex);  <span class="co">// p3</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>        put(i);                                <span class="co">// p4</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>        Pthread_cond_signal(&amp;cond);            <span class="co">// p5</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>        Pthread_mutex_unlock(&amp;mutex);          <span class="co">// p6</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>    }</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>}</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="dt">void</span>* consumer(<span class="dt">void</span>* arg) {</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>    <span class="dt">int</span> i;</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>    <span class="cf">for</span> (i = <span class="dv">0</span>; i &lt; loops; i++) {</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>        Pthread_mutex_lock(&amp;mutex);            <span class="co">// c1</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>        <span class="cf">if</span> (count == <span class="dv">0</span>)                        <span class="co">// c2</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>            Pthread_cond_wait(&amp;cond, &amp;mutex);  <span class="co">// c3</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>        <span class="dt">int</span> tmp = get();                       <span class="co">// c4</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>        Pthread_cond_signal(&amp;cond);            <span class="co">// c5</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>        Pthread_mutex_unlock(&amp;mutex);          <span class="co">// c6</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>        printf(<span class="st">&quot;</span><span class="sc">%d\n</span><span class="st">&quot;</span>, tmp);</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a>    }</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Things may happen in following order: - At t1, consumer thread 1 run, it finds the buffer empty, then it goes to sleep - At t2, producer thread 1 run, it finds the buffer empty, then it add one item to the buffer then signal one sleeping thread (in this case consumer 1 - At t3, consumer thread 2 sneaks in, and it find the buffer ready, and it consumes the buffer - At t4, consumer thread 1 run, it tries to consume the buffer, but the buffer is empty now. Here’s where the error occurs After we change the <code>if</code> to <code>while</code>, things get better but still broken.</p>
+<p>There are two race conditions, but we have only one lock: 1. the buffer 2. who’s the next one to be awaken Our lock only protects the buffer. Things may happen in following order and in this case a deadlock will occur: - At t1, consumer thread 1 run, it finds the buffer empty, then it goes to sleep - At t2, consumer thread 2 run, it finds the buffer empty, then it goes to sleep - At t3, producer thread 1 run, it finds the buffer empty, then it add one item to the buffer then signal one sleeping thread (in this case either consumer 1 or consumer 2, let’s suppose consumer 1 is awaken - At t4, consumer thread 1 run, it finds the buffer ready, then it consumes it and signals one sleeping thread, let’s suppose consumer 2 is awaken - At t5, consumer thread 2 run, it finds the buffer empty, then it goes to sleep At t5 we reach a state that all threads are sleeping. At t4, some producer thread is expected to be wake up, but the consumer thread 2 is wake up.</p>
+<p>Below is a correct solution, - producer threads wait on the condition empty and signal fill - consumer threads wait on the condition fill and signal empty</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="dt">cond_t</span> empty, fill;</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="dt">mutex_t</span> mutex;</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="dt">void</span>* producer(<span class="dt">void</span>* arg) {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    <span class="dt">int</span> i;</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>    <span class="cf">for</span> (i = <span class="dv">0</span>; i &lt; loops; i++) {</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>        Pthread_mutex_lock(&amp;mutex);             <span class="co">// p1</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>        <span class="cf">while</span> (count == MAX)                    <span class="co">// p2</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>            Pthread_cond_wait(&amp;empty, &amp;mutex);  <span class="co">// p3</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>        put(i);                                 <span class="co">// p4</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>        Pthread_cond_signal(&amp;fill);             <span class="co">// p5</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>        Pthread_mutex_unlock(&amp;mutex);           <span class="co">// p6</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>    }</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>}</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a><span class="dt">void</span>* consumer(<span class="dt">void</span>* arg) {</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>    <span class="dt">int</span> i;</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>    <span class="cf">for</span> (i = <span class="dv">0</span>; i &lt; loops; i++) {</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>        Pthread_mutex_lock(&amp;mutex);            <span class="co">// c1</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>        <span class="cf">while</span> (count == <span class="dv">0</span>)                     <span class="co">// c2</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>            Pthread_cond_wait(&amp;fill, &amp;mutex);  <span class="co">// c3</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>        <span class="dt">int</span> tmp = get();                       <span class="co">// c4</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>        Pthread_cond_signal(&amp;empty);           <span class="co">// c5</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>        Pthread_mutex_unlock(&amp;mutex);          <span class="co">// c6</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>        printf(<span class="st">&quot;</span><span class="sc">%d\n</span><span class="st">&quot;</span>, tmp);</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>    }</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>}</span></code></pre></div>
+<h4 id="covering-conditions">Covering Conditions</h4>
+<p>Let us consider a multi-thread memory allocation library. Suppose we have 100 units of memory. - At t1, thread 1 required 100 units of memory, and there are enough memory, so 100 units of memory are allocated to thread 1 - At t2, thread 2 required 50 units of memory, but there are not enough memory, so thread 2 goes to sleep - At t3, thread 3 required 10 units of memory, but there are not enough memory, so thread 3 goes to sleep - At t5, thread 1 releases 20 units of memory, and it signals one thread. But who are to be signaled? In this case, all threads are both consumer and producer, so it is not like the bounded buffer problem, we cannot use <code>cond_t empty, fill</code> to direct</p>
+<p>Instead we use <code>broadcast</code> to wakeup all waiting threads, this will introduce some performance penalty, but it is the simplest &amp; straight forward method</p></section>
+    </article>
+</main>
+
+    </body>
+</html>

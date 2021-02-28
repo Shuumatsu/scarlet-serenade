@@ -1,0 +1,205 @@
+---
+title: TypeScript | Type Challenges
+---
+
+> :a[https://github.com/type-challenges/type-challenges]{href=https://github.com/type-challenges/type-challenges .nav}
+
+---
+
+Implement the built-in `Pick<T, K>` generic without using it.
+
+```ts
+// type MyPick<T, K> = K extends keyof T ? { [P in K]: T[P] } : {}
+type MyPick<T, K extends keyof T> = { [P in K]: T[P] }
+```
+
+---
+
+Implement the built-in `Readonly<T>` generic without using it.
+
+```ts
+type MyReadonly<T> = {
+    readonly [P in keyof T]: T[P]
+}
+```
+
+---
+
+Given an array, transform to a object type and the key/value must in the given array.
+
+```ts
+type TupleToObject<T extends readonly any[]> = {
+    [K in T[number]]: K
+}
+```
+
+---
+
+Implement a generic First<T> that takes an Array T and returns it's first element's type.
+
+```ts
+type First<T extends any[]> = T extends [infer A, ...any] ?
+    A : never
+```
+
+---
+
+For given a tuple, you need create a generic Length, pick the length of the tuple.
+
+```ts
+type Length<T extends readonly any[]> = T["length"]
+```
+
+---
+
+Implement the built-in `Exclude<T, U>`.
+
+```ts
+type MyExclude<T, U> = T extends U ? never : T
+```
+
+---
+
+If we have a type which is wrapped type like Promise. How we can get a type which is inside the wrapped type? For example if we have `Promise<ExampleType>` how to get `ExampleType`?
+
+```ts
+type Awaited<T> = T extends Promise<infer R> ? R : never
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBCMAcCcEC0ECCB3AhgSwC4FMATSZJM8kgIwE8IBZTAY23wCsIBlbAawHsAnTBAAUAAQC2TFqwDOPAZgCUEAMT5MM2ioAO-XuOwz8JEirMQAigFd8M3Nl4A7E1ACSAMwjp8EABaYANx8hXGptH3RfbEZfCEMvQW1wwghQ8IgAGx4fAAU9AyMAOggACV50Lx9GTEcIAHN8XAgQsIiomLiZOMc5Qh9cXwjE5NTWgH4IADEBCHwAD0xxbQyfbE9vP0CfAAM8-UN8AB4AUQWllYAVVoA+bb9y1N56xohTxeX8K-CxlwhriAuUS6AEcbHYHLV4toBAQUu58qlBhAANoCbB1bCOTAZZr8eyMFYAXWEvlwuG0MgAXMBgH0AoVcLxgJJGHI+IJgJhCAEaowiEg0rZGPxsNpcEh5vh+MwjDIkKDbPYnEhoEgACwAVm4auUNBREikbDZCmJpPJVJpGIGVkohUY+mZhtk8kEil+-wAaiwKk4IABxPAlG2UvxkinU4C4GQxQqyQoCOrAODwMAgYBgDOgCAAfVzefzeYgAE1eFZ+BAAMK8PqlKU+AsN3MQNMZwVoLB4IiHC7-AC8ANmcwIjkIXT2BSOmPcUogACV-hNZxAQ458EF+BmwFnGw2AYrKxpbDmd-nm+nsEsYRAAN6vUHYgA0rzm4UYTQAvhB4foIAByUSCkgMTYisjgNDIwBWPYGQyL+ratBAAAaED9uOByHHYIpgdcYBtkWKEQGhRiHLe7gsBkhArlY4iUDO744bhCHVLKBHIiQpyvrgJz3hkhwYDgsKHIh1xPphmJ1NcInsS++BvtxVjYnxHaCUWIk3l+5GURAjjUbR5b0VJhKbluIDHieTaTGWAwzhwBAUmZ5lniZJD-Bw-j8D41CluWMi8BkUEQlSobmhGUYxnGCZJggnI9N4G5QJ63oQL5-lKj0IZmuGNJhb4sYyPG-CJsmwApQFTgyC59ACD4Fb+BkoHgRlYYWpG0a5RFhWpumYBAA .nav}
+
+---
+
+Implement a utils If which accepts condition `C`, a truthy return type `T`, and a falsy return type `F`. `C` is expected to be either `true` or `false` while `T` and `F` can be any type.
+
+```ts
+type If<C extends true | false, T, F> = C extends true ? T : F
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBBMBsAcEC0ECSAzSyk91gRgJ4QAKAhgG4CmANhAOI0CuAzgBYDWA9hRABQABAA5l2TAC4cAlBADEVUcVkSAljRZYss7RACKTKi3EquAO01RUAWyE0qVqqfEQyEVeogADDJ4gB3NhUAYzYXIKCqIXEWCCCzABMVYzMvAGFPABoXCHEAJwk2YlyqcSZc0xzCISovABVMl1N47PQydSKSsorxKprPADFPADo03xUYqgAPaqDxKmbxLgh8GqoktipcrzyDXy4tz1b1Kl8AtT76xuaB3yCyCpXG4h7qoYsIfv2IKbIbOwAud6eYHRLAvGoAQQgAF40OgADw7KhZADkZBRqPwKIAfFBgMBvtMqLN5jklo80Siwb0IAAhGFw+FHFjIiCUzE4iD4wkzOYLck1FFYrDAzzvXEANRUVD8EBS9CSAAkmPh-hA2OJxEIWP98dEQkMAFYsIb7ADmwDg8DAIGAYHtoAgAH0Xa63a6IABNLhlCCpLjxGqKzY1d1hl0QW328GM1KEuZNGJIiAAHwgzNZtSy-VxsLjUwT8ST+RqAH4ILUIGr+vawI7w2GK4ZnKlRIZnQ23ZG7SobPtnABvCAAUQAjkw2llh0TZhAAL7p3JcKxsgTgpAhNp2UxmwzAdwsKlgGN3FkxWEAbSw0958LHE5o8IwiJLqPRHOxb5xn+vM-Ed-HNonwRDMvyyaBPxgbEfwAXQdAk1xYJApl5ZDciXXJjxpTYMIZZ9TCYGgaDAtksWxWs6xADtOwjfoynEDYtgAZTmbVqJo7tKKwXEmLYMhiggQgfS2FguGYZJTB1dVNW1XVgH1NgjRNc1LQQYB7hYPxNm4iApRlCBRPEkxJLVDUtR1PUWANY1TVyC0rWAQzVDMDQoFxABZfYalSPiiMcXcpLM2TLOs5S7JtO0wCAA .nav}
+
+---
+
+Implement the JavaScript `Array.concat` function in the type system. A type takes the two arguments. The output should be a new array that includes inputs in ltr order
+
+```ts
+type Concat<T extends any[], U extends any[]> = [...T, ...U]
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBCsDMsQLQQMIHsB2BjAhgF0iUWJMICMBPCAQQwBMAnAUyoGkGcBnNAN04GsqACgACZZrAAM-DgDYAnFk4BKCAGImXKmpwMOFQoTXGIARQCuTTngCWmQ1ACSAWwAOAGybOmGPBDwAFkwQAFI4PDgAylgMNq5+AAbUejgUAHRYmLh4CRAAZubYtpgQNhj+Qf4UrsGcFNZeaTRVNf44-FYVwXgA7mgQugDm5t6+nE0AKpVo5niusxCcATPudBBkwTgQGEw9AylUgfil2O7mdJ1l83icJxDueAwQaAwXDA4QAGIvEEwAHjg3J4PglQTdCHhqsEAEpWcwPCAAXlQWXwAB4ANoARgAugAaCAYgBMOIAfBBgMBfn8alg8Ew1nh+htCViCSTCKCEh9yQA1Gy7Z7lADiNjwAAlzGQAFwQAJ4OacaWUm5YAJpABW4xeg2AcFgYBAwDAJtAEAA+pardarRAAJozJ7oC4QcVMZgWm1e80QI0myGtdDYdETan0+i3HAYCgY-EQACqYZ8dEj0dj5ORGLS2YmBOzaXjONNIE93utEAmVj8KC4nTLNt9xpsbhefgA3hAAKIAR3MOHcBM7NKYdIgAF98gw0M4IAByEQBpiINX9zwYQZWYCzGzuTiz-1QiC4TidTOEIe0vBont99xooPZTFx9ME9OkvHn4d06+9-v31FXrGr64u+rJku+n6Xj+t7-sGgFshAJKvrABIACxksB7IEihEDoaSEFQBeI5Xjef4PuiGKzlis5YXOsCzs+eT9ieBJkGgaCeFGBKzqhDGgZR1G0bO9EEkxu5MKx7GcRg3G8eBH5FiaYBmvW5afOYDCBO6ECRPSri3Kptp+qAhDkpEAS6MEFCOosHHbpgSpygq+nKsAqrqlqaQ6nq8DAFGnA9O6pkQPygrcGcxQYI58qKq57matqDC6vqwDhfZUXBQAsi8wQoBZ7hrhu0XOUqKqcGqCVeUlhrGmAQA .nav}
+
+---
+
+Implement the JavaScript `Array.includes` function in the type system. A type takes the two arguments. The output should be a boolean `true` or `false`.
+
+```ts
+type Includes<T extends readonly any[], U> = U extends T[number] ? true : false
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBAcCc0QLQQJIDsDGAbArgEwFMBnSJRci0gIwE8I0cssIAKAAQGsa0CAzHDgEoIAYgIBDInRHiATrPE1SpEaogBFHMQAuASwD2aZVBQBbAA5YCpgmm0RtACwIQAUuIBu4gMoZZu83sAAwBBeUUAOl1MXEIiIIh+TD1DCGiHZwcacxcpIm1rCIgQrJyHcQ5iDJdtAHd9CDkAcxwbOyIigBVM-Rxtcz6IIkderDwIKhdxCf19K3E0CCDtWS0E-Vkl3nEsIgIgiNIAMQ2IAgAPcQsrUiC70m1sl10iAAVdJjkAWVsIAF5UDF8MQADwAbQA5ABpORECEAGggEIAokRdHgXroEUiAOpXHA4bEQ7wLbQLcQQgC6iIhABEDBCAHwQYDAM7nHIYArjbQNSZbHZ7IK3e5QUjMgBqugItQgqQA4rptAAJHBUABcEEc2n6RHVrO0RAwjgiACsOhsmsA4NAwCBgGBHaAIAB9N3uj3uiAATV6mwAwvpCBBlQRZC5PZG3RB7Y7HmV0NhgUQQZ12QU0HgiBBw+I8IYsHQFjQwdSIABVZkA8vp2xZiCdMEMUyTWSUiAAfgcqxcmu2uwIYGdUcjDZ0EH9kiqI89MYdugsG3sAG8IMiAI44HaI5Ecghcnd7rlHQUEREAOX02g3W+YAF9ErJ9KYkWx4wREMadlY0E1iMA+g+OE4yeCAMCnbMATBUhd05bQQRvHYQUTWJQUhGFZDhGlUXRTEiTxUwCSJEk7HJKkaQwuFGURFYtEZaiYKPeDEKwZCgTicFoVhIkcIxNF8PxQkaRIsk0ApMs6QZajElPej4UYuCEM3JCUOTcEAEZEQAJkRABmREAFZEQANkRAB2MsABZpP7PY5LASlHSdEBXRnL0jhwWQnDDCBvAKcxszcr1Y1AcVfMcOQXBoP0hjmQDDD1LUdQC-VgENY0zQtWQrRtYAFiIWowzCqUZVi3AUjQRLtV1VL0pNc0Ikta14GAIg4oqkgoGZL4Nhcf0IqYWw-yq5K9QNI16qypo7QdMAgA .nav}
+
+---
+
+Implement the built-in `ReturnType<T>` generic without using it.
+
+```ts
+type MyReturnType<T> = T extends (..._: any[]) => infer R ? R : never
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBBMELQQOIFMAuEBKaCuAnAdhACoCeADspPHDbVQEYkQCC+qAFgPb5MBi2EABQABAIZsAZtgCUEAMQBbZABMAltgXzV+Cclzz62VQBtUcbVSpzrEAIrZkAZ1SrulqAEkFZY8iVsIDmQIQxMzbQgAAyxUPHxSCgAeIgA+SIgAc2R8PVUAYwgAd1UOTmx0bEdtDIgSgDp3CF5OfWQAD1FvX0bI3tRHKjzuZwgJQgBeIQA3AC4Qzk5fcVlxlIgAbyooVQlp6S2oCFwcAggARgPkY0dKQ8Pj2NPoKgBfRtRyYNEISYBZEhicQSyESHwonF2YzWwGAEEcXGwxmUIWCACIzhAAD4wVFUXqRRprABqqmQhQg3CQJQAEth6HN2KhUGRHDMYf08uw6gArRx1FoZYDPEDAMBi0AQAD60plsplEAAmmV9ABhTjKYLUvTBOW66UQEVisHBf6AgjA5JrSZECDtVDZZSOIR1F2SubiEgAbQAuis1tpdPoMBAAPyYCBzHJTPRisASvW64hOdAq0Q3J0JuUG0WqbwtdDrCAAUQAjthRMYADTFtoUPLoF6jXCcTQAcmExrgnIrvnwWUcwHKJkcraNnwgeTTTh+EE9VCLteQ9cSpfLxkSzlw1WrppO8U+iUEfrhqC3fZSF8r88Xy9XFcSZ2gAGYdwC9xajz81o+nxeUleoAXOtUBXMt7zVLp2gAeXobkl1QV8zX3JJP1WCAIJ8aDYPgv8AJrYDQLXRIAAVmwUVQbkSegFiWfB-wgXdHmQkFULWUiWwokFqMWZBxD-f9rwIu911YiBWwkBZW0Q98D1E0TxMk3DBPgwj7wxbFoGkpiLWNCFRjoy9lNvMD13UmAtKBA9dMhfAziU70xwodCW0wtoYLg+sZ02KBRDmT1H2rBTOFbByoHoURcDmVt2CuYxgqoMhjimI9Iw0egYzeMAhnwEYxhnQRZnmHjli-CAplDc4IxgLLhnQMYMUmAq5m42jq0Kd0eGPcqwwxOZnljeNM3lfhcCCfQAGV7RZKUhv1Q1QCoNZxvYCLghIZU4UWIdhgZJkWTZYAOS5Xl+VwQVoGAcRHEKGMoGJUlyUcLaXB2iBGWZVl2UcTkeT5AUhWAJ7jG2nLFoYlpghVFbjF7ftdo+g6jt+06MjAQ0wCAA .nav}
+
+---
+
+Implement the built-in `Omit<T, K>` generic without using it.
+
+```ts
+type MyOmit<T, K> = Pick<T, Exclude<keyof T, K>>
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBDMELQQPIFsCWAXS8491gRgJ4QCCAdugBYD2ZxAYgK4QAUAAgIYUBmjAlBADEyAKYATVI2RDGZVLSH5GqADbo4qMliyDdEAIqMRAZ3TytULAElkABxUjRFCFREQlq9ZogADFBgAeABUAGggAaQA+HwgAcxEyEQAnVABjCAB3DBpGdAhGY01YiAwAOm0oAGFaUyTGVPRjCA4XQls3IghbNIBrIuaVFS6k6naksxMIbhHpHyCYrjEXSgSIJMdqADd+n3CfCoh6aiSIEQAPDjsHA59bxqxNdGTuDlS3IOoxaggAbywoMzoBwALggtSK-wgYhMqRStjMtFB4LIsUhqWoVxETzEoPw1GoDi4WAAvgd0G13p9qAAFdbbEQZCAAXggAFlCP50MEqWEAOTQ4yw1Dw8y8iAAHwgvMBDl5kQO6LIphcVNBHy+tJE9MZLL+UCg6Mx2NBLxUxhEIRJWFu+0sUEiEAAaqgGRAFABxDAACUY+FBlHQ6FsxmBwGAjVSlFKACtjKVjrFgNAwCBgGB06AIAB9HO5vO5iAATWojBO1WhEC9yTc+drOYgqfT5PabI5aC5oQiDpZ1N6wTCAFEzqkVIxoQEeiJCNRuBBO1F5RmQNm6-m5yY8pUOOamqu143UHZjnkfhABwBHRgcFSDs7tBoQYlTGZStjNkRwSPXhwokzAXKqMYvJNhSECpNukwsgA2lgQ73lyF5XioARwSIDTiAAjGE7KctyXx8gKQoirQcqRJElpQKhDQoZe14oXeaHYgATNhbaBOq1AETCcIImQYqSryhr2Fi4ikfKAC66aPM8ryUl8vxYDKIhIugKQolghE8eYKlqaiBoYsJxruPihJaKSYDSUkLxvGeDHoWIGEKQCGAgmCqkQvpRriLiJkiES5mWdZbhUcxTkuC5ylubpYDmUuK57vWTDjCsJwAMpPMG8UJQ2aagFgDqpZQHDrBA06lmCBIATU-qBsGobhoKUaxvGSSJtAwBcMYGTJPlTouoyxiVbxIYQAGQYhmGEZNXGCZJsAg2jsNvWsscbiVEVgwJPEI1jXVk2NTGM2tSmaZgEAA .nav}
+
+---
+
+Implement a generic `MyReadonly2<T, K>` which takes two type argument `T` and `K`.
+  
+`K` specify the set of properties of `T` that should set to Readonly. When `K` is not provided, it should make all properties readonly just like the normal `Readonly<T>`.
+
+```ts
+type Flatten<T extends { [key: string]: any }> = { [key in keyof T]: T[key] }
+
+type MyReadonly2<T, K extends keyof T = keyof T> = Flatten<T & { readonly [S in K]: T[S] }>
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBAcELQQEoFMCGATA9gOwDYE8IAmSeOci0gI0IEFsAXACx0IDEBXCACgAFVGAMw4BKCAGIAtsnQBLDpIkAnNFjyFxmKgCtkAYwZwA1snwBnUqXHWIARQ7IzDWTktQAkpIAOuZNMYQqBAA5sjYyEqyehAABgCy+CgYOAREADwAKgA0EADSAHwxEADuTFFMEAyoJmaVxZiV+F7IgUrBCmEMsRlFAuixuTEAdG4DRWbNerKChMwtZshdmIIQXkqYzUrOjhDL3UXMqF1mLBy4-QtdDA1JagRDEADqTGFjELK12Jhda5gAbrJ0DIcrJjqdzhBJNUWqhcLhVutNttaipkuoINoOE4ILhZCZKi8IF8lFD4TFbil8JlCiMoKQ2JglBBkAAPVDeXyjGLchgWKCyRgRQSoPQtDKYLAQADepCgzgYvgAXBAnJFsMFZRAgWY9JEvM4cMrVQKNVAoHpMBzFjJlVRMJhfAJSABfUYW7DY65YZUJCnqdLirA5ADk8t8wYgAB8IMHtbrZPqXNhg-kIABeaWasPIZUAIgAEqZc1lNXG9QbsHnBPaqKglMXNRarQwbRBhbgFiWoK66XKJZghtn0xAC8g4ZhcxBgMAIABRJTrJTKvQCL5dVFmMyyYLYQIQVF3Qi-JH4UhegdlhMV4e52tKBkTqcz+eL5er777tCb7e7oIHykIhsEQMKefZYEMTY+Na-QZgwSgOE+EAAPK5KQ3IxKMqYAGqyMgxS7LuADioL5hwVDKkwDAMF4ZiKtOvJ6EwQzaGYQyMsEwDQGAIDAGAfGgBAAD6wkiaJIkQAAmpgHBMgAwhKLSFioQliapgkQDxfEgc0EBsLgRwttgmTMiyhnoLUUoQAA2iY+BGnBJoALrKgIhDOqmGaWTZpjvLutl7BkzkQBk3n4I5ECumA2ktL6qiUgGOS5CZZm1P5KwZMOaXBR5un6VRYTGQAZNKn5ogQ1kAMq+XkQUhRV4XufxIAqWponBY4XSyagCy1K1YkabxsjeIyXSWbQuImDks4spMXTOm26yKMGvDRXAjGwr46qOMAHDOB2wZaU0LQrj1w5WaQ02zWk414sgaSxWV+ABv2ACM+Q5H6BCZK9+S-V2c4zfoDDXRNd0PYez1YC9IbZhG0axo48aJjgKZTYDBgyH9F3o8DN0mPdiRxf631YEQMOguGUYxpeyPJu9AOzZj71gI5fECi2SjCqKwWvZmcoUzmKoOeqpA0xWAD89lqqaECQb4LboLa9qOtgYCRezQoimK-ZEHzpWHpUAtSyaouI+WSaS0L0ukHL0FKw6aCq+rgqc1rDNAzIev-ui2bGyLUDe+VYsW37Mu2wr9sq2rfFNS1fXqZwWwvEyFUtjRcd9QNYCgKQqYVUwdYtPg0lMmYDq7UmtEQJR1G0fROpMSxbFtJxwACGYxQRLnEA4XhKrlxWVc1zRdHAAxjesexrdl7gFc4HyECpnEjItLJBdwmEoRD1RI-14xzGT203G8WAQA .nav}
+
+---
+
+Implement a generic `DeepReadonly<T>` which make every parameter of an object - and its sub-objects recursively - readonly.
+
+```ts
+type DeepReadonly<T> = keyof T extends never ? T : { readonly [P in keyof T]: DeepReadonly<T[P]> }
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBCcELQQCIFNkAcICVkEMAmA9gHYA2AnpPHNTZQEZkQCCRALgBbGMBiArhAAoAAjjYAzXgEoIAYgC2yPAEtec2QCdchUoxkE6AK2QBjVnADWyMgGdZeVGkqUZLiAEVeya6yXEnUAEk5NBJkBTYIHAgAc2QiZHUlYwgAAxR0bHxicgAeABUAPhSIAHd2JPYIORxLCGQANwTGNBx1HAVWBIgCMUiibsMTVng+vAglVltrXjo4fSNTW01jXnVrJUbyEc0snQA6fwgATQJ+Y1FI62mFCA4cYZLkSM1unQh7HBIlImjSicqAPKDRbjfocJS2YzsT6hH7IPbMdRtGwAGggfCIpl8RGsaIAwiQcFcvKMINYCK9nk8iBT4opbhTWDUnt9WBTjMR1vY2j5iAiABIER6NdRosinCDnfreJQkEiS6FyuKxCDi1Zk5AkXoMSUEEXfX7KMRiBJxYbnawkolVUSMa1oAhXOiy+GHbgEdR1AAe7RCyEOKUDk0orDIaCeAA0IABeCAAbwglCgXoAXPHE1BM5E0wBGJOZuhpgDk5SL+YAvvmyMX2FYy1BK1AQ2GngBRL3h0z02MJ-M7bRbVPp-NQfvZO25kcQMdvQsQEtKeuZxuZmdbavz2tkIsZiArygcnHDNmENPpNCZAdkHIRgoQYDAMmcXgkMZ0J7WdpPa0pdudzp4CklCBkBTZQHeABqSjICUlIAOITPyMxpuwrCsGg1gpg+kxQnsBjWHsHrRMA0BgCAwBgJRoAQAA+nR9EMfRxynJ6eIEPYED8qatGMbxNEQORlGhuGSAOJe475HesaWOKvR5N6nREHgtjxCKEAAPwQPJaYJmujAANoAAqghAMk9FpAC6Z5iVoEl5EZFl3pWVEgDxfEMVpXjDHiRIku5jECRRSjBB6wwJq2ACOvCfGif5DHuEBiOoBBqEWQjCcgcBQjCypeMAvA+CQ1hlmAGWSr5tixvplBxaYOSRdFJA5Oe4k6DeBSxR2QyKAUHVgBZQkthAUY9pQOBpgI0jRneABMM30Gm3iJD8B46fmeBpnQBAEKEoj5sga1ZlA0SHUdUDsKdZ1QEoaasOonhTlmBjFktBpLmdK5neYNaaiQBDvcuFaUJWzllbVAExvGlB6dmghTbN82jrZs6LXdBrQ8jWzGJd06Y4wG0QFtO24EQfZ43UONI7sWwnVDV249TjAXXT9MM1e4y3fd-qs2z44QM986vT8ANZp9R0w99m6-f9U5iyuIOUS5bn+fxfDqBwXQAMqdBhyv+YFYCgJQd6a9CLxqp65IkAV2KYRAqHoZh2HWLh+GEeoxHQMAojWI86jGxAUEwWSO025yKFoRhWHADh7B4QRREkcAVthziAcALIek8eKKrCsR2w7UfO67Cce2RFFgEAA .nav}
+
+---
+
+Implement a generic `TupleToUnion<T>` which covers the values of a tuple to its values union.
+
+```ts
+type TupleToUnion<T extends any[]> = T extends [_: infer H, ..._: infer Rest] ? (H | TupleToUnion<Rest>) : never
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBCMAMEFoIBUCuAHANgUwgFwHsIBVAOwEsDTJEE76aAjATwgEFS8ALK1gMVQQAFAAEAhpwBmqAJQQAxAFtsAE3KpFC8qUnYATgrwYcC1BSo0a86xACKqbAGc8lalBoBJRVmzLOEMQgAc2xSfXIAYwgAAzQfZAIyVwAeZAA+aIgAdy5IrggIggA3fUd8LlwisUwHMoJJAPxjXEIIcjwyqpqnCDNXADpLKD4CA2wADzFvHCGY6OiOmjxmdFw2PQMAXggAbQByaD2AGgg9gCZj04BmPYBdWcLSZwCALhRmhKSqZPW9NIhgMAIBNVhE8Kp8ERGLgDnsIAAfU4XBHXPY0ebRWb-ABq5GwWQgVAgAHF2gAJVCMN5cPB4dCOF6AjoRLj9ABWjn6oyCwDgYBAwDAQtAEAA+uKJZKJRAAJoEVAGADCBBUuDJ+lwUq14ogAqFy1W73iiXMpFSwPG4NIKjKEmYO1u-22yAtVptu1Fb20ugMZJO-QDnraOn0EAASk48LcIAB+YRklFxHCfU3JCPONJyN5hEp6IVgEXarUoSMQRViRw9ItS3WC8jeUZ4CAAbwgAFEAI6oaonNvjUFNgC+EEkegImj2IgN2AQLOqOFIIUcwFQLkwjjRYGnBQrPW2OxofYHyU73cwqQ+JpSO2gZyuJz2ABYAKwANkueD0DkdJ1vVxRT5vnCiKfg4aRpEch79tgYInl21QXsaXxmjed4-jAd7gZB9zCiAYrVtKAh6NwoYAMrgvS+EEaKtYFuAUD-KRXBiHouDMPKBiOAQNQuFQDIQDSdIMkyjgsuynLcrysDABIjhZPoNA4niBJcTxrj8YJ9KMsAzKshyXJ6DycDAKpq7qYpEAALKjLgirMZgC5LtStJaSJYn6dy-KCmAQA .nav}
+
+---
+
+Implement an object to provide two function `option(key, value)` and `get()`
+- In `option`, you can extend the current config type by the given key and value.
+- We should about to access the final config type via `get`.
+
+```ts
+type Flatten<T extends Record<string, any>> = { [key in keyof T]: T[key] }
+type Extend<O extends Record<string, any>, K extends string, T> = Flatten<O & { [S in K]: T }>
+
+type Chainable<Options = {}> = {
+    option<K extends string, T>(key: K, value: T): Chainable<Extend<Options, K, T>>
+    get(): Options
+}
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBCMBMEFoIGEAWBDAlgO3QIwBsBTCAeQAcAXTAe2wGdJEEXWm8BPCAQW0tTpcAYgFcIACgAC6PgDMRASggBiALZEAJphGqV6cuQKYAxump0mTZdYgBFEUXrnslqGiy5CJGlVoMI6ABOJMY0qqp0BFwi9JoQOBAAUugAbuj0xoGYVAB0EABCIpQQAO6oRNilJPQlmJTGqBCUNBAAKhzkRADKmdmUADQQppUcNGLkgT5EgVFNHSR1APyuEACSlfyY9EMYBMTYAOZEg6Ni2ERxzXOdAZU0eABWRMbFNIEBQwTp20hlZkQpaYQU4QIwAaxISCuExoKUwGhIlBKLXk2BefggAAMfM5xBCOIM0gQHApMbcNFijpRxKS8ussTi-JiTmMhjIIEQAB6UCoU-ghESBYJ8IZ0WSYA7XEicJrlCAHTCAyr48kQIkOPIAdWqAhEBAp+DGxSu6GMxkc235EHFuAIEGC9D1xTh6EpREomJyKyEbw5nPQqkMRBWmNDlEYUARxi+wVFDGKoWw4oOAC4UBgcPhiCtE057Y4nRAALxx5NMKA5Rl0cQAclkNBoNcGcAAzApyxBK75qzXcOomxAa5R5ggGug9hUjvQa+2oBWq9ha3gggOAN5q8cONM1gASRD2LU1b31NYgAF9Z3OclSaStgMA-Z0XrLEfMIDRZPnHQRjS08EQUyYHAeUCWRTRIAAlAsfwgVcO3rGg02wHR-0CDs+wAiAnCyQ4O2XQI0zguc53VTDsJwA4OzPJhqKgUNMRWABNVkNDoIcIHOS4WhKLIeVuLgHnoYBw1BGgFWMJoWgwbANGIF8IBhLxdCQB4YmKBJhxuYhAQIPImNZYYAnoR11FlMwsXxMlIi4U1zSobZMXIw4yRkPk5UxUiyUM-9+M2Q5EAgVS82IVIFmKdIEC2PIugDEhMUs0o2OKHzyG+S5anNL0oCYAA+CAADVMCIEp30qABxOodxEPA01QShKHIegU3vcMGhyQTK0CA5gDgMAQGAMBBtACAAH0xvGibxogZjBRQGgEQgPdY0mlaxogfrBs0kghC+eqKgAHlaP0eRk7YoNCQINH2pyDkGGQOByvKS3XABtFUEnxD82gAXTTVo3qIDhvvPMAtogABRbleX20hjt5M7njeK6bru7AHsGABpOHTqwygcNutonogHazBOmGIAAMlgiAXq6eJKgx362nPHLNrfdxMy8GHu38Z6zyJoj3x5-asa5E6NG2FHCbxQG0wxwlN0w1oFDTDnPGIfbIfF7nnHoTHBlaR6mBvFWyB5xhqKGkBRtWya2kcYpkHSRwbdtqaNswQM3mKdduHBY4Ic5J9ijPa1Jl0GtJC20ddn2KdgCKTACGnQaoxjEI6DzdBVYzdXgzAXNigdQsS3QJgu1xOsGwHVtLwrvwlxXQZ11I7c9wPCAjxmDRTwvcuF1rDCByHEcxwnQ5HBncuTbZm5TFibYSxephIeD-a-cwCF9q2r7i5-QZV+eHkNCN77Z5IQ+XjiZ6mAQpCUOmdggkIjtW9x-GaKYDC0xusBLat12bsRrE0FPyd4XQeSNUAW7daA1QC5QgF0DAsZTjvHoDQYkutar1Uas1YSGRUDtXoJ1bqcBgAyBqI-KAeVCrFSwhgxOmdsENSai1AhRCSE9VgMAdBmC-ARggHlAAsm8Eg7hx5TmYbgthbUOpvEohtMAQA .nav}
+
+
+---
+
+Implement a generic `Last<T>` that takes an Array `T` and returns it's last element's type.
+
+```ts
+type Last<T extends any[]> = T extends [...any, infer A] ? A : never
+```
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBCMCsEFoIBkCGBnALhA9gMwgEEAnY1AT0kQRtqoCNyiA7TACx2aYDEBXCABQABVKzy8AlBADEAWwCmAEwCWvWTNSkKVKtL0QAir3lZlnHVAB8EACrkADvIDKAY2LL72ACwA6AAwQyugQxPIuOLIKzIpKgcwQ7EEQLmyoADZp8swA5vIWEACSsvaZUdioELnM8u4uEAAGaFgAPDaW9Qmp2JioANYmEKJEWkz1Nh2iiiHymLzEzMHKmADkwWkY2PKlWSvBmA7yPvncOMQQ8gAeqMWZ+fX3mOhU+46DpNAQALwQANrLqMsADQQZb0IEglzLAC6zwOb2IACYvr8AMzAhHA6AwqCw149ZRpD7fJqYZqaYjQazAYDnC6OFyYWKYHAQejyCHLXHs-FpJHEjZk0gIqk0y70xlTZms9nQKj3er5awANWU8gA7rh4gBxJYACV49AAXBA2JhMPZ0IbqY8Uj4AFboHynbLAOBgEDAMBe0AQAD6-oDgYDEAAmjg5hAAMI4GIQXU1dlBpP+iAer0vdkk1q0xnRYKicg-KHWb42HNZRTBH4+GsF4HKZh4GpEKEQAD8VEIEGN1QAbjUvWAfcmk7YTNhIxgBiOg6nPcpiqdsABvCAAUQAjrx0sC13SwtgAL4QPDECIgoQZhApdKZHImYC8TAE9CcsAZ5JT4LfH5UPfi5pN23NJmizH40QgDEYGLTFLEsQE-33BlAK3dJQIFH4BCkT5rGgBEINXVBjSwdwcggQ8YIgQjiMwUjsnIuCEJhQdhxnYM+GIdhmycRkLT9NiUzTUAqGsJxUlCCByHDM50BwNInzMBZjVNc1LWtdBbQdJ1iBdOBgFEdA1QHKwIBVdUIFk+Tn04S0TTNC0rWAG02HtR1nVdWBgEshSbJEiAAFlTnZSNUgyLJclslSHPUzS3J091PTAIA .nav}
+
+---
+
+Implement a generic `Pop<T>` that takes an Array `T` and returns an Array without it's last element.
+
+```ts
+type Pop<T extends any[]> = T extends [...infer A, any] ? A : never
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBCMBsEFoIAUD2AHSiE91gRgJ4QCCAdgC4AWqZxAYgK4QAUAAgIaUBmjAlBADEAWwCmAEwCWjYUI4AneR0JYsg9RACKjUQGcKk2qqgA+CABVC6UQGUAxvMnoKEACwA6AAwRJuiPNE7VGExMnEJHzIIal8IOyoOABtE0TIAc1FjCABJYXQU0JcOCAyyUUc7CAADNHQAHnMTKuiElwoOAGs9CC5SRWVq82aucX9RCkZ5Mj9ekn7iAHdJalRGF2WAcj9Ejn0IUQLUincs+lR5fYAPDjyUrKqHil0sCitRHsVoCABeCABtDYcDYAGggG3wILBdkhG3EGwAui83h95AAmH7-ADMoNRoOgiKgSOsYy+v1qdQU8mgZmAwCu1jsFAiFFQEHw7wBQNB4Jh0IJ0WRAXRZIwFMUqJpdNElwZTNGLLZHOxEFR-IeVSyIBAAFFLhQlFqAFwQGySYSSHbyRKEUF2XqEVY+W6iQrVGxUSTcChVUE1Ri6KjDMLVACq0w9XuGfgWB0SAH4smYAGqSUQLCC0CAAcWWAAlGPhjVQKBR0LpDbSnvF3AArXTuc5pYBwMAgYBgDugCAAfV7ff7fYgAE1VhcAMKocIQXPld4D+e9iBtjuvYnk8xXJlhGZ0P7wsy-DfSrfiPx-dwXyRkbjlUigriEeEQOOkCDGsoAN3KnZAPYXA4sPQXDHXZun-ADlzNdBzhcABvCBtQAR0YJJQV1WUIAAXwgbh5GCME2FXUQEHiJIUnSPRgDWC1dA2FdkTtXRul+P4sHQwIKDqJCUMSOpyT+ZVcRgfdQQEnF9xMYE2JlDiuOQpI+NFTkYQhbloW5OFgRE-5ARU3kERMSSwERDswC7cD+wgJh5GoW8bCZMs-ws7sl3bUAsDMd0FHeB1JggXRUESajaHLCBi1LctK10as6wbeQmzgYAuF0GN5A8iAUzTfzAuC6YixLMsK2AKsqFretG2bWBgACoKDBC9KAFlzneMcEmSVIMlC8LCqimLyvi1t2zAIA .nav}
+
+---
+
+Type the function `PromiseAll` that accepts an array of PromiseLike objects, the returning value should be `Promise<T>` where `T` is the resolved result array.
+
+```ts
+type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
+
+declare function PromiseAll<T extends any[]>(values: readonly [...T]): Promise<{
+    [P in keyof T]: Awaited<T[P]>
+}>
+```
+
+:a[playground]{href=https://www.typescriptlang.org/play?#code/PQKgUABBBMAMEFoIAUBOB7AtgSwM4FMA6AQwBtTJEFqbKAjATwgEEA7AFwAt1WmAxAK4QAFAAFiHAGYCAlBADEmfABNsAzAuKpUxJvLoDspdgmytKleVYgBFAflztsPC1AAqDAA74IXH9NYAYyceCAADNCw8fGZyMN9OYnYIYkDA-E92XBTWFO1dCHRJFAwcAgAZbABrH3Q6ACt8YNwAGgSfVHx2AVRWMwBzCAA3MnsIXG4BUmUIOh8I0uiAHjcAPniAd058TvC3eLx2iE7cdFIhlWOHKeStHQZCV3CwsKzKQJ5HCE9FggBGCAAXhKUQIhBOZwuwgAzDIANzvT7JH6g-DQIEQAAs0ARUA+rC+KLK+GhGNY+A2IOJS0cqAGq2Ewgh53wbU6jWCckBqwgAG9KFACOw3NglOgBOwmQ5IayIH9YLA2gBySTodBK+GUAC+mqglGAwAg+AAHt5gpd2OhZvNItSANqsdRzVBtR2YZ1tWkDAC660RBORGNt0RI5GEdqJ0T+bUjBGgMd+JO9KWy+McMkoLzCTx5ADVsBTCrkAOLYdgACQEdAAXBBOOx2J5cNWDVlApxCPVcIR0Kh+sA4GAQMAwKPQBAAPpT6cz6cQACa4tQEAAwuhlD5yzsfLPd1OIMPR+wvD5mBtiGWVCsecC3Ebjex8KxlNlgxVqvglmZJDsIABVHkAH5-wgWs3ARMAN0CUgtH8AQghCXI3xicgVnvR9n2yCQGDtX1hBGUh7GbK5iGUHhSCYO1CGotxvRkWtkKWfkoCgO1kAgMwIBqBgiggWjazPC9H2UFY2N9MAtVWMcQEnPdZz4hxkhXYgCGyOT5MPUVPF7ZJeQgABRABHAQyDafTTSaZItQgSRSggJVRGPbwEHbMhSCffoHGACUjFwJVRzTZFE1iUg3EUgFgWQkLw2jGA2mhZMVIgQKM0C75gvIMLHHRSKMtIGK2njKkQ2ZKFYUS1MkVSpF0tREKsvYUlcrqsM7ViorkPBaUWRhGQ6KPE9kpUhwMTtShzLNdgliMkzSCWJz8F42MUNC8K2kYtrCvi31VlWFpxos4JpuMsh5pPJa8oajrEyWTa4ogN1nR2vaDsm47ZrO7wLpa1bHGhdabodJ0dldYGXQesHnrAb1R2k2T1P3QRUD8ZcAGVHybeGEYPEdQEoHlUcSXYeJ6cYzh8z5a3rRtm1bXB207bte37OBgAkXANh2fGIHzQtTkIxDiOppsW2ANsOy7Hs+wHWBgH5imCW5gBZXsfBXRJyA8hwqYbEW6YZyXmaHEcwCAA .nav}

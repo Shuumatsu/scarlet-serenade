@@ -2,11 +2,6 @@
 title: Lattice
 ---
 
-**Definition**: A relation $R$ on a set $S$ is called a partial order if it is (partial means for a pair of set elements in $P$, they could be incomparable.
-- reflexive: $\forall x \in P, x \sqsubseteq x$
-- antisymmetric: $\forall x, y \in P, x \sqsubseteq y \wedge y \sqsubseteq x \Rightarrow x = y$
-- transitive: $\forall x, y, z \in P, x \sqsubseteq y \wedge y \sqsubseteq z \Rightarrow x \sqsubseteq z$
-
 **Definition**: A set $S$ together with a partial ordering $R$ is called a partially ordered set or poset for short 
 
 ---

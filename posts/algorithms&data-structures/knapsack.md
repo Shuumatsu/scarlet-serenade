@@ -2,7 +2,7 @@
 title: Algorithms & Data Structures | Knapsack Problems
 ---
 
-## 01 Knapsack Problems
+## 01 背包问题
 
 有 `n` 件物品和一个容量为 `cap` 的背包。放入第 `i` 件物品的消耗是 `cost[i]`, 收益是 `price[i]`。求解装入哪些物品得到的收益最高
 
@@ -73,5 +73,37 @@ int knapsack(int items_cnt,
     }
 
     return dp[capacity];
+}
+```
+
+## 完全背包问题
+
+和 01 背包问题的区别在于，完全背包的每种物品有无数件
+
+### Practice  
+
+:a[https://www.acwing.com/problem/content/3/]{href=https://www.acwing.com/problem/content/3/ .nav}
+
+可以将完全背包问题看作 01 背包问题：将每种物品看作 `1..=cap/cosst[i]` 件 收益与成本相同的物品
+
+```c++
+vector<int> dp(capacity + 1, 0);
+for (int i = 0; i < items_cnt; i += 1) {
+    for (int cap = capacity; cap >= costs[i]; cap -= 1) {
+        for (int k = 1; k * costs[i] <= cap; k += 1) {
+            dp[cap] = max(dp[cap], dp[cap - costs[i] * k] + prices[i] * k);
+        }
+    }
+}
+```
+注意 `dp[cap - costs[i] * k] + prices[i] * k = dp[cap - costs[i] * (k - 1) - costs[i]] + prices[i] * (k - 1) + prices[i]`，\
+我们将 `cap` 改成升序遍历进行优化, 此时，对每一个 `k`，其依赖的 `dp[cap - costs[i] * (k - 1)] + prices[i] * (k - 1)` 都已计算过
+
+```c++
+vector<int> dp(capacity + 1, 0);
+for (int i = 0; i < items_cnt; i += 1) {
+    for (int cap = costs[i]; cap <= capacity; cap += 1) {
+        dp[cap] = max(dp[cap], dp[cap - costs[i]] + prices[i]);
+    }
 }
 ```

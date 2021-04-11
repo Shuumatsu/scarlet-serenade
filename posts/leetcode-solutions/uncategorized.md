@@ -3,41 +3,6 @@ title: 'LeetCode Solutions | Uncategorized'
 ---
 
 
-#### 1110. Delete Nodes And Return Forest
-
-use a param to indicate if it will be a root
-
-#### 1122. Relative Sort Array
-
-sort
-
----
-
-use a sort len of 1001 to store counts in arr1, loop arr2 to place to target arr, then result of the numbers in arr to target arr
-
-#### :a[1143. Longest Common Subsequence]{href=https://leetcode.com/problems/longest-common-subsequence/}
-
-memoized recursion / dp
-
-#### :a[1175. Prime Arrangements]{href=https://leetcode.com/problems/prime-arrangements/}
-
-先筛出范围内有多少个素数，再利用全排列公式得到结果 primes_c! * (n - primes_c)!
-
-#### :a[1214. Two Sum BSTs]{href=https://leetcode.com/problems/two-sum-bsts/}
-
-convert one tree to hashset
-
----
-
-two pointers, from the smallest value of root1 and greatest value of root2; need to do iterative inorder traversal
-
-> :a[https://leetcode.com/problems/two-sum-bsts/discuss/397624/Simple-Stack-Solution]{href=https://leetcode.com/problems/two-sum-bsts/discuss/397624/Simple-Stack-Solution}
-
-#### :a[1239. Maximum Length of a Concatenated String with Unique Characters]{href=https://leetcode.com/problems/maximum-length-of-a-concatenated-string-with-unique-characters/}
-
-对于字符数组 arr 中的每个字符串都只有两个选择：要么加入到最后的结果串，要么不加入。则可以将我们的决策看作一个二叉树，假设往左分支走是加入当前字符串，往右分支走就不加入当前字符串。然后深搜即可。
-
-
 #### 1353. Maximum Number of Events That Can Be Attended
 
 贪心的想法，每次我们取最快要过期的那个 event1，称为 Schedule 1

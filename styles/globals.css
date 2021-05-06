@@ -39,5 +39,5 @@ hr {
 
 pre,
 code {
-    font-family: 'Iosevka Web';
+    font-family: 'ui-monospace', 'Cascadia Mono', 'Iosevka Web';
 }

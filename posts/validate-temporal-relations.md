@@ -83,6 +83,15 @@ Only functions with the same or fewer required predecessor events can be passed 
 let bounded (fn: event_a + event_b) = (* do something *)
 ```
 
+---
+
+We can restric the function maybe called by add restriction on the params.
+
+Only functions with the same or fewer required predecessor events can be passed in
+```ocaml
+let bounded (fn: event_a + event_b) = (* do something *)
+```
+
 ```ocaml
 val cb_for_click_event: (() -> (), [click_event])
 let cb_for_click_event () = (* do something *)
@@ -92,6 +101,8 @@ let _ = register_blur_event cb_for_click_event (* error *)
 ```
 
 If possible, we could have some improvements, like dependent type support. Instead of having `register_click_event` and `register_blur_event`, we could have a generic function `register`, that automatically infer the callback type from the event param.
+
+---
 
 we start from the main function of the program, we do context-sensitive pointer analysis on every possible execution path.
 

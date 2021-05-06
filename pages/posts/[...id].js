@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import rehype from 'rehype-react'
 import CodeBlock from '../../components/CodeBlock'
 import Indent from '../../components/Indent'
-import Math from '../../components/Math'
+import Equation from '../../components/Math'
 import { getAllPostIds, getPostData } from '../../lib/posts'
 import typography from '../../lib/post_typography'
 import theme from '../../lib/theme'
@@ -29,7 +29,7 @@ const renderAst = new rehype({
             const Component = inline ? 'code' : CodeBlock
             return <Component {...props}></Component>
         },
-        math: props => <Math {...props}></Math>,
+        math: props => <Equation {...props}></Equation>,
         img: props => <Image layout="intrinsic" {...props}></Image>,
         indent: props => <Indent {...props}></Indent>,
     },

@@ -9,13 +9,11 @@ Note: there is no requirement that the Turing Machine should halt for strings no
 
 A language is Decidable iff there is a Turing Machine which will accept strings in the language and reject strings not in the language.
 
-显然，一个他图灵课判定的语言的补也是图灵可判定的
+显然，一个图灵可判定的语言的补也是图灵可判定的
 
 如果一个语言是图灵可识别的语言的补集，则我们称它为补图灵可识别的
 
 ---
-
-我们可以有一个图灵机 $U$ 对于输入 $<M, w>$ 在 $M$ 上模拟 $w$，若 M 进入接收状态，则接受，若 M 进入拒绝状态
 
 为了解决无限集之间规模大小的问题，Cantor 引入了一种不基于计数的方法来确定无限集间的相对规模：对于两个无限集合 A 和 B，若存在之间的一个双射 f，则称 A 于 B 有相同的规模
 
@@ -45,7 +43,7 @@ A language is Decidable iff there is a Turing Machine which will accept strings 
 
 ---
 
-对任意字母表，其上所有串的集合是可数的。因为固定长度的串来说，其数量是有限的，我们可以先协下长度为 1 的串，再写下长度为 2 的串，依次类推从而得到一个排列
+对任意字母表，其上所有串的集合是可数的。因为固定长度的串来说，其数量是有限的，我们可以先写下长度为 1 的串，再写下长度为 2 的串，依次类推从而得到一个排列
 
 ---
 
@@ -75,4 +73,4 @@ A language is Decidable iff there is a Turing Machine which will accept strings 
 正向的证明是显然的，我们考虑逆向
 $A$ 与 $~A$ 都是图灵可识别的，令 $M_1$ 为 $A$ 的识别器，$M_2$ 为 $~A$ 的识别器。我们可用 $M_1$ 与 $M_2$ 构造 $A$ 的判定器 $M$，对于输入 $w$：
 $M$ 在输入 $w$ 上平行的运行 $M_1$ 与 $M_2$，(平行指的是，M有两个纸带，一个模拟 M_1 一个模拟 M_2 直到其中一个停机)
-若 $M_1$ 输出接受，则 $M$ 输出接受，$M_2$ 输出接受，则 $M$ 输出拒绝。$w$ 比属于 $A$ 或 $~A$ 中的一个，则 $A$ 与 $~A$ 中必有一个输出接受，则 $M$ 必停机
+若 $M_1$    输出接受，则 $M$ 输出接受，$M_2$ 输出接受，则 $M$ 输出拒绝。$w$ 比属于 $A$ 或 $~A$ 中的一个，则 $A$ 与 $~A$ 中必有一个输出接受，则 $M$ 必停机
